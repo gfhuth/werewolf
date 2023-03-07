@@ -41,7 +41,7 @@ drawio:
     - git config user.name "CI Runner DrawIO"
     - git config user.email "ci_runner@nothing.org"
     - git commit -m "[skip ci] DrawIO rendering"
-    - git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git
+    - git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git HEAD:master
     
 
 deploy-job:      # This job runs in the deploy stage.
