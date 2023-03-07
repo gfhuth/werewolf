@@ -1,7 +1,8 @@
 stages:          # List of stages for jobs, and their order of execution
+  - testRUNNER
   - build
   - test
-  - lint
+  #- lint
   - deploy
 
 build-job:       # This job runs in the build stage, which runs first.
@@ -27,6 +28,17 @@ eslint:
     # Run eslint
     - node_modules/eslint/bin/eslint.js ./client/
     - node_modules/eslint/bin/eslint.js ./server/
+
+
+
+testRUNNER:
+  stage: test
+  image: node
+  script:
+    - cd documentation/client/
+    - mkdir out
+    - ls documentation/client/out
+    
 
 
 drawio:
