@@ -23,6 +23,7 @@ eslint:
   script:
     # Install eslint
     - npm install eslint
+    - yarn add typescript
     - yarn add --dev @gitlab/eslint-plugin @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-plugin-jsx-a11y
     # Run eslint
     - node_modules/eslint/bin/eslint.js ./client/
@@ -31,17 +32,10 @@ eslint:
 
 drawio:
   stage: lint
-  image: node:latest
+  image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
   script:
-    - git clone --recursive https://github.com/jgraph/drawio-desktop.git
-    - ls #TODO DELETE THIS LINE
-    - cd drawio-desktop
-    - ls #TODO DELETE THIS LINE
-    - npm install
-    - cd drawio
-    - npm install
-    - cd ..
-    - npm start
+    - drawio --export -f png --crop --output documentation/client/out/ documentation/client/
+    
    
 
 
