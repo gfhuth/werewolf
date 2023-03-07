@@ -3,6 +3,7 @@ stages:          # List of stages for jobs, and their order of execution
   - build
   - test
   - lint
+  - drawio
   - deploy
 
 build-job:       # This job runs in the build stage, which runs first.
@@ -31,7 +32,7 @@ eslint:
 
 
 drawio:
-  stage: lint
+  stage: drawio
   image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
   script:
     - mkdir documentation/client/out
