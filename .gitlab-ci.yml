@@ -25,11 +25,8 @@ eslint:
     - npm install eslint
     - yarn add --dev @gitlab/eslint-plugin
     # Run eslint
-    - cd client
-    - node_modules/eslint/bin/eslint.js .
-    - cd ..
-    - cd server
-    - node_modules/eslint/bin/eslint.js .
+    - node_modules/eslint/bin/eslint.js ./client/
+    - node_modules/eslint/bin/eslint.js ./server/
 
 
 drawio:
@@ -37,8 +34,9 @@ drawio:
   image: node:latest
   script:
     - git clone --recursive https://github.com/jgraph/drawio-desktop.git
-    - ls
-    - cd drawio
+    - ls #TODO DELETE THIS LINE
+    - cd drawio-desktop
+    - ls #TODO DELETE THIS LINE
     - npm install
     - cd src/main/webapp
     - npm install
