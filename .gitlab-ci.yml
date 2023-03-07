@@ -30,22 +30,11 @@ eslint:
     - node_modules/eslint/bin/eslint.js ./server/
 
 
-
-testRUNNER:
-  stage: test
-  image: node
-  script:
-    - mkdir documentation/client/out
-    - ls documentation/client/out
-    
-
-
 drawio:
   stage: lint
   image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
   script:
-    - cd documentation/client/
-    - mkdir out
+    - mkdir documentation/client/out
     - drawio --export -f png --crop --output documentation/client/out documentation/client/
     - ls documentation/client/out
     - git add documentation/client/out/*
@@ -54,9 +43,6 @@ drawio:
     - git commit -m "[skip ci] DrawIO rendering"
     - git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git
     
-   
-
-
 
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
