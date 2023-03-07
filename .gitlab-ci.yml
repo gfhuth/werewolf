@@ -33,8 +33,8 @@ drawio:
   stage: lint
   image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
   script:
-    - ls documentation/client/out/
-    - drawio --export --crop --output documentation/client/out/ documentation/client/
+    - ls documentation/client/
+    - drawio --export -f png --crop --output documentation/client/ documentation/client/
     - ls documentation/client/out/
    # - xvfb-run -a /opt/drawio/drawio --export -f png --crop --output documentation/client/out/ documentation/client/
   #  - git add documentation/client/out/*
