@@ -35,8 +35,7 @@ testRUNNER:
   stage: test
   image: node
   script:
-    - cd documentation/client/
-    - mkdir out
+    - mkdir documentation/client/out
     - ls documentation/client/out
     
 
