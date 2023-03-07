@@ -23,7 +23,7 @@ eslint:
   script:
     # Install eslint
     - npm install eslint
-    - yarn add --dev @gitlab/eslint-plugin
+    - yarn add --dev @gitlab/eslint-plugin @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-plugin-jsx-a11y
     # Run eslint
     - node_modules/eslint/bin/eslint.js ./client/
     - node_modules/eslint/bin/eslint.js ./server/
