@@ -31,9 +31,9 @@ eslint:
 
 drawio:
   stage: lint
-  image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
+  image: docker:stable
   script:
-    - drawio --export -f png --crop --output documentation/client/out/ documentation/client/
+    - docker run --rm -w ./ -v $PWD:/ docker-registry.univ-nantes.fr/bousse-e/docker-drawio drawio --export -f png --crop --output documentation/client/out/ documentation/client/
     - git add documentation/client/out/*
     - git config user.name "CI Runner DrawIO"
     - git config user.email "ci_runner@nothing.org"
