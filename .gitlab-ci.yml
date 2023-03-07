@@ -22,7 +22,7 @@ eslint:
   image: node
   script:
     # Install eslint
-    - npm install -g eslint
+    - npm install eslint
     - yarn add --dev @gitlab/eslint-plugin
     # Run eslint
     - cd client
