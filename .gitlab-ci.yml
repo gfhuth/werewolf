@@ -37,6 +37,7 @@ drawio:
     - mkdir documentation/client/out
     - drawio --export -f png --crop --output documentation/client/out documentation/client/
     - ls documentation/client/out
+    - git checkout main
     - git add documentation/client/out/*
     - git config user.name "CI Runner DrawIO"
     - git config user.email "ci_runner@nothing.org"
