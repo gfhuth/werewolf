@@ -35,7 +35,7 @@ drawio:
   script:
     - ls documentation/client/
     - drawio --export -f png --crop --output documentation/client/ documentation/client/
-    - ls documentation/client/out/
+    - ls documentation/client/
    # - xvfb-run -a /opt/drawio/drawio --export -f png --crop --output documentation/client/out/ documentation/client/
   #  - git add documentation/client/out/*
    # - git config user.name "CI Runner DrawIO"
