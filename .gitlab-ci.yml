@@ -33,15 +33,15 @@ drawio:
   stage: lint
   image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
   script:
-    - ls documentation/client/
-    - drawio --export -f png --crop --output documentation/client/ documentation/client/
-    - ls documentation/client/
-   # - xvfb-run -a /opt/drawio/drawio --export -f png --crop --output documentation/client/out/ documentation/client/
-  #  - git add documentation/client/out/*
-   # - git config user.name "CI Runner DrawIO"
-   # - git config user.email "ci_runner@nothing.org"
-    #- git commit -m "DrawIO rendering"
-    #- git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git
+    - cd documentation/client/
+    - mkdir out
+    - drawio --export -f png --crop --output documentation/client/out documentation/client/
+    - ls documentation/client/out
+    - git add documentation/client/out/*
+    - git config user.name "CI Runner DrawIO"
+    - git config user.email "ci_runner@nothing.org"
+    - git commit -m "[skip ci] DrawIO rendering"
+    - git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git
     
    
 
