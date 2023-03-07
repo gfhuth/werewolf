@@ -38,9 +38,9 @@ drawio:
     - cd drawio-desktop
     - ls #TODO DELETE THIS LINE
     - npm install
-    - cd src/main/webapp
+    - cd drawio
     - npm install
-    - cd ../../..
+    - cd ..
     - npm start
    
 
