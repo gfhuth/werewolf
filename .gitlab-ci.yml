@@ -31,11 +31,13 @@ eslint:
     - node_modules/eslint/bin/eslint.js ./server/
 
 
-drawio:
+drawio:on-schedule:
   stage: drawio
   image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
   script:
-    - mkdir documentation/client/out
+    - mkdir -p documentation/client/out
     - drawio --export -f png --crop --output documentation/client/out documentation/client/
     - ls documentation/client/out
     - git checkout main
