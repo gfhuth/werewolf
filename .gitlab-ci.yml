@@ -2,8 +2,7 @@ stages:          # List of stages for jobs, and their order of execution
   # - buildAndTest
   # - lint
   # - drawio
-  # - deploy
-  - badges
+  - deploy
 
 # build-job:       # This job runs in the build stage, which runs first.
 #   stage: buildAndTest
