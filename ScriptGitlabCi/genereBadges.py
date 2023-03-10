@@ -11,9 +11,9 @@ NBDIAGRAMSGENERE=subprocess.run("ls documentation/client/out | wc -l", shell=Tru
 #On regarde s'il y a une difference
 if NBDIAGRAMS != NBDIAGRAMSGENERE:
     color = "red"
-    message = Erreurs diagrammes
+    message = "Erreurs diagrammes"
 else:
-    message = Diagrammes OK
+    message = "Diagrammes OK"
 
 
 
