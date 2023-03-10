@@ -4,6 +4,7 @@ stages:          # List of stages for jobs, and their order of execution
   - lint
   - drawio
   - deploy
+  - badges
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
@@ -61,3 +62,22 @@ deploy-job:      # This job runs in the deploy stage.
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
+
+
+
+badges:
+  stage: deploy
+  script:
+    - apt-get update #on doit récupérer les paquets
+    - apt-get install python -y #on installe python en disant bien "yes" lorsqu'on aura la question (-y)
+    - apt-get install python3-pip -y #on installe pip3 qui va nous servir à installer anybadge
+    - pip3 install anybadge #on installe anybadge
+    - python genereBadges.py # Script de génération des badges
+  dependencies:         # Les badges sont générés à partir des rapports s'ils sont disponibles
+    #NONE
+  artifacts:
+    paths:
+        # Ces fichiers sont générés par le script genereBadges.sh
+      - drawio.svg    # et mis à disposition pour mise en évidence sur la page du dépôt
+  when: always          # Et quoiqu'il arrive la génération des badges devra se faire.
+                        # Le script de génération de badge doit tenir compte du fait de disposer ou non des rapports 
