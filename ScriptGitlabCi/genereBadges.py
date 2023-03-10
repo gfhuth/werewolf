@@ -30,7 +30,7 @@ elif NBWARN > 0:
 
 
 #on appelle anybadge pour faire un badge .svg
-#subprocess.run(f"""anybadge -o -l \"Drawio\" -v \"{NBERR} erreur {NBWARN} warning\" -c \"{color}\" -f \"drawio.svg\"""", shell=True, check=True)
-subprocess.run(['anybadge', '-o', '-l', 'Drawio', '-v', NBERR, 'erreur', NBWARN, 'warning','-c', color,'-f', 'drawio.svg'], shell=True, check=True)
+subprocess.run(f"""anybadge -o -l \"Drawio\" -v \"{NBERR} erreur {NBWARN} warning\" -c \"{color}\" -f \"drawio.svg\"""", shell=True, check=True)
+
 
  
