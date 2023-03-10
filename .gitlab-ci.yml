@@ -72,7 +72,7 @@ badges:
     - apt-get install python -y #on installe python en disant bien "yes" lorsqu'on aura la question (-y)
     - apt-get install python3-pip -y #on installe pip3 qui va nous servir à installer anybadge
     - pip3 install anybadge #on installe anybadge
-    - python other/genereBadges.py # Script de génération des badges
+    - python CI&CD/genereBadges.py # Script de génération des badges
   dependencies:         # Les badges sont générés à partir des rapports s'ils sont disponibles
     #NONE
   artifacts:
