@@ -1,65 +1,65 @@
 stages:          # List of stages for jobs, and their order of execution
-  # - buildAndTest
-  # - lint
-  # - drawio
+  - buildAndTest
+  - lint
+  - drawio
   - deploy
 
-# build-job:       # This job runs in the build stage, which runs first.
-#   stage: buildAndTest
-#   script:
-#     - echo "Compiling the code..."
-#     - echo "Compile complete."
+build-job:       # This job runs in the build stage, which runs first.
+  stage: buildAndTest
+  script:
+    - echo "Compiling the code..."
+    - echo "Compile complete."
 
-# unit-test-job:   # This job runs in the test stage.
-#   stage: buildAndTest    # It only starts when the job in the build stage completes successfully.
-#   script:
-#     - echo "Running unit tests... This will take about 60 seconds."
-#     - echo "Code coverage is 90%"
+unit-test-job:   # This job runs in the test stage.
+  stage: buildAndTest    # It only starts when the job in the build stage completes successfully.
+  script:
+    - echo "Running unit tests... This will take about 60 seconds."
+    - echo "Code coverage is 90%"
 
-# eslint:
-#   stage: lint
-#   image: node
-#   script:
-#     # Install eslint
-#     - npm install eslint
-#     - yarn add typescript
-#     - yarn add --dev @gitlab/eslint-plugin @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-plugin-jsx-a11y
-#     # Run eslint
-#     - node_modules/eslint/bin/eslint.js ./client/
-#     - node_modules/eslint/bin/eslint.js ./server/
-
-
-# drawio:on-schedule:
-#   stage: drawio
-#   image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
-#   rules:
-#     - if: $CI_PIPELINE_SOURCE == "schedule"
-#   script:
-#       #configuration de git
-#     - git checkout main
-#     - git pull
-#     - git config user.name "CI Runner DrawIO"
-#     - git config user.email "ci_runner@nothing.org"
-#     - mkdir -p documentation/client/out
-#     #Génération des images avec drawio
-#     - drawio --export -f svg --crop --output documentation/client/out documentation/client/
-#     - drawio --export -f svg --crop --output documentation/server/out documentation/server/
-#     #on ajoute les images et commit/push
-#     - git add documentation/client/out/*
-#     - git add documentation/server/out/*
-#     - if [ $(git status | grep "nothing to commit" | wc -l) == "0" ]; then
-#     - git commit -m "[skip ci] DrawIO rendering"
-#     - git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git 
-#     - else echo "No changes, ignoring commit"
-#     - fi;
+eslint:
+  stage: lint
+  image: node
+  script:
+    # Install eslint
+    - npm install eslint
+    - yarn add typescript
+    - yarn add --dev @gitlab/eslint-plugin @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-plugin-jsx-a11y
+    # Run eslint
+    - node_modules/eslint/bin/eslint.js ./client/
+    - node_modules/eslint/bin/eslint.js ./server/
 
 
-# deploy-job:      # This job runs in the deploy stage.
-#   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
-#   environment: production
-#   script:
-#     - echo "Deploying application..."
-#     - echo "Application successfully deployed."
+drawio:on-schedule:
+  stage: drawio
+  image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  script:
+      #configuration de git
+    - git checkout main
+    - git pull
+    - git config user.name "CI Runner DrawIO"
+    - git config user.email "ci_runner@nothing.org"
+    - mkdir -p documentation/client/out
+    #Génération des images avec drawio
+    - drawio --export -f svg --crop --output documentation/client/out documentation/client/
+    - drawio --export -f svg --crop --output documentation/server/out documentation/server/
+    #on ajoute les images et commit/push
+    - git add documentation/client/out/*
+    - git add documentation/server/out/*
+    - if [ $(git status | grep "nothing to commit" | wc -l) == "0" ]; then
+    - git commit -m "[skip ci] DrawIO rendering"
+    - git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git 
+    - else echo "No changes, ignoring commit"
+    - fi;
+
+
+deploy-job:      # This job runs in the deploy stage.
+  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  environment: production
+  script:
+    - echo "Deploying application..."
+    - echo "Application successfully deployed."
 
 
 
