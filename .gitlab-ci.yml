@@ -48,6 +48,7 @@ drawio:on-schedule:
     - ls documentation/client/out
     #on ajoute les images et commit/push
     - git add documentation/client/out/*
+    - if[git status | grep "nothing to commit" | wc -l == "1"]; then exit 0 ; fi
     - git commit -m "[skip ci] DrawIO rendering"
     - git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git 
     
