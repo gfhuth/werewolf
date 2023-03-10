@@ -43,7 +43,7 @@ drawio:on-schedule:
     - git config user.email "ci_runner@nothing.org"
     - mkdir -p documentation/client/out
     #Génération des images avec drawio
-    - drawio --export -f png --crop --output documentation/client/out documentation/client/
+    - drawio --export -f svg --crop --output documentation/client/out documentation/client/
     - ls documentation/client/out
     #on ajoute les images et commit/push
     - git add documentation/client/out/*
