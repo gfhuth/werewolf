@@ -68,9 +68,10 @@ badges:
   script:
     - apt-get update #on doit récupérer les paquets
     - apt-get install python3 -y #on installe python en disant bien "yes" lorsqu'on aura la question (-y)
+    - python3 -V #Check the version of Python
     - apt-get install python3-pip -y #on installe pip3 qui va nous servir à installer anybadge
     - pip3 install anybadge #on installe anybadge
-    - python ScriptGitlabCi/genereBadges.py # Script de génération des badges
+    - python3 ScriptGitlabCi/genereBadges.py # Script de génération des badges
   dependencies:         # Les badges sont générés à partir des rapports s'ils sont disponibles
     #NONE
   artifacts:
