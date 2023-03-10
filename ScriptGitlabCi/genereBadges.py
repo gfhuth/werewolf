@@ -23,7 +23,7 @@ elif NBWARN > 0:
 
 
 #on appelle anybadge pour faire un badge .svg
-args = f"anybadge -o -l \"Drawio\" -v \"{NBERR} erreur {NBWARN} warning\" -c \"{color}\" -f \"drawio.svg\""
+args = f"anybadge -o -l \"Drawio\" -v \"{NBERR} erreur {NBWARN} warning\" -c \"{color}\" -f \"drawio.svg\"
 subprocess.run(args, shell=True, check=True)
 
  
