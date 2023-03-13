@@ -1,1 +1,1 @@
-Diagrams UML pour le client
+Diagrams UML pour le serveur
