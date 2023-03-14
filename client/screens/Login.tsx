@@ -3,6 +3,7 @@ import { Button, StyleSheet, Text, View } from "react-native";
 import { useNavigation, Link } from "@react-navigation/native";
 import Home from "./Home";
 import { StackNavigation } from "../App";
+import { TextInput } from "react-native-gesture-handler";
 
 const styles = StyleSheet.create({
     container: {
@@ -23,7 +24,8 @@ export default function Login() {
     return (
         <View style={styles.container}>
             <Text>It's time to log in!</Text>
-            <StatusBar style="auto" />
+            <TextInput />
+            <TextInput secureTextEntry />
             <Button onPress={verifyUserAndPass} title="Login" />
         </View>
     );
