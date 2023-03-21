@@ -9,8 +9,9 @@ import { API_BASE_URL } from "@env";
 const styles = StyleSheet.create({
     box: {
         borderRadius: 10,
-        border: "5px solid #000000",
-        padding: "2rem"
+        border: "5px solid #FFFFFF",
+        padding: "2rem",
+        textAlign: "center"
     }
 });
 

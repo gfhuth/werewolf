@@ -28,9 +28,13 @@ const styles = StyleSheet.create({
     },
     texte: {
         flex: 1,
-        color: "white"
+        color: "white",
+        fontFamily: "pixel",
+        fontSize: 25
     },
     TextInput: {
+        
+        marginTop: 10,
         backgroundColor: "#fff"
     }
 });
@@ -59,8 +63,8 @@ export default function Login() {
 
                 <Box>
                     <Text style={styles.texte}>Login</Text>
-                    <TextInput aria-label="Login" ref={userInputRef} style={styles.TextInput}/>
-                    <TextInput aria-label="Mot de passe" ref={passInputRef} secureTextEntry />
+                    <TextInput placeholder="Login" aria-label="Login" ref={userInputRef} style={styles.TextInput}/>
+                    <TextInput placeholder="Mot de passe" aria-label="Mot de passe" ref={passInputRef} style={styles.TextInput} secureTextEntry />
                     <Button onPress={verifyUserAndPass} title="Login" />
                 </Box>
 
