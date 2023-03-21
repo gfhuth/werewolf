@@ -4,7 +4,7 @@ import NavigationUI from "../components/NavigationUI";
 export default function Settings() {
     return (
         <Background>
-            <NavigationUI allowBack={false} />
+            <NavigationUI allowBack />
         </Background>
     );
 }
