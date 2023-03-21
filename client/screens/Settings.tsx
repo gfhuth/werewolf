@@ -1,3 +1,10 @@
+import Background from "../components/Background";
+import NavigationUI from "../components/NavigationUI";
+
 export default function Settings() {
-    return <></>;
+    return (
+        <Background>
+            <NavigationUI allowBack={false} />
+        </Background>
+    );
 }
