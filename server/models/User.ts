@@ -1,12 +1,14 @@
 class User {
+
     private userName: string;
-    private isConnected: boolean = false;
+    private isConnected = false;
 
     constructor(userName: string) {
-      this.userName = userName;
+        this.userName = userName;
     }
-  
+
     public getStatus(): boolean {
-      return this.isConnected;
+        return this.isConnected;
     }
+
 }
