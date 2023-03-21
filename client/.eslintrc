@@ -166,7 +166,7 @@
         ],
         "no-array-constructor": "error",
         "no-bitwise": "warn",
-        "no-inline-comments": "error",
+        "no-inline-comments": "off",
         "no-multiple-empty-lines": [
             "error",
             {
