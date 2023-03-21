@@ -2,6 +2,8 @@ import { NavigationContainer, NavigationProp } from "@react-navigation/native";
 import Home from "./screens/Home";
 import Login from "./screens/Login";
 import { createStackNavigator } from "@react-navigation/stack";
+import { UserProvider } from "./context/UserContext";
+import { SettingsProvider } from "./context/SettingsContext";
 
 export type StackParamList = {
     Home: undefined;
@@ -21,8 +23,12 @@ function MyStack() {
 
 export default function App() {
     return (
-        <NavigationContainer>
-            <MyStack />
-        </NavigationContainer>
+        <SettingsProvider>
+            <UserProvider>
+                <NavigationContainer>
+                    <MyStack />
+                </NavigationContainer>
+            </UserProvider>
+        </SettingsProvider>
     );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export const SettingsContext = React.createContext<{
+export const UserContext = React.createContext<{
     token: string;
     setToken:(token: string) => void;
     username: string;
@@ -12,9 +12,9 @@ export const SettingsContext = React.createContext<{
             setUsername: () => null
         });
 
-export function SettingsProvider(props: { children: React.ReactNode }) {
+export function UserProvider(props: { children: React.ReactNode }) {
     const [token, setToken] = useState("");
     const [username, setUsername] = useState("");
 
-    return <SettingsContext.Provider value={{ token, setToken, username, setUsername }}>{props.children}</SettingsContext.Provider>;
+    return <UserContext.Provider value={{ token, setToken, username, setUsername }}>{props.children}</UserContext.Provider>;
 }
