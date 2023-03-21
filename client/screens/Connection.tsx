@@ -6,11 +6,7 @@ import { StackNavigation } from "../App";
 import { TextInput } from "react-native-gesture-handler";
 import { useRef, useState } from "react";
 import { API_BASE_URL } from "@env";
-import Counter from "../components/Counter";
 import Box from "../components/Box";
-
-
-const image = { uri: './assets/pxArt_6.png' };
 
 const styles = StyleSheet.create({
     container: {
@@ -33,9 +29,13 @@ const styles = StyleSheet.create({
         fontSize: 25
     },
     TextInput: {
-
+        height: "2rem",
         marginTop: 10,
-        backgroundColor: "#fff"
+        backgroundColor: "#fff",
+        paddingLeft: 10
+    },
+    Button: {
+        marginTop: 10
     }
 });
 
@@ -74,7 +74,7 @@ export default function Login() {
                             <TextInput placeholder="Login" aria-label="Login" ref={userInputRef} style={styles.TextInput} />
                             <TextInput placeholder="Mot de passe" aria-label="Mot de passe" ref={passInputRef} style={styles.TextInput} secureTextEntry />
                             <Button onPress={verifyUserAndPass} title="Login" />
-                            <Text style={{ color: 'white', marginTop: 4}}
+                            <Text style={{ color: 'white', marginTop: 4 }}
                                 onPress={() => setLoginOrRegister(loginOrRegister + 1)}>
                                 Vous n'avez pas de compte, Enregistez vous!
                             </Text></> :
@@ -83,12 +83,12 @@ export default function Login() {
                             <TextInput placeholder="Pseudo" aria-label="Pseudo" ref={pseudoInputRef} style={styles.TextInput} />
                             <TextInput placeholder="Mot de passe" aria-label="Mot de passe" ref={passInputRef} style={styles.TextInput} secureTextEntry />
                             <Button onPress={registerUser} title="Register" />
-                            
+
                             <Text style={{ color: 'white', marginTop: 4 }}
                                 onPress={() => setLoginOrRegister(loginOrRegister - 1)}>
                                 Vous avez deja un compte, Connectez vous!
                             </Text></>
-                            
+
                     }
                 </Box>
             </ImageBackground>
