@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         fontSize: 25
     },
     TextInput: {
-        height: "2rem",
+        height: 30,
         marginTop: 10,
         backgroundColor: "#fff",
         paddingLeft: 10
