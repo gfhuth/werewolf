@@ -11,6 +11,7 @@ export const getToken = async (req: Request, res: Response) => {
             password: password
         },
         "secret"
+        // le secret est a generer par u
     );
 
     res.status(200).json({
