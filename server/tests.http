@@ -1,0 +1,27 @@
+### GET token
+POST http://{{baseUrl}}/auth HTTP/1.1
+content-type: application/json
+
+{
+    "username": "carrereb",
+    "password": "AZERTY1234"
+}
+
+### GET token
+GET http://{{baseUrl}}/getjwtDeleg/Bruno HTTP/1.1
+
+### GET whoami
+GET http://{{baseUrl}}/whoami HTTP/1.1
+x-access-token: {{token}}
+
+### GET users
+GET http://{{baseUrl}}/api/users/ HTTP/1.1
+x-access-token: {{token}}
+
+### POST user
+POST http://{{baseUrl}}/api/users/ HTTP/1.1
+content-type: application/json
+
+{
+    "username": "Bruno"
+}
