@@ -22,6 +22,7 @@ export const getToken = async (req: Request, res: Response) => {
             username: username,
             password: password
         },
+        // le secret est a generer par u
         "secret",
         { algorithm: "RS256" }
     );
