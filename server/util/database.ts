@@ -11,7 +11,13 @@ const db = new Kysely<Database>({
 
 export const createSchema = async (): Promise<void> => {
     // connection.exec(fs.readFileSync(`${__dirname}/sql/schema.sql`).toString());
-    await db.schema.createTable("users").addColumn("id", "integer").addColumn("username", "text").addColumn("password", "text").execute();
+    await db.schema
+        .createTable("users")
+        .ifNotExists()
+        .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
+        .addColumn("username", "text", (col) => col.unique())
+        .addColumn("password", "text")
+        .execute();
     console.log(await db.insertInto("users").values({ username: "Bruno", password: "1234" }).returning("id").executeTakeFirstOrThrow());
 };
 
