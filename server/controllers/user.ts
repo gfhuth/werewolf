@@ -1,33 +1,34 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
+const { JWT_TOKEN } = process.env;
 
-function validToken(token) {
-    const isValid: boolean = jwt.verify(token, "secret", { algorithms: ["RS256"] });
+function getTokenContent(token): {username:string} {
+    const isValid = jwt.verify(token, JWT_TOKEN);
     if (!isValid) throw new Error("Invalid Token !");
 
-    const username = jwt.decode(token, "secret", { algorithms: ["RS256"] }).username;
-    const password = jwt.decode(token, "secret", { algorithms: ["RS256"] }).password;
+    const username = (jwt.decode(token) as {username:string}).username;
     return {
-        username: username,
-        password: password
+        username: username
     };
 }
 
-export const getToken = async (req: Request, res: Response) => {
+export const getToken = async (req: Request, res: Response): Promise<void> => {
     const username: string = req.body.username;
-    const password: string = req.body.password;
 
     const token: string = jwt.sign(
         {
-            username: username,
-            password: password
+            username: username
         },
         // le secret est a generer par u
-        "secret",
-        { algorithm: "RS256" }
+        JWT_TOKEN
     );
 
     res.status(200).json({
         token: token
     });
+};
+
+export const whoAmI = async (req: Request, res: Response): Promise<void> => {
+    const username = getTokenContent(req.headers["x-access-token"]);
+    res.json({ data: username });
 };

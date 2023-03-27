@@ -1,10 +1,12 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-import mysql from "mysql";
+import { createSchema } from "./util/database";
 
 import { getToken } from "./controllers/user";
 import gameRouter from "./routers/game";
+
+createSchema();
 
 const app = express();
 app.use(express.json());
@@ -20,4 +22,3 @@ app.post("/auth", getToken);
 app.listen(3000, () => {
     console.log("The application is listening on port https://localhost:3000");
 });
-
