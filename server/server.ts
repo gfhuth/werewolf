@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import { createSchema } from "./util/database";
-import { getToken, whoAmI } from "./controllers/user";
+import { login, whoAmI, register } from "./controllers/user";
 import gameRouter from "./routers/game";
 
 createSchema();
@@ -12,11 +12,9 @@ app.use(express.json());
 app.use("/game", gameRouter);
 
 //START move this part in routers/user.ts
-app.get("/", (req, res) => {
-    res.send("This is a test web page!");
-});
-app.post("/user/login", getToken);
+app.post("/user/login", login);
 app.get("/user/whoami", whoAmI);
+app.post("/user/register", register);
 // END PART TO MOVE
 
 app.listen(3000, () => {
