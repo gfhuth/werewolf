@@ -1,6 +1,11 @@
 {
     "editor.tabSize": 4,
     "editor.detectIndentation": false,
+    "files.exclude": {
+        "**/.*rc": true,
+        "**/*config.*": true,
+        "**/*.lock": true
+    },
     "todo-tree.general.tags": [
         "BUG",
         "NOTSURE",
