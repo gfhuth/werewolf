@@ -2,10 +2,11 @@ import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import database from "../util/database";
+import { insertUser } from "../models/userModel";
 
 const { JWT_SECRET } = process.env;
 
-function getTokenContent(token): { username: string } {
+function getTokenContent(token: string): { username: string } {
     const isValid = jwt.verify(token, JWT_SECRET);
     if (!isValid) throw new Error("Invalid Token !");
 
@@ -57,8 +58,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
 export const whoAmI = async (req: Request, res: Response): Promise<void> => {
     try {
-        const username: string = getTokenContent(req.headers["x-access-token"]).username;
-        res.json({ username: username });
+        const username: string = getTokenContent(req.headers["x-access-token"] as string).username;
+        res.status(200).json({ username: username });
     } catch (e) {
         res.sendStatus(400);
     }
@@ -78,10 +79,18 @@ export const register = async (req: Request<any, any, { username: string; passwo
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    //TODO: vérifier que l'utilisateur n'existe pas déjà
-
+    // On s'assure que le nom d'utilisateur n'est pas déjà utilisé
     try {
-        await database.insertInto("users").values({ username: username, password: hashPassword }).execute();
+        const user = (await database.selectFrom("users").select(["username"]).where("username", "=", username).executeTakeFirstOrThrow()).username;
+        if (user) {
+            res.status(409).send("User already exists");
+            return;
+        }
+    } catch (e) {}
+
+    // Insertion de l'utilisateur dans la base de données
+    try {
+        insertUser({ username: username, password: hashPassword });
     } catch (e) {
         res.sendStatus(500);
     }
