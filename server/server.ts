@@ -20,4 +20,3 @@ app.post("/auth", getToken);
 app.listen(3000, () => {
     console.log("The application is listening on port https://localhost:3000");
 });
-
