@@ -6,11 +6,8 @@ content-type: application/json
     "username": "carrereb"
 }
 
-### GET token
-GET http://{{baseUrl}}/getjwtDeleg/Bruno HTTP/1.1
-
 ### GET whoami
-GET http://{{baseUrl}}/whoami HTTP/1.1
+GET http://{{baseUrl}}/user/whoami HTTP/1.1
 x-access-token: {{token}}
 
 ### GET users

@@ -2,8 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import { createSchema } from "./util/database";
-
-import { getToken } from "./controllers/user";
+import { getToken, whoAmI } from "./controllers/user";
 import gameRouter from "./routers/game";
 
 createSchema();
@@ -17,6 +16,7 @@ app.get("/", (req, res) => {
     res.send("This is a test web page!");
 });
 app.post("/user/login", getToken);
+app.get("/user/whoami", whoAmI);
 // END PART TO MOVE
 
 app.listen(3000, () => {
