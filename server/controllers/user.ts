@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
-const { JWT_TOKEN } = process.env;
+const { JWT_SECRET } = process.env;
 
 function getTokenContent(token): {username:string} {
-    const isValid = jwt.verify(token, JWT_TOKEN);
+    const isValid = jwt.verify(token, JWT_SECRET);
     if (!isValid) throw new Error("Invalid Token !");
 
     const username = (jwt.decode(token) as {username:string}).username;
@@ -20,7 +20,7 @@ export const getToken = async (req: Request, res: Response): Promise<void> => {
             username: username
         },
         // le secret est a generer par u
-        JWT_TOKEN
+        JWT_SECRET
     );
 
     res.status(200).json({
