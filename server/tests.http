@@ -1,10 +1,9 @@
 ### GET token
-POST http://{{baseUrl}}/auth HTTP/1.1
+POST http://{{baseUrl}}/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "username": "carrereb",
-    "password": "AZERTY1234"
+    "username": "carrereb"
 }
 
 ### GET token
