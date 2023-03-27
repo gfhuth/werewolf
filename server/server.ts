@@ -16,7 +16,7 @@ app.use("/game", gameRouter);
 app.get("/", (req, res) => {
     res.send("This is a test web page!");
 });
-app.post("/auth", getToken);
+app.post("/user/login", getToken);
 // END PART TO MOVE
 
 app.listen(3000, () => {
