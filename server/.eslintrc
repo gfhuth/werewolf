@@ -133,7 +133,7 @@
             }
         ],
         "max-depth": ["warn", 5],
-        "max-len": ["warn", 400, 2],
+        "max-len": ["warn", 200, 2],
         "max-nested-callbacks": [
             "error",
             {
