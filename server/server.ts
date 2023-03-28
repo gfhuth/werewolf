@@ -7,11 +7,18 @@ import gameRouter from "./routers/game";
 import cors from "cors";
 import { newGame } from "./controllers/gameController";
 
+import * as http from "http";
+import * as WebSocket from "ws";
+
+const app = express();
+
+//initialize the WebSocket server instance
+const wss = new WebSocket.Server({ noServer: true });
+
 const { PORT, HOST } = process.env;
 
 createSchema();
 
-const app = express();
 app.use(
     cors({
         origin: true
@@ -33,6 +40,23 @@ app.get("/user/debug", debugUser);
 app.post("/game/new", newGame);
 // END PART TO MOVE
 
-app.listen(parseInt(PORT), HOST, () => {
+wss.on("connection", (ws: WebSocket) => {
+    //connection is up, let's add a simple simple event
+    ws.on("message", (message: string) => {
+        //log the received message and send it back to the client
+        console.log("Received: %s", message);
+        ws.send(`You sent -> ${message}`);
+    });
+    //send immediatly a feedback to the incoming connection
+    ws.send("Hi there, I am a WebSocket server");
+});
+
+const server = app.listen(parseInt(PORT), HOST, () => {
     console.log(`The application is listening on port http://${HOST}:${PORT}`);
+});
+
+server.on("upgrade", (request, socket, head) => {
+    wss.handleUpgrade(request, socket, head, s => {
+        wss.emit("connection", s, request);
+    });
 });
