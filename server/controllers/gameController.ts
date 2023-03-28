@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { Game } from "../models/Game";
 import jwt from 'jsonwebtoken';
+const { JWT_SECRET } = process.env;
 
-export async function searchGame(req: Request, res: Response) {
+export async function searchGame(req: Request, res: Response):Promise<void> {
     //game list from SQLdatabase;
     console.log("aaa");
     try {
@@ -19,7 +20,7 @@ export async function searchGame(req: Request, res: Response) {
                 startDate: new Date("2023-04-27T18:30:00"),
                 percentWereWolf: 0.3,
                 proba: { contamination: 0.5, insomnie: 0.5, voyance: 0.5, spiritisme: 0.5 }
-            }, "Mon zizi").toShortJson()
+            }, "souzi").toShortJson()
         ];
         res.status(200).json({ games: example });
     } catch (err) {
@@ -28,7 +29,7 @@ export async function searchGame(req: Request, res: Response) {
     }
 }
 
-export async function searchGameById(req: Request, res: Response) {
+export async function searchGameById(req: Request, res: Response):Promise<void> {
     try {
         const gameId:String = req.params.id;
         if (!gameId) throw new Error('No game given in URL!');
@@ -51,7 +52,7 @@ export async function searchGameById(req: Request, res: Response) {
     }
 }
 
-export async function searchGameByUsername(req, res) {
+export async function searchGameByUsername(req, res):Promise<void> {
     try {
         const token = req.headers.authorization;
         // Vérifier la validité du token
@@ -72,7 +73,7 @@ export async function searchGameByUsername(req, res) {
                 startDate: new Date("2023-04-27T18:30:00"),
                 percentWereWolf: 0.3,
                 proba: { contamination: 0.5, insomnie: 0.5, voyance: 0.5, spiritisme: 0.5 }
-            }, "Mon zizi").toShortJson()
+            }, "").toShortJson()
         ];
         res.status(200).json({ games: example });
 
@@ -82,7 +83,7 @@ export async function searchGameByUsername(req, res) {
     }
 }
 
-export async function newGame(req, res) {
+export async function newGame(req, res):Promise<void> {
     const token = req.headers.authorization;
     // TODO check token validation
     const gameData = req.body;
@@ -90,3 +91,5 @@ export async function newGame(req, res) {
     // TODO register game in database
     res.status(200).json({ message: "New game created" });
 }
+
+
