@@ -47,18 +47,21 @@ export default function Login(): React.ReactElement {
 
     const userInputRef = useRef<TextInput>(null);
     const passInputRef = useRef<TextInput>(null);
-    const pseudoInputRef = useRef<TextInput>(null);
 
     const context = useContext(UserContext);
 
     const verifyUserAndPass = (): void => {
         navigation.navigate("Home");
         fetch(`${API_BASE_URL}/user/login`, {
-            method: "GET",
+            method: "POST",
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json"
-            }
+            },
+            body: JSON.stringify({
+                username: userInputRef.current?.value,
+                password: passInputRef.current?.value
+            })
         })
             .then((res) => res.json())
             .then((res) => {
@@ -105,7 +108,7 @@ export default function Login(): React.ReactElement {
                     ) : (
                         <>
                             <Text style={styles.texte}>Register</Text>
-                            <TextInput placeholder="Pseudo" aria-label="Pseudo" ref={pseudoInputRef} style={styles.TextInput} />
+                            <TextInput placeholder="Pseudo" aria-label="Pseudo" ref={userInputRef} style={styles.TextInput} />
                             <TextInput placeholder="Mot de passe" aria-label="Mot de passe" ref={passInputRef} style={styles.TextInput} secureTextEntry />
                             <Button onPress={registerUser} title="Register" />
                             <Text style={{ color: "white", marginTop: 4 }} onPress={(): void => setLoginOrRegister(loginOrRegister - 1)}>
