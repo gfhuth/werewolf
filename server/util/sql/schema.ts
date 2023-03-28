@@ -1,4 +1,5 @@
 import { Generated } from "kysely";
+import { Chat } from "../../models/Chat";
 
 export interface UserTable {
     id: Generated<number>;
@@ -29,8 +30,17 @@ export interface GameTable {
     probaSpiritisme: number;
 }
 
+export interface MessageTable {
+    idMsg: number;
+    idChat: number;
+    idSender: number;
+    text: string;
+    time: number;
+}
+
 export interface Database {
     users: UserTable;
     players: PlayerTable;
     games: GameTable;
+    messages: MessageTable
 }
