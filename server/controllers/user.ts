@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import database from "../util/database";
 import { insertUser, listUsers } from "../models/userModel";
-import { hasSubscribers } from "diagnostics_channel";
 
 const { JWT_SECRET } = process.env;
 
