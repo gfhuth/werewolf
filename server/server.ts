@@ -2,9 +2,10 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import { createSchema } from "./util/database";
-import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/user";
+import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/userConroller";
 import gameRouter from "./routers/game";
 import cors from "cors";
+import { searchGame } from "./controllers/gameController";
 
 const { PORT, HOST } = process.env;
 
@@ -25,6 +26,10 @@ app.get("/user/whoami", whoAmI);
 app.post("/user/register", register);
 app.post("/user/reinit", reinitDatabase);
 app.get("/user/debug", debugUser);
+// END PART TO MOVE
+
+//START move this part in routers/game.ts
+app.get("/game/search", searchGame);
 // END PART TO MOVE
 
 app.listen(parseInt(PORT), HOST, () => {
