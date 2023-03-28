@@ -162,7 +162,7 @@ export const debugUser = async (req: Request, res: Response): Promise<void> => {
         const users = await listUsers();
         res.status(200).json(users);
     } catch (e) {
-        res.sendStatus(500);
+        res.sendStatus(404);
         return;
     }
 };
