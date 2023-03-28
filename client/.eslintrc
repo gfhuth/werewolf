@@ -30,6 +30,7 @@
             }
         }
     },
+    "ignorePatterns": ["babel.config.js"],
     "rules": {
         "jsx-a11y/label-has-associated-control": [
             "error",
