@@ -1,7 +1,7 @@
 import React from "react";
 import { View, ImageBackground } from "react-native";
 
-export default function Background(props: { children: React.ReactNode }) {
+export default function Background(props: { children: React.ReactNode }): React.ReactElement {
     return (
         <View
             style={{
