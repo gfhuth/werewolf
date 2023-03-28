@@ -22,7 +22,8 @@
     "react-native-reanimated": "~2.14.4",
     "react-native-safe-area-context": "4.5.0",
     "react-native-web": "~0.18.10",
-    "react-navigation": "^4.4.4"
+    "react-navigation": "^4.4.4",
+    "react-use-websocket": "^4.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
