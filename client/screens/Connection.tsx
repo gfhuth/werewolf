@@ -76,8 +76,8 @@ export default function Login(): React.ReactElement {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                username: userInputRef,
-                password: passInputRef
+                username: userInputRef.current?.value,
+                password: passInputRef.current?.value
             })
         })
             .then((res) => res.json())
