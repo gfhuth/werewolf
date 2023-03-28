@@ -4,9 +4,10 @@ import { useNavigation, Link } from "@react-navigation/native";
 import Home from "./Home";
 import { StackNavigation } from "../App";
 import { TextInput } from "react-native-gesture-handler";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { API_BASE_URL } from "@env";
 import Box from "../components/Box";
+import { UserContext } from "../context/UserContext";
 
 const styles = StyleSheet.create({
     container: {
@@ -48,19 +49,43 @@ export default function Login() {
     const passInputRef = useRef<TextInput>(null);
     const pseudoInputRef = useRef<TextInput>(null);
 
-    const verifyUserAndPass = () => {
-        //setCount(count + 1);
+    const context = useContext(UserContext);
+
+    const verifyUserAndPass = ():void => {
         navigation.navigate("Home");
-        fetch(`${API_BASE_URL}login`).then((res) => res.json());
-        // .then(res => setToken(res.token))
-        // .catch(e => ...);
+        fetch(`${API_BASE_URL}/user/login`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then(res => {
+                context.setToken(res.token);
+                navigation.navigate("Home");
+            })
+            .catch(e => console.log(e));
     };
 
-    const registerUser = () => {
-        navigation.navigate("Home"); // TODO: A mettre dans le then
-        fetch(`${API_BASE_URL}login`).then((res) => res.json());
-        // .then(res => setToken(res.token))
-        // .catch(e => ...);
+    const registerUser = ():void => {
+        fetch(`${API_BASE_URL}/user/register`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: userInputRef,
+                password: passInputRef
+            })
+        })
+            .then((res) => res.json())
+            .then(res => {
+                context.setToken(res.token);
+                navigation.navigate("Home");
+            })
+            .catch(e => console.log(e));
     };
 
     return (
