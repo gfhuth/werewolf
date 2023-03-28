@@ -16,17 +16,17 @@ export type StackParamList = {
 export type StackNavigation = NavigationProp<StackParamList>;
 
 const Stack = createStackNavigator();
-function MyStack() {
+function MyStack(): React.ReactElement {
     return (
-        <Stack.Navigator initialRouteName="Login">
+        <Stack.Navigator initialRouteName="Connection">
             <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-            <Stack.Screen name="Login" component={Connection} options={{ headerShown: false, title: "Connection" }} />
+            <Stack.Screen name="Connection" component={Connection} options={{ headerShown: false, title: "Connection" }} />
             <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
 }
 
-export default function App() {
+export default function App(): React.ReactElement {
     const [isLoaded] = useFonts({
         pixel: require("./assets/fonts/depixel.ttf")
     });
