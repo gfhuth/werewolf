@@ -6,7 +6,7 @@ import { insertUser, listUsers } from "../models/userModel";
 
 const { JWT_SECRET } = process.env;
 
-function getTokenContent(token: string): { username: string } {
+export const getTokenContent = (token: string): { username: string } => {
     const isValid = jwt.verify(token, JWT_SECRET);
     if (!isValid) throw new Error("Invalid Token !");
 
@@ -14,7 +14,7 @@ function getTokenContent(token: string): { username: string } {
     return {
         username: username
     };
-}
+};
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     const username: string = req.body.username;
