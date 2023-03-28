@@ -5,6 +5,8 @@ import { createSchema } from "./util/database";
 import { login, whoAmI, register } from "./controllers/user";
 import gameRouter from "./routers/game";
 
+const { PORT, HOST } = process.env;
+
 createSchema();
 
 const app = express();
@@ -17,6 +19,6 @@ app.get("/user/whoami", whoAmI);
 app.post("/user/register", register);
 // END PART TO MOVE
 
-app.listen(3000, () => {
-    console.log("The application is listening on port https://localhost:3000");
+app.listen(parseInt(PORT), HOST, () => {
+    console.log(`The application is listening on port https://${HOST}:${PORT}`);
 });
