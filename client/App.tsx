@@ -6,6 +6,7 @@ import { UserProvider } from "./context/UserContext";
 import { SettingsProvider } from "./context/SettingsContext";
 import { useFonts } from "expo-font";
 import Settings from "./screens/Settings";
+import { View, Text } from "react-native";
 
 export type StackParamList = {
     Home: undefined;
@@ -26,17 +27,25 @@ function MyStack() {
 }
 
 export default function App() {
-    useFonts({
+    const [isLoaded] = useFonts({
         pixel: require("./assets/fonts/depixel.ttf")
     });
 
-    return (
-        <SettingsProvider>
-            <UserProvider>
-                <NavigationContainer>
-                    <MyStack />
-                </NavigationContainer>
-            </UserProvider>
-        </SettingsProvider>
-    );
+    if (isLoaded) {
+        return (
+            <SettingsProvider>
+                <UserProvider>
+                    <NavigationContainer>
+                        <MyStack />
+                    </NavigationContainer>
+                </UserProvider>
+            </SettingsProvider>
+        );
+    } else {
+        return (
+            <View>
+                <Text>Loading font...</Text>
+            </View>
+        );
+    }
 }

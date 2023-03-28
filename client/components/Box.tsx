@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     box: {
         borderRadius: 10,
         border: "5px solid #FFFFFF",
-        padding: "2rem",
+        padding: 32,
         textAlign: "center"
     }
 });
