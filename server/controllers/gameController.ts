@@ -98,17 +98,24 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         res.sendStatus(400);
     }
 
+    // Valeur par défaut de la date
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 1);
+    defaultDate.setHours(8);
+    defaultDate.setMinutes(0);
+    defaultDate.setMilliseconds(0);
+
     const game: GameObject = {
-        nbPlayerMin: req.body.nbPlayerMin,
-        nbPlayerMax: req.body.nbPlayerMax,
-        dayLength: req.body.dayLength,
-        nightLength: req.body.nightLength,
-        startDate: new Date(req.body.startDate).getTime(),
-        percentageWerewolf: req.body.percentageWerewolf,
-        probaContamination: req.body.probaContamination,
-        probaInsomnie: req.body.probaInsomnie,
-        probaVoyance: req.body.probaVoyance,
-        probaSpiritisme: req.body.probaSpiritisme
+        nbPlayerMin: req.body.nbPlayerMin || 5,
+        nbPlayerMax: req.body.nbPlayerMax || 20,
+        dayLength: req.body.dayLength || 60 * 14,
+        nightLength: req.body.nightLength || 60 * 10,
+        startDate: new Date(req.body.startDate).getTime() || defaultDate.getTime(),
+        percentageWerewolf: req.body.percentageWerewolf || 0.33,
+        probaContamination: req.body.probaContamination || 0,
+        probaInsomnie: req.body.probaInsomnie || 0,
+        probaVoyance: req.body.probaVoyance || 0,
+        probaSpiritisme: req.body.probaSpiritisme || 0
     };
 
     // Vérifier les valeurs du body de la reqête
