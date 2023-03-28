@@ -98,20 +98,69 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         res.sendStatus(400);
     }
 
+    // Valeur par défaut de la date
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 1);
+    defaultDate.setHours(8);
+    defaultDate.setMinutes(0);
+    defaultDate.setMilliseconds(0);
+
+    const today = new Date();
+
     const game: GameObject = {
-        nbPlayerMin: req.body.nbPlayerMin,
-        nbPlayerMax: req.body.nbPlayerMax,
-        dayLength: req.body.dayLength,
-        nightLength: req.body.nightLength,
-        startDate: new Date(req.body.startDate).getTime(),
-        percentageWerewolf: req.body.percentageWerewolf,
-        probaContamination: req.body.probaContamination,
-        probaInsomnie: req.body.probaInsomnie,
-        probaVoyance: req.body.probaVoyance,
-        probaSpiritisme: req.body.probaSpiritisme
+        nbPlayerMin: req.body.nbPlayerMin || 5,
+        nbPlayerMax: req.body.nbPlayerMax || 20,
+        dayLength: req.body.dayLength || 60 * 14,
+        nightLength: req.body.nightLength || 60 * 10,
+        startDate: new Date(req.body.startDate).getTime() || defaultDate.getTime(),
+        percentageWerewolf: req.body.percentageWerewolf || 0.33,
+        probaContamination: req.body.probaContamination || 0,
+        probaInsomnie: req.body.probaInsomnie || 0,
+        probaVoyance: req.body.probaVoyance || 0,
+        probaSpiritisme: req.body.probaSpiritisme || 0
     };
 
-    // Vérifier les valeurs du body de la reqête
+    // Vérification des valeurs du body de la requête
+    if (game.probaContamination < 0 || game.probaContamination > 1) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.probaInsomnie < 0 || game.probaInsomnie > 1) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.probaVoyance < 0 || game.probaVoyance > 1) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.probaSpiritisme < 0 || game.probaSpiritisme > 1) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.percentageWerewolf < 0 || game.percentageWerewolf > 100) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.dayLength > 24 * 60) {
+        res.status(406).send("Day length too long");
+        return;
+    }
+    if (game.nightLength > 24 * 60) {
+        res.status(406).send("Night length too long");
+        return;
+    }
+    if (game.nbPlayerMin <= 1) {
+        res.status(406).send("There must be at least two players");
+        return;
+    }
+    if (game.nbPlayerMax > 500) {
+        res.status(406).send("Too many players");
+        return;
+    }
+    if (game.startDate < today.getTime()) {
+        res.status(406).send("Start date passed");
+        return;
+    }
 
     try {
         await createGame(game);
