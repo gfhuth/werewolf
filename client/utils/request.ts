@@ -13,7 +13,7 @@ export default function request(input: RequestInfo | URL, init?: RequestInit | u
                     resolve(res);
                 } else {
                     reject({
-                        message: res.body,
+                        message: res.text(),
                         status: res.status,
                         response: res
                     });
