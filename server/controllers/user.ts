@@ -2,8 +2,7 @@ import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import database from "../util/database";
-import { insertUser } from "../models/userModel";
-import { hasSubscribers } from "diagnostics_channel";
+import { insertUser, listUsers } from "../models/userModel";
 
 const { JWT_SECRET } = process.env;
 
@@ -155,4 +154,14 @@ export const reinitDatabase = async (req: Request, res: Response): Promise<void>
     }
 
     res.status(200).send("Database reinit");
+};
+
+export const debugUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const users = await listUsers();
+        res.status(200).json(users);
+    } catch (e) {
+        res.sendStatus(404);
+        return;
+    }
 };
