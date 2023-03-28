@@ -12,7 +12,7 @@ export const UserContext = React.createContext<{
             setUsername: () => null
         });
 
-export function UserProvider(props: { children: React.ReactNode }) {
+export function UserProvider(props: { children: React.ReactNode }): React.ReactElement {
     const [token, setToken] = useState("");
     const [username, setUsername] = useState("");
 
