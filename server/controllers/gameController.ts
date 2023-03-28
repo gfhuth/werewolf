@@ -105,6 +105,8 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
     defaultDate.setMinutes(0);
     defaultDate.setMilliseconds(0);
 
+    const today = new Date();
+
     const game: GameObject = {
         nbPlayerMin: req.body.nbPlayerMin || 5,
         nbPlayerMax: req.body.nbPlayerMax || 20,
@@ -118,7 +120,47 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         probaSpiritisme: req.body.probaSpiritisme || 0
     };
 
-    // Vérifier les valeurs du body de la reqête
+    // Vérification des valeurs du body de la requête
+    if (game.probaContamination < 0 || game.probaContamination > 1) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.probaInsomnie < 0 || game.probaInsomnie > 1) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.probaVoyance < 0 || game.probaVoyance > 1) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.probaSpiritisme < 0 || game.probaSpiritisme > 1) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.percentageWerewolf < 0 || game.percentageWerewolf > 100) {
+        res.status(406).send("Unvalid contamination probability");
+        return;
+    }
+    if (game.dayLength > 24 * 60) {
+        res.status(406).send("Day length too long");
+        return;
+    }
+    if (game.nightLength > 24 * 60) {
+        res.status(406).send("Night length too long");
+        return;
+    }
+    if (game.nbPlayerMin <= 1) {
+        res.status(406).send("There must be at least two players");
+        return;
+    }
+    if (game.nbPlayerMax > 500) {
+        res.status(406).send("Too many players");
+        return;
+    }
+    if (game.startDate < today.getTime()) {
+        res.status(406).send("Start date passed");
+        return;
+    }
 
     try {
         await createGame(game);
