@@ -8,12 +8,12 @@ export type RequestError = {
 export default function request(input: RequestInfo | URL, init?: RequestInit | undefined): Promise<Response> {
     return new Promise((resolve, reject) => {
         fetch(input, init)
-            .then((res) => {
+            .then(async (res) => {
                 if (res.ok) {
                     resolve(res);
                 } else {
                     reject({
-                        message: res.text(),
+                        message: await res.text(),
                         status: res.status,
                         response: res
                     });
