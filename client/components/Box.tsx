@@ -1,10 +1,4 @@
-import { ImageBackground, Button, StyleSheet, Text, View } from "react-native";
-import { useNavigation, Link } from "@react-navigation/native";
-import { StackNavigation } from "../App";
-import { TextInput } from "react-native-gesture-handler";
-import { useRef, useState } from "react";
-import { API_BASE_URL } from "@env";
-
+import { StyleSheet, View } from "react-native";
 
 const styles = StyleSheet.create({
     box: {
@@ -15,7 +9,6 @@ const styles = StyleSheet.create({
     }
 });
 
-
-export default function BoxLogin(props : {children: React.ReactNode}) {
+export default function Box(props : {children: React.ReactNode}): React.ReactElement {
     return <View style={styles.box}>{props.children}</View>;
 }
