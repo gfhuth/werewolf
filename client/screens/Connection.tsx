@@ -8,6 +8,7 @@ import { useContext, useRef, useState } from "react";
 import { API_BASE_URL } from "@env";
 import Box from "../components/Box";
 import { UserContext } from "../context/UserContext";
+import request from "../utils/request";
 
 const styles = StyleSheet.create({
     container: {
@@ -51,8 +52,7 @@ export default function Login(): React.ReactElement {
     const context = useContext(UserContext);
 
     const verifyUserAndPass = (): void => {
-        navigation.navigate("Home");
-        fetch(`${API_BASE_URL}/user/login`, {
+        request(`${API_BASE_URL}/user/login`, {
             method: "POST",
             headers: {
                 Accept: "application/json",
