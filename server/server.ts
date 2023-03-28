@@ -2,10 +2,10 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import { createSchema } from "./util/database";
-import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/userConroller";
+import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/userController";
 import gameRouter from "./routers/game";
 import cors from "cors";
-import { searchGame } from "./controllers/gameController";
+import { newGame } from "./controllers/gameController";
 
 import * as http from "http";
 import * as WebSocket from "ws";
@@ -36,7 +36,8 @@ app.get("/user/debug", debugUser);
 // END PART TO MOVE
 
 //START move this part in routers/game.ts
-app.get("/game/search", searchGame);
+// app.get("/game/search", searchGame);
+app.post("/game/new", newGame);
 // END PART TO MOVE
 
 wss.on("connection", (ws: WebSocket) => {
