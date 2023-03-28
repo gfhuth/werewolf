@@ -1,10 +1,8 @@
-import { StatusBar } from "expo-status-bar";
-import { ImageBackground, Button, StyleSheet, Text, View, Linking } from "react-native";
-import { useNavigation, Link } from "@react-navigation/native";
-import Home from "./Home";
+import { ImageBackground, Button, StyleSheet, Text, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../App";
 import { TextInput } from "react-native-gesture-handler";
-import { useContext, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { API_BASE_URL } from "@env";
 import Box from "../components/Box";
 import { UserContext } from "../context/UserContext";
@@ -45,9 +43,8 @@ export default function Login(): React.ReactElement {
     const navigation = useNavigation<StackNavigation>();
 
     const [loginOrRegister, setLoginOrRegister] = useState(0);
-
-    const userInputRef = useRef<TextInput>(null);
-    const passInputRef = useRef<TextInput>(null);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
 
     const context = useContext(UserContext);
 
@@ -59,8 +56,8 @@ export default function Login(): React.ReactElement {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                username: userInputRef.current?.value,
-                password: passInputRef.current?.value
+                username: username,
+                password: password
             })
         })
             .then((res) => res.json())
@@ -79,8 +76,8 @@ export default function Login(): React.ReactElement {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                username: userInputRef.current?.value,
-                password: passInputRef.current?.value
+                username: username,
+                password: password
             })
         })
             .then((res) => res.json())
@@ -98,8 +95,8 @@ export default function Login(): React.ReactElement {
                     {loginOrRegister === 0 ? (
                         <>
                             <Text style={styles.texte}>Login</Text>
-                            <TextInput placeholder="Login" aria-label="Login" ref={userInputRef} style={styles.TextInput} />
-                            <TextInput placeholder="Mot de passe" aria-label="Mot de passe" ref={passInputRef} style={styles.TextInput} secureTextEntry />
+                            <TextInput placeholder="Login" aria-label="Login" onChangeText={setUsername} style={styles.TextInput} />
+                            <TextInput placeholder="Mot de passe" aria-label="Mot de passe" onChangeText={setPassword} style={styles.TextInput} secureTextEntry />
                             <Button onPress={verifyUserAndPass} title="Login" />
                             <Text style={{ color: "white", marginTop: 4 }} onPress={(): void => setLoginOrRegister(loginOrRegister + 1)}>
                                 Vous n'avez pas de compte, Enregistez vous!
@@ -108,8 +105,8 @@ export default function Login(): React.ReactElement {
                     ) : (
                         <>
                             <Text style={styles.texte}>Register</Text>
-                            <TextInput placeholder="Pseudo" aria-label="Pseudo" ref={userInputRef} style={styles.TextInput} />
-                            <TextInput placeholder="Mot de passe" aria-label="Mot de passe" ref={passInputRef} style={styles.TextInput} secureTextEntry />
+                            <TextInput placeholder="Pseudo" aria-label="Pseudo" onChangeText={setUsername} style={styles.TextInput} />
+                            <TextInput placeholder="Mot de passe" aria-label="Mot de passe" onChangeText={setPassword} style={styles.TextInput} secureTextEntry />
                             <Button onPress={registerUser} title="Register" />
                             <Text style={{ color: "white", marginTop: 4 }} onPress={(): void => setLoginOrRegister(loginOrRegister - 1)}>
                                 Vous avez deja un compte, Connectez vous!
