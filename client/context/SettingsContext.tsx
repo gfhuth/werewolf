@@ -10,7 +10,7 @@ export const SettingsContext = React.createContext<{
             setTheme: () => null
         });
 
-export function SettingsProvider(props: { children: React.ReactNode }) {
+export function SettingsProvider(props: { children: React.ReactNode }): React.ReactElement {
     const [theme, setTheme] = useState<Theme>("system");
 
     return <SettingsContext.Provider value={{ theme, setTheme }}>{props.children}</SettingsContext.Provider>;
