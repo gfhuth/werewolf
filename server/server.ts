@@ -53,9 +53,6 @@ wss.on("connection", (ws: WebSocket) => {
 
 const server = app.listen(parseInt(PORT), HOST, () => {
     console.log(`The application is listening on port http://${HOST}:${PORT}`);
-
-    const w = new WebSocket.WebSocket(`ws://${HOST}:${PORT}`);
-    w.on(`open`, () => console.log(42));
 });
 
 server.on("upgrade", (request, socket, head) => {
