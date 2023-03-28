@@ -91,5 +91,3 @@ export async function newGame(req, res):Promise<void> {
     // TODO register game in database
     res.status(200).json({ message: "New game created" });
 }
-
-
