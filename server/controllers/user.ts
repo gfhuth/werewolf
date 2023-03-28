@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import database from "../util/database";
 import { insertUser } from "../models/userModel";
+import { hasSubscribers } from "diagnostics_channel";
 
 const { JWT_SECRET } = process.env;
 
@@ -93,6 +94,7 @@ export const register = async (req: Request<any, any, { username: string; passwo
         insertUser({ username: username, password: hashPassword });
     } catch (e) {
         res.sendStatus(500);
+        return;
     }
 
     const token: string = jwt.sign(
@@ -105,4 +107,52 @@ export const register = async (req: Request<any, any, { username: string; passwo
     res.status(200).json({
         token: token
     });
+};
+
+export const reinitDatabase = async (req: Request, res: Response): Promise<void> => {
+    // Suppression des anciennes valeurs de la base de données
+    database.deleteFrom("users").execute();
+
+    // Insertion des valeurs d'initialisation
+    let hashPassword: string = await bcrypt.hash("Gieules", 10);
+    try {
+        insertUser({ username: "Damien", password: hashPassword });
+    } catch (e) {
+        res.sendStatus(500);
+        return;
+    }
+
+    hashPassword = await bcrypt.hash("Voland", 10);
+    try {
+        insertUser({ username: "Dorian", password: hashPassword });
+    } catch (e) {
+        res.sendStatus(500);
+        return;
+    }
+
+    hashPassword = await bcrypt.hash("Thiken", 10);
+    try {
+        insertUser({ username: "Samuel", password: hashPassword });
+    } catch (e) {
+        res.sendStatus(500);
+        return;
+    }
+
+    hashPassword = await bcrypt.hash("Huth", 10);
+    try {
+        insertUser({ username: "Guilherme", password: hashPassword });
+    } catch (e) {
+        res.sendStatus(500);
+        return;
+    }
+
+    hashPassword = await bcrypt.hash("Carrère", 10);
+    try {
+        insertUser({ username: "Bruno", password: hashPassword });
+    } catch (e) {
+        res.sendStatus(500);
+        return;
+    }
+
+    res.status(200).send("Database reinit");
 };

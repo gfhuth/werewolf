@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import { createSchema } from "./util/database";
-import { login, whoAmI, register } from "./controllers/user";
+import { login, whoAmI, register, reinitDatabase } from "./controllers/user";
 import gameRouter from "./routers/game";
 
 const { PORT, HOST } = process.env;
@@ -17,6 +17,7 @@ app.use("/game", gameRouter);
 app.post("/user/login", login);
 app.get("/user/whoami", whoAmI);
 app.post("/user/register", register);
+app.get("/user/reinit", reinitDatabase);
 // END PART TO MOVE
 
 app.listen(parseInt(PORT), HOST, () => {

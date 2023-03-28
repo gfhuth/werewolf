@@ -28,7 +28,3 @@ export const userSchema = async (): Promise<void> => {
 export const insertUser = async (user: { username: string; password: string }): Promise<void> => {
     await database.insertInto("users").values(user).execute();
 };
-
-export const reinitDatabase = async (): Promise<void> => {
-    await database.insertInto("users").values({ username: "Damien", password: "TOTO" });
-};
