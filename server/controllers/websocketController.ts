@@ -23,34 +23,37 @@ class WebsocketConnection {
     }
 
     readMessage(message: string): void {
-        const data: { game_id: number; event: string; data: Record<string, any> } = JSON.parse(message);
-        if (!this.isAuthenticated()) {
-            if (data.event !== "authentication") {
-                this.ws.send(JSON.stringify({ status: 403, message: "Not Authenticated" }));
+        try {
+            const data: { game_id: number; event: string; data: Record<string, any> } = JSON.parse(message);
+            if (!this.isAuthenticated()) {
+                if (data.event !== "authentication") {
+                    this.ws.send(JSON.stringify({ status: 403, message: "Not Authenticated" }));
+                    return;
+                }
+                const token: string = data.data.token;
+                if (!jwt.verify(token, JWT_SECRET)) {
+                    this.ws.send(JSON.stringify({ status: 403, message: "Bad Authentication" }));
+                    return;
+                }
+                const username: string = (jwt.decode(token) as { username: string }).username;
+                this.user = new User(username);
+                this.ws.send(JSON.stringify({ status: 200, message: "User authenticated" }));
                 return;
             }
-            const token: string = data.data.token;
-            if (!jwt.verify(token, JWT_SECRET)) {
-                this.ws.send(JSON.stringify({ status: 403, message: "Bad Authentication" }));
-                return;
-            }
-            const username: string = (jwt.decode(token) as { username: string }).username;
-            this.user = new User(username);
-            this.ws.send(JSON.stringify({ status: 200, message: "User authenticated" }));
-            return;
+
+            // const game: Game = getGame(data.game_id);
+            // if (!game) {
+            //     this.ws.send(JSON.stringify({ status: 409, message: "Game doesn't exist" }));
+            //     return;
+            // }
+            // if (!this.user.playInGame(data.game_id)) {
+            //     this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
+            //     return;
+            // }
+            // for (const func of eventHandlers[data.event]) func(game, data.data);
+        } catch (e) {
+            this.ws.send(JSON.stringify({ status: 500, message: "Server Internal Error" }));
         }
-
-        // const game: Game = getGame(data.game_id);
-        // if (!game) {
-        //     this.ws.send(JSON.stringify({ status: 409, message: "Game doesn't exist" }));
-        //     return;
-        // }
-        // if (!this.user.playInGame(data.game_id)) {
-        //     this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
-        //     return;
-        // }
-
-        // for (const func of eventHandlers[data.event]) func(game, data.data);
     }
 
 }
