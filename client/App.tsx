@@ -7,11 +7,13 @@ import { SettingsProvider } from "./context/SettingsContext";
 import { useFonts } from "expo-font";
 import Settings from "./screens/Settings";
 import { View, Text } from "react-native";
+import CreateGame from "./screens/CreateGame";
 
 export type StackParamList = {
     Home: undefined;
     Connection: undefined;
     Settings: undefined;
+    CreateGame: undefined;
 };
 export type StackNavigation = NavigationProp<StackParamList>;
 
@@ -22,6 +24,7 @@ function MyStack(): React.ReactElement {
             <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
             <Stack.Screen name="Connection" component={Connection} options={{ headerShown: false, title: "Connection" }} />
             <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+            <Stack.Screen name="CreateGame" component={CreateGame} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
 }
