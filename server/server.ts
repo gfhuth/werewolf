@@ -42,6 +42,7 @@ app.post("/game/new", newGame);
 
 wss.on("connection", (ws: WebSocket) => {
     //connection is up, let's add a simple simple event
+    console.log("Connection is UP (Socket)")
     ws.on("message", (message: string) => {
         //log the received message and send it back to the client
         console.log("Received: %s", message);

@@ -63,7 +63,7 @@ export default function Login(): React.ReactElement {
             .then((res) => res.json())
             .then((res) => {
                 context.setToken(res.token);
-                navigation.navigate("Home");
+                navigation.navigate("Jeux");
             })
             .catch((e) => console.log(e));
     };
