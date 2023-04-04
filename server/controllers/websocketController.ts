@@ -26,7 +26,7 @@ class WebsocketConnection {
         try {
             const data: { game_id: number; event: string; data: Record<string, any> } = JSON.parse(message);
             if (!this.isAuthenticated()) {
-                if (data.event !== "authentication") {
+                if (data.event !== "AUTHENTICATION") {
                     this.ws.send(JSON.stringify({ status: 403, message: "Not Authenticated" }));
                     return;
                 }
@@ -52,6 +52,7 @@ class WebsocketConnection {
             // }
             // for (const func of eventHandlers[data.event]) func(game, data.data);
         } catch (e) {
+            console.log("Ça ne marche pas");
             this.ws.send(JSON.stringify({ status: 500, message: "Server Internal Error" }));
         }
     }
