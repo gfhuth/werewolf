@@ -27,7 +27,6 @@ function MyStack(): React.ReactElement {
             <Stack.Screen name="Connection" component={Connection} options={{ headerShown: false, title: "Connection" }} />
             <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
             <Stack.Screen name="Jeux" component={Jeux} options={{ headerShown: false }} />
-
             <Stack.Screen name="CreateGame" component={CreateGame} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
