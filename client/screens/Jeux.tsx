@@ -4,11 +4,18 @@ import useWebSocket from 'react-use-websocket';
 import { WS } from "@env";
 
 export default function Jeux(): React.ReactElement {
-    useWebSocket(WS, {
-        onOpen: () => {
-          console.log('WebSocket connection established.');
-        }
-      });
+    const {
+        sendMessage,
+        sendJsonMessage,
+        lastMessage,
+        lastJsonMessage,
+        readyState,
+        getWebSocket
+    } = useWebSocket(WS, {
+        onOpen: () => console.log('opened'),
+        //Will attempt to reconnect on all close events, such as server shutting down
+        shouldReconnect: (closeEvent) => true
+    });
 
 
     return (
