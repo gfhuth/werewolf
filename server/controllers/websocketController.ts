@@ -25,9 +25,13 @@ class WebsocketConnection {
     readMessage(message: string): void {
         try {
             const data: { game_id: number; event: string; data: Record<string, any> } = JSON.parse(message);
-            if (!this.isAuthenticated()) {
-                if (data.event !== "AUTHENTICATION") {
-                    this.ws.send(JSON.stringify({ status: 403, message: "Not Authenticated" }));
+            if (!data || typeof data !== "object" || !data.event || !data.data || typeof data.data !== "object") {
+                this.ws.send(JSON.stringify({ status: 400, message: "Bad Request" }));
+                return;
+            }
+            if (data.event === "AUTHENTICATION") {
+                if (this.isAuthenticated()) {
+                    this.ws.send(JSON.stringify({ status: 200, message: "Already Authentified" }));
                     return;
                 }
                 const token: string = data.data.token;
@@ -38,6 +42,10 @@ class WebsocketConnection {
                 const username: string = (jwt.decode(token) as { username: string }).username;
                 this.user = new User(username);
                 this.ws.send(JSON.stringify({ status: 200, message: "User authenticated" }));
+                return;
+            }
+            if (!this.isAuthenticated()) {
+                this.ws.send(JSON.stringify({ status: 403, message: "Not Authenticated" }));
                 return;
             }
 
