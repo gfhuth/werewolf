@@ -2,13 +2,16 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import { createSchema } from "./util/database";
-import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/userController";
 import gameRouter from "./routers/game";
 import cors from "cors";
-import { newGame } from "./controllers/gameController";
-
 import * as http from "http";
 import * as WebSocket from "ws";
+
+import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/userController";
+import { newGame } from "./controllers/gameController";
+import { newChat } from "./controllers/chatController";
+import { listMessages, newMessage } from "./controllers/messageController";
+import { onConnect } from "./controllers/websocketController";
 
 const app = express();
 
@@ -40,7 +43,19 @@ app.get("/user/debug", debugUser);
 app.post("/game/new", newGame);
 // END PART TO MOVE
 
+//START move this part in routers/chat.ts
+app.post("/game/:gameid/chat/:id", newChat);
+// END PART TO MOVE
+
+//START move this part in routers/message.ts
+app.post("/game/:gameid/chat/:id/message/new", newMessage);
+app.get("/game/:gameid/chat/:chatid/message", listMessages);
+// END PART TO MOVE
+
 wss.on("connection", (ws: WebSocket) => {
+<<<<<<< HEAD
+    onConnect(ws);
+=======
     //connection is up, let's add a simple simple event
     console.log("Connection is UP (Socket)")
     ws.on("message", (message: string) => {
@@ -50,6 +65,7 @@ wss.on("connection", (ws: WebSocket) => {
     });
     //send immediatly a feedback to the incoming connection
     ws.send("Hi there, I am a WebSocket server");
+>>>>>>> 02889c8ab0a515f30713bbc6527f43f8ef060554
 });
 
 const server = app.listen(parseInt(PORT), HOST, () => {
@@ -57,7 +73,7 @@ const server = app.listen(parseInt(PORT), HOST, () => {
 });
 
 server.on("upgrade", (request, socket, head) => {
-    wss.handleUpgrade(request, socket, head, s => {
+    wss.handleUpgrade(request, socket, head, (s) => {
         wss.emit("connection", s, request);
     });
 });
