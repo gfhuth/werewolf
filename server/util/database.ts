@@ -5,6 +5,8 @@ import { Database } from "./sql/schema";
 import { gameSchema } from "../models/gameModel";
 import { playerSchema } from "../models/playerModel";
 import { userSchema } from "../models/userModel";
+import { chatSchema } from "../models/chatModel";
+import { messageSchema } from "../models/messageModel";
 
 const database = new Kysely<Database>({
     dialect: new SqliteDialect({
@@ -16,6 +18,8 @@ export const createSchema = async (): Promise<void> => {
     userSchema();
     playerSchema();
     gameSchema();
+    chatSchema();
+    messageSchema();
 };
 
 export default database;
