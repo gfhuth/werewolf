@@ -2,13 +2,16 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import { createSchema } from "./util/database";
-import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/userController";
 import gameRouter from "./routers/game";
 import cors from "cors";
-import { newGame } from "./controllers/gameController";
-
 import * as http from "http";
 import * as WebSocket from "ws";
+
+import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/userController";
+import { newGame } from "./controllers/gameController";
+import { newChat } from "./controllers/chatController";
+import { listMessages, newMessage } from "./controllers/messageController";
+import { onConnect } from "./controllers/websocketController";
 
 const app = express();
 
@@ -40,15 +43,17 @@ app.get("/user/debug", debugUser);
 app.post("/game/new", newGame);
 // END PART TO MOVE
 
+//START move this part in routers/chat.ts
+app.post("/game/:gameid/chat/:id", newChat);
+// END PART TO MOVE
+
+//START move this part in routers/message.ts
+app.post("/game/:gameid/chat/:id/message/new", newMessage);
+app.get("/game/:gameid/chat/:chatid/message", listMessages);
+// END PART TO MOVE
+
 wss.on("connection", (ws: WebSocket) => {
-    //connection is up, let's add a simple simple event
-    ws.on("message", (message: string) => {
-        //log the received message and send it back to the client
-        console.log("Received: %s", message);
-        ws.send(`You sent -> ${message}`);
-    });
-    //send immediatly a feedback to the incoming connection
-    ws.send("Hi there, I am a WebSocket server");
+    onConnect(ws);
 });
 
 const server = app.listen(parseInt(PORT), HOST, () => {
@@ -56,7 +61,7 @@ const server = app.listen(parseInt(PORT), HOST, () => {
 });
 
 server.on("upgrade", (request, socket, head) => {
-    wss.handleUpgrade(request, socket, head, s => {
+    wss.handleUpgrade(request, socket, head, (s) => {
         wss.emit("connection", s, request);
     });
 });
