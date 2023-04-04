@@ -1,16 +1,26 @@
 import database from "../util/database";
+import { Game } from "./gameModel";
 
-class User {
+export class User {
 
-    private userName: string;
-    private isConnected = false;
+    private username: string;
+    private gamesList: Array<Game>;
 
-    constructor(userName: string) {
-        this.userName = userName;
+    constructor(username: string) {
+        this.username = username;
+        this.gamesList = [];
     }
 
-    public getStatus(): boolean {
-        return this.isConnected;
+    getUsername(): string {
+        return this.username;
+    }
+
+    playInGame(gameId: number): boolean {
+        for (const game of this.gamesList) {
+            if (gameId === game.getGameId()) 
+                return true;
+        }
+        return false;
     }
 
 }

@@ -16,10 +16,16 @@ export class Game {
     private gameParam: GameParam;
     private hostName: string;
     private currentNumberOfPlayer = 1;
+    private gameId: number;
 
-    constructor(gameParam: GameParam, hostName: string) {
+    constructor(gameParam: GameParam, hostName: string, gameId: number) {
         this.gameParam = gameParam;
         this.hostName = hostName;
+        this.gameId = gameId;
+    }
+
+    getGameId(): number {
+        return this.gameId;
     }
 
     public getGameParam(): GameParam {
