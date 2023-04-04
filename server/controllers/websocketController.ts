@@ -52,7 +52,7 @@ class WebsocketConnection {
             // }
             // for (const func of eventHandlers[data.event]) func(game, data.data);
         } catch (e) {
-            console.log("Ça ne marche pas");
+            console.log(e);
             this.ws.send(JSON.stringify({ status: 500, message: "Server Internal Error" }));
         }
     }
