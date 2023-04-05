@@ -1,103 +1,65 @@
 import { Request, Response } from "express";
 import { getTokenContent } from "./userController";
-import { GameObject, createGame } from "../models/gameModel";
+import { Game, GameParam, GameStatus } from "../models/gameModel";
+import database from "../util/database";
 
-// export async function searchGame(req: Request, res: Response) {
-//     //game list from SQLdatabase;
-//     console.log("aaa");
-//     try {
-//         // Récupérer la liste des jeux depuis la base de données SQL
-//         // À compléter avec la requête appropriée
+export async function searchGame(req: Request, res: Response): Promise<void> {
+    //game list from SQLdatabase;
+    try {
+        console.log("aaa");
+        // Récupérer la liste des jeux depuis la base de données SQL et le username
+        const games = await database.selectFrom("games").selectAll().execute();
 
-//         // Exemple de réponse avec un jeu
-//         const example = [
-//             new Game(
-//                 {
-//                     id: 1,
-//                     maxNbPlayer: 10,
-//                     dayLenght: 12,
-//                     nightLenght: 12,
-//                     startDate: new Date("2023-04-27T18:30:00"),
-//                     percentWereWolf: 0.3,
-//                     proba: { contamination: 0.5, insomnie: 0.5, voyance: 0.5, spiritisme: 0.5 }
-//                 },
-//                 "Mon zizi"
-//             ).toShortJson()
-//         ];
-//         res.status(200).json({ games: example });
-//     } catch (err) {
-//         console.log(err);
-//         res.sendStatus(200);
-//     }
-// }
+        // Convertir le jeu en JSON et l'envoyer dans la réponse
+        const gamesJson = [];
+        games.forEach((game) => {
+            gamesJson.push(Game.gameDBtoGame(game).toShortJson());
+        });
+        res.status(200).json({ games: gamesJson });
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(500);
+    }
+}
 
-// export async function searchGameById(req: Request, res: Response) {
-//     try {
-//         const gameId: String = req.params.id;
-//         if (!gameId) throw new Error("No game given in URL!");
-//         // Récupérer le jeu depuis la base de données SQL avec l'ID
-//         // À compléter avec la requête appropriée
+export async function searchGameById(req: Request, res: Response): Promise<void> {
+    try {
+        const gameId: number = parseInt(req.params.id);
+        if (!gameId) throw new Error("Invalid game ID provided.");
 
-//         //example:
-//         const ex: Game = new Game(
-//             {
-//                 id: 1,
-//                 maxNbPlayer: 10,
-//                 dayLenght: 12,
-//                 nightLenght: 12,
-//                 startDate: new Date("2023-04-27T18:30:00"),
-//                 percentWereWolf: 0.3,
-//                 proba: { contamination: 0.5, insomnie: 0.5, voyance: 0.5, spiritisme: 0.5 }
-//             },
-//             "Zisou"
-//         );
-//         res.status(200).json({ game: ex.toLongJson() });
-//     } catch (err) {
-//         res.status(500).json({ message: err });
-//     }
-// }
+        // Récupérer le jeu depuis la base de données SQL avec l'ID
+        const games = await database.selectFrom("games").selectAll().where("id", "=", gameId).limit(1).execute();
+        if (games.length === 0) throw new Error(`Game with ID ${gameId} not found.`);
+        // Renvoyer la parti en longJson
+        res.status(200).json(Game.gameDBtoGame(games[0]).toLongJson());
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: err.message });
+    }
+}
 
-// export async function searchGameByUsername(req, res) {
-//     try {
-//         const token = req.headers.authorization;
-//         // Vérifier la validité du token
-//         // À compléter avec la vérification appropriée
-//         if (!jwt.verify(token, "secret")) throw new Error("Unverified token");
-//         //Decode
-//         // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
-//         // À compléter avec la requête appropriée
+export async function searchGameByUsername(req: Request, res: Response): Promise<void> {
+    try {
+        const username: string = req.params.username;
+        if (!username) throw new Error("No username provided.");
 
-//         // Exemple de réponse avec un jeu
-//         const example = [
-//             new Game(
-//                 {
-//                     id: 1,
-//                     maxNbPlayer: 10,
-//                     dayLenght: 12,
-//                     nightLenght: 12,
-//                     startDate: new Date("2023-04-27T18:30:00"),
-//                     percentWereWolf: 0.3,
-//                     proba: { contamination: 0.5, insomnie: 0.5, voyance: 0.5, spiritisme: 0.5 }
-//                 },
-//                 "Mon zizi"
-//             ).toShortJson()
-//         ];
-//         res.status(200).json({ games: example });
+        // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
+        const games = await database.selectFrom("games").where("games.hostname", "=", username).execute();
 
-//         res.status(200).json({ games: [] });
-//     } catch (err) {
-//         res.status(500).json({ message: err });
-//     }
-// }
+        // Convertir le jeu en JSON et l'envoyer dans la réponse
+        const gamesJson = [];
+        games.forEach((game) => {
+            gamesJson.push(Game.gameDBtoGame(game).toShortJson());
+        });
+        res.status(200).json({ games: gamesJson });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: err.message });
+    }
+}
 
 export const newGame = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const username = getTokenContent(req.headers["x-access-token"] as string).username;
-        // TODO: vérifier que username est dans le base de données
-    } catch (e) {
-        res.sendStatus(400);
-    }
-
+    const hostName = getTokenContent(req.headers["x-access-token"] as string).username;
     // Valeur par défaut de la date
     const defaultDate = new Date();
     defaultDate.setDate(defaultDate.getDate() + 1);
@@ -107,7 +69,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 
     const today = new Date();
 
-    const game: GameObject = {
+    const gameParam: GameParam = {
         nbPlayerMin: req.body.nbPlayerMin || 5,
         nbPlayerMax: req.body.nbPlayerMax || 20,
         dayLength: req.body.dayLength || 60 * 14,
@@ -119,51 +81,31 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         probaVoyance: req.body.probaVoyance || 0,
         probaSpiritisme: req.body.probaSpiritisme || 0
     };
+    const game = new Game(-1, gameParam, hostName, GameStatus.notStated);
 
-    // Vérification des valeurs du body de la requête
-    if (game.probaContamination < 0 || game.probaContamination > 1) {
-        res.status(406).send("Unvalid contamination probability");
-        return;
-    }
-    if (game.probaInsomnie < 0 || game.probaInsomnie > 1) {
-        res.status(406).send("Unvalid contamination probability");
-        return;
-    }
-    if (game.probaVoyance < 0 || game.probaVoyance > 1) {
-        res.status(406).send("Unvalid contamination probability");
-        return;
-    }
-    if (game.probaSpiritisme < 0 || game.probaSpiritisme > 1) {
-        res.status(406).send("Unvalid contamination probability");
-        return;
-    }
-    if (game.percentageWerewolf < 0 || game.percentageWerewolf > 100) {
-        res.status(406).send("Unvalid contamination probability");
-        return;
-    }
-    if (game.dayLength > 24 * 60) {
-        res.status(406).send("Day length too long");
-        return;
-    }
-    if (game.nightLength > 24 * 60) {
-        res.status(406).send("Night length too long");
-        return;
-    }
-    if (game.nbPlayerMin <= 1) {
-        res.status(406).send("There must be at least two players");
-        return;
-    }
-    if (game.nbPlayerMax > 500) {
-        res.status(406).send("Too many players");
-        return;
-    }
-    if (game.startDate < today.getTime()) {
-        res.status(406).send("Start date passed");
-        return;
+    const conditions = [
+        { minRange: 0, value: game.getGameParam().probaContamination, maxRange: 1, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.getGameParam().probaInsomnie, maxRange: 1, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.getGameParam().probaVoyance, maxRange: 1, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.getGameParam().probaSpiritisme, maxRange: 1, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.getGameParam().percentageWerewolf, maxRange: 100, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.getGameParam().dayLength, maxRange: 24 * 60, errorMessage: "Day length too long" },
+        { minRange: 0, value: game.getGameParam().nightLength, maxRange: 24 * 60, errorMessage: "Night length too long" },
+        { minRange: 2, value: game.getGameParam().nbPlayerMin, maxRange: Infinity, errorMessage: "There must be at least two players" },
+        { minRange: 0, value: game.getGameParam().nbPlayerMax, maxRange: 500, errorMessage: "Too many players" },
+        { minRange: today.getTime(), value: game.getGameParam().startDate, maxRange: Infinity, errorMessage: "Start date passed" }
+    ];
+
+    for (let i = 0; i < conditions.length; i++) {
+        const cond = conditions[i];
+        if (cond.value < cond.minRange || cond.value > cond.maxRange) {
+            res.status(406).send(cond.errorMessage);
+            return;
+        }
     }
 
     try {
-        await createGame(game);
+        await database.insertInto("games").values(game).execute();
     } catch (e) {
         res.sendStatus(500);
     }

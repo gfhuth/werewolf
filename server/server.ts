@@ -18,6 +18,7 @@ const wss = new WebSocket.Server({ noServer: true });
 const { PORT, HOST } = process.env;
 
 createSchema();
+console.log("database created");
 
 app.use(
     cors({
