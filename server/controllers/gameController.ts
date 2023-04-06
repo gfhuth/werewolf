@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getTokenContent } from "./userController";
-import { GameObject, createGame } from "../models/gameModel";
+import { Game, GameObject, createGame, gamesList } from "../models/gameModel";
 
 // export async function searchGame(req: Request, res: Response) {
 //     //game list from SQLdatabase;
@@ -169,4 +169,10 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
     }
 
     res.status(200).json({ message: "New game created" });
+};
+
+export const getGame = (gameId: number): Game => {
+    for (const game of gamesList) 
+        if (game.getGameId() === gameId) return game;
+    return null;
 };

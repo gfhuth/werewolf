@@ -11,6 +11,8 @@ export type GameParam = {
     proba: { contamination: number; insomnie: number; voyance: number; spiritisme: number };
 };
 
+export const gamesList: Array<Game> = [];
+
 export class Game {
 
     private gameParam: GameParam;
