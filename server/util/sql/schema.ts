@@ -32,24 +32,18 @@ export interface GameTable {
     probaSpiritisme: number;
 }
 
-export interface ChatTable {
-    id: Generated<number>;
-    game: number;
-}
-
 export interface MessageTable {
     id: Generated<number>;
     game: number;
-    chat: number;
-    player: number;
-    text: string;
-    time: number;
+    chat: number,
+    user: number;
+    content: string;
+    date: number;
 }
 
 export interface Database {
     users: UserTable;
     players: PlayerTable;
     games: GameTable;
-    chats: ChatTable;
     messages: MessageTable
 }
