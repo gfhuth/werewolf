@@ -1,0 +1,45 @@
+### POST user
+POST http://{{baseUrl}}/user/register/ HTTP/1.1
+content-type: application/json
+
+{
+    "username": "carrereb",
+    "password": "AZERTY1234"
+}
+
+### GET token
+POST http://{{baseUrl}}/user/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "carrereb",
+    "password": "AZERTY1234"
+}
+
+### GET whoami
+GET http://{{baseUrl}}/user/whoami HTTP/1.1
+x-access-token: {{token}}
+
+### GET reinit
+POST http://{{baseUrl}}/user/reinit HTTP/1.1
+
+### GET debug (list of users)
+GET http://{{baseUrl}}/user/debug HTTP/1.1
+
+### POST new game
+POST http://{{baseUrl}}/game/new HTTP/1.1
+x-access-token: {{token}}
+content-type: application/json
+
+{
+    "nbPlayerMin": 5,
+    "nbPlayerMax": 20,
+    "dayLength": 13,
+    "nightLength": 12,
+    "startDate": "2023-04-28T18:30:00",
+    "percentageWerewolf": 0.33,
+    "probaContamination": 0.1,
+    "probaInsomnie": 0.1,
+    "probaVoyance": 0.1,
+    "probaSpiritisme": 0.1
+}
