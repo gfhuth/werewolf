@@ -7,7 +7,7 @@ import { getGame } from "./gameController";
 
 const { JWT_SECRET } = process.env;
 
-const connections: Array<WebsocketConnection> = [];
+export const connections: Array<WebsocketConnection> = [];
 
 class WebsocketConnection {
 
@@ -59,7 +59,7 @@ class WebsocketConnection {
                 this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
                 return;
             }
-            for (const func of eventHandlers[data.event]) func(game, data.data);
+            for (const func of eventHandlers[data.event]) func(game, this.user, data.data);
         } catch (e) {
             console.log(e);
             this.ws.send(JSON.stringify({ status: 500, message: "Server Internal Error" }));

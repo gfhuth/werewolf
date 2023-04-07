@@ -1,12 +1,13 @@
 import { Game } from "../models/gameModel";
+import { User } from "../models/userModel";
+import { newMessage } from "./messageController";
 
-type functionHandler = (game: Game, data: Record<string, any>) => void;
+type functionHandler = (game: Game, user: User, data: Record<string, any>) => void;
 
-export let eventHandlers: {
+export const eventHandlers: {
     [key: string]: Array<functionHandler>;
-};
+} = {};
 
-export function registerHandler(event: string, func: functionHandler): void {
-    if (eventHandlers[event]) eventHandlers[event].push(func);
-    else eventHandlers[event] = [func];
+export function registerHandlers(): void {
+    eventHandlers.CHAT_SENT = [newMessage];
 }

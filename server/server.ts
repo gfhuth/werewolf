@@ -9,6 +9,7 @@ import * as WebSocket from "ws";
 
 import { onConnect } from "./controllers/websocketController";
 import userRouter from "./routers/user";
+import { registerHandlers } from "./controllers/eventController";
 
 const app = express();
 
@@ -28,6 +29,9 @@ app.use(
 app.use(express.json());
 app.use("/game", gameRouter);
 app.use("/user", userRouter);
+
+// set events in eventHandlers
+registerHandlers();
 
 wss.on("connection", (ws: WebSocket) => {
     onConnect(ws);
