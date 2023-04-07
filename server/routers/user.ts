@@ -1,5 +1,4 @@
 import express from "express";
-import { verifyToken } from "../controllers/authenticationController";
 import { debugUser, login, register, reinitDatabase, whoAmI } from "../controllers/userController";
 const userRouter = express.Router();
 

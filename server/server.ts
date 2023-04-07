@@ -7,10 +7,6 @@ import cors from "cors";
 import * as http from "http";
 import * as WebSocket from "ws";
 
-import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/userController";
-import { newGame } from "./controllers/gameController";
-import { newChat } from "./controllers/chatController";
-import { listMessages, newMessage } from "./controllers/messageController";
 import { onConnect } from "./controllers/websocketController";
 import userRouter from "./routers/user";
 
