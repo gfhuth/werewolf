@@ -25,6 +25,9 @@ class WebsocketConnection {
     readMessage(message: string): void {
         try {
             const data: { game_id: number; event: string; data: Record<string, any> } = JSON.parse(message);
+
+            console.log(data); //DEBUG
+
             if (!data || typeof data !== "object" || !data.event || !data.data || typeof data.data !== "object") {
                 this.ws.send(JSON.stringify({ status: 400, message: "Bad Request" }));
                 return;
