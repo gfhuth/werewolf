@@ -3,10 +3,11 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/userModel";
 import { eventHandlers } from "./eventController";
 import { Game } from "../models/gameModel";
+import { getGame } from "./gameController";
 
 const { JWT_SECRET } = process.env;
 
-const connections: Array<WebsocketConnection> = [];
+export const connections: Array<WebsocketConnection> = [];
 
 class WebsocketConnection {
 
@@ -52,16 +53,16 @@ class WebsocketConnection {
                 return;
             }
 
-            // const game: Game = getGame(data.game_id);
-            // if (!game) {
-            //     this.ws.send(JSON.stringify({ status: 409, message: "Game doesn't exist" }));
-            //     return;
-            // }
-            // if (!this.user.playInGame(data.game_id)) {
-            //     this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
-            //     return;
-            // }
-            // for (const func of eventHandlers[data.event]) func(game, data.data);
+            const game: Game = getGame(data.game_id);
+            if (!game) {
+                this.ws.send(JSON.stringify({ status: 409, message: "Game doesn't exist" }));
+                return;
+            }
+            if (!this.user.playInGame(data.game_id)) {
+                this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
+                return;
+            }
+            for (const func of eventHandlers[data.event]) func(game, this.user, data.data);
         } catch (e) {
             console.log(e);
             this.ws.send(JSON.stringify({ status: 500, message: "Server Internal Error" }));

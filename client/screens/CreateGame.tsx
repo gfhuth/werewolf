@@ -39,7 +39,7 @@ export default function CreateGame(): React.ReactElement {
         nbPlayerMax: { type: "number", validation: { required: true, min: 2, max: 100 }, defaultValue: 20 },
         dayLength: { type: "number", validation: { required: true, min: 1, max: 24 * 60 }, defaultValue: 60 },
         nightLength: { type: "number", validation: { required: true, min: 1, max: 24 * 60 }, defaultValue: 60 },
-        startDate: { type: "number", validation: { required: true, min: new Date().getTime() }, defaultValue: new Date().getTime() },
+        startDate: { type: "date", validation: { required: true, min: new Date().getTime() }, defaultValue: new Date().getTime() },
         percentageWerewolf: { type: "number", validation: { required: true, min: 0, max: 100 }, defaultValue: 50 },
         probaContamination: { type: "number", validation: { required: true, min: 0, max: 100 }, defaultValue: 20 },
         probaInsomnie: { type: "number", validation: { required: true, min: 0, max: 100 }, defaultValue: 20 },
@@ -49,6 +49,7 @@ export default function CreateGame(): React.ReactElement {
 
     const submitCreateGame = (fieldValues: FormFieldsValue): void => {
         request(`${API_BASE_URL}/game/create`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "x-access-token": token

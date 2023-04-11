@@ -7,11 +7,9 @@ import cors from "cors";
 import * as http from "http";
 import * as WebSocket from "ws";
 
-import { login, whoAmI, register, reinitDatabase, debugUser } from "./controllers/userController";
-import { newGame } from "./controllers/gameController";
-import { newChat } from "./controllers/chatController";
-import { listMessages, newMessage } from "./controllers/messageController";
 import { onConnect } from "./controllers/websocketController";
+import userRouter from "./routers/user";
+import { registerHandlers } from "./controllers/eventController";
 
 const app = express();
 
@@ -21,6 +19,7 @@ const wss = new WebSocket.Server({ noServer: true });
 const { PORT, HOST } = process.env;
 
 createSchema();
+console.log("database created");
 
 app.use(
     cors({
@@ -29,28 +28,10 @@ app.use(
 );
 app.use(express.json());
 app.use("/game", gameRouter);
+app.use("/user", userRouter);
 
-//START move this part in routers/user.ts
-app.post("/user/login", login);
-app.get("/user/whoami", whoAmI);
-app.post("/user/register", register);
-app.post("/user/reinit", reinitDatabase);
-app.get("/user/debug", debugUser);
-// END PART TO MOVE
-
-//START move this part in routers/game.ts
-// app.get("/game/search", searchGame);
-app.post("/game/new", newGame);
-// END PART TO MOVE
-
-//START move this part in routers/chat.ts
-app.post("/game/:gameid/chat/:id", newChat);
-// END PART TO MOVE
-
-//START move this part in routers/message.ts
-app.post("/game/:gameid/chat/:id/message/new", newMessage);
-app.get("/game/:gameid/chat/:chatid/message", listMessages);
-// END PART TO MOVE
+// set events in eventHandlers
+registerHandlers();
 
 wss.on("connection", (ws: WebSocket) => {
     onConnect(ws);

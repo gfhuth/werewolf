@@ -3,16 +3,22 @@ import { Game } from "./gameModel";
 
 export class User {
 
+    private userId: number;
     private username: string;
     private gamesList: Array<Game>;
 
     constructor(username: string) {
         this.username = username;
+        this.userId = database.selectFrom("users").select(["id"]).where("username", "=", this.username).execute()[0].id;
         this.gamesList = [];
     }
 
     getUsername(): string {
         return this.username;
+    }
+
+    getUserId(): number {
+        return this.userId;
     }
 
     playInGame(gameId: number): boolean {
