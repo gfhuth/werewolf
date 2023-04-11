@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getTokenContent } from "./userController";
-import { Game, GameParam, GameStatus, gamesList } from "../models/gameModel";
+import { Game, GameParam, gamesList } from "../models/gameModel";
 import database from "../util/database";
 
 export async function searchGame(req: Request, res: Response): Promise<void> {
@@ -81,7 +81,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         probaVoyance: req.body.probaVoyance || 0,
         probaSpiritisme: req.body.probaSpiritisme || 0
     };
-    const game = new Game(-1, gameParam, hostName, GameStatus.notStated);
+    const game = new Game(-1, gameParam, hostName);
 
     const conditions = [
         { minRange: 0, value: game.getGameParam().probaContamination, maxRange: 1, errorMessage: "Unvalid contamination probability" },

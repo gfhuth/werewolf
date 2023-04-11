@@ -3,11 +3,6 @@ import database from "../util/database";
 
 export const gamesList: Array<Game> = [];
 
-export enum GameStatus {
-    notStated,
-    stated
-}
-
 export type GameParam = {
     nbPlayerMin: number;
     nbPlayerMax: number;
@@ -26,14 +21,12 @@ export class Game {
     private gameId: number;
     private gameParam: GameParam;
     private hostName: string;
-    private gameStatus: GameStatus;
     public currentNumberOfPlayer = 1;
 
-    constructor(gameId: number, gameParam: GameParam, hostName: string, gameStatus: GameStatus) {
+    constructor(gameId: number, gameParam: GameParam, hostName: string) {
         this.gameId = gameId;
         this.gameParam = gameParam;
         this.hostName = hostName;
-        this.gameStatus = gameStatus;
     }
 
     getGameId(): number {
@@ -97,7 +90,7 @@ export class Game {
             probaSpiritisme: row.probaSpiritisme
         };
 
-        const game = new Game(Number(row.id), gameParam, row.hostname, Number(row.status));
+        const game = new Game(Number(row.id), gameParam, row.hostname);
         game.currentNumberOfPlayer = row.currentNumberOfPlayer;
         return game;
     }
@@ -111,7 +104,6 @@ export const gameSchema = async (): Promise<void> => {
         .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
         .addColumn("hostname", "text", (col) => col.notNull())
         //TODO add statuts needed for the game (for example : isNight, idPersonAlives,...)
-        .addColumn("status", "integer", (col) => col.defaultTo(0).notNull())
         .addColumn("currentNumberOfPlayer", "integer", (col) => col.defaultTo(1).notNull())
         //param of type gameParam
         .addColumn("nbPlayerMin", "integer", (col) => col.defaultTo(5).notNull())
@@ -125,12 +117,12 @@ export const gameSchema = async (): Promise<void> => {
         .addColumn("probaVoyance", "real", (col) => col.defaultTo(0).notNull())
         .addColumn("probaSpiritisme", "real", (col) => col.defaultTo(0).notNull())
         .execute();
+
     // add example game for test
     await database
         .insertInto("games")
         .values({
             hostname: "admin",
-            status: 0,
             currentNumberOfPlayer: 1,
             nbPlayerMin: 5,
             nbPlayerMax: 20,
