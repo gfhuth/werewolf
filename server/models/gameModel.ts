@@ -1,5 +1,6 @@
 import { sql } from "kysely";
 import database from "../util/database";
+import { GameTable } from "../util/sql/schema";
 
 export const gamesList: Array<Game> = [];
 

@@ -40,12 +40,12 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
 
 export async function searchGameByUsername(req: Request, res: Response): Promise<void> {
     try {
-        const username: string = req.params.username;
+        const username: string = getTokenContent(req.headers["x-access-token"] as string).username;
         if (!username) throw new Error("No username provided.");
-
+        console.log(username);
         // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
-        const games = await database.selectFrom("games").where("games.hostname", "=", username).execute();
-
+        const games = await database.selectFrom("games").selectAll().where("games.hostname", "=", username).execute();
+        console.log(games);
         // Convertir le jeu en JSON et l'envoyer dans la réponse
         const gamesJson = [];
         games.forEach((game) => {
@@ -59,6 +59,7 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
 }
 
 export const newGame = async (req: Request, res: Response): Promise<void> => {
+    console.log("verif en cours");
     const hostName = getTokenContent(req.headers["x-access-token"] as string).username;
     // Valeur par défaut de la date
     const defaultDate = new Date();
@@ -69,7 +70,9 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 
     const today = new Date();
 
-    const gameParam: GameParam = {
+    const game = {
+        hostName: hostName,
+        currentNumberOfPlayer: 1,
         nbPlayerMin: req.body.nbPlayerMin || 5,
         nbPlayerMax: req.body.nbPlayerMax || 20,
         dayLength: req.body.dayLength || 60 * 14,
@@ -81,19 +84,18 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         probaVoyance: req.body.probaVoyance || 0,
         probaSpiritisme: req.body.probaSpiritisme || 0
     };
-    const game = new Game(-1, gameParam, hostName);
 
     const conditions = [
-        { minRange: 0, value: game.getGameParam().probaContamination, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.getGameParam().probaInsomnie, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.getGameParam().probaVoyance, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.getGameParam().probaSpiritisme, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.getGameParam().percentageWerewolf, maxRange: 100, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.getGameParam().dayLength, maxRange: 24 * 60, errorMessage: "Day length too long" },
-        { minRange: 0, value: game.getGameParam().nightLength, maxRange: 24 * 60, errorMessage: "Night length too long" },
-        { minRange: 2, value: game.getGameParam().nbPlayerMin, maxRange: Infinity, errorMessage: "There must be at least two players" },
-        { minRange: 0, value: game.getGameParam().nbPlayerMax, maxRange: 500, errorMessage: "Too many players" },
-        { minRange: today.getTime(), value: game.getGameParam().startDate, maxRange: Infinity, errorMessage: "Start date passed" }
+        { minRange: 0, value: game.probaContamination, maxRange: 1, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.probaInsomnie, maxRange: 1, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.probaVoyance, maxRange: 1, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.probaSpiritisme, maxRange: 1, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.percentageWerewolf, maxRange: 100, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.dayLength, maxRange: 24 * 60, errorMessage: "Day length too long" },
+        { minRange: 0, value: game.nightLength, maxRange: 24 * 60, errorMessage: "Night length too long" },
+        { minRange: 2, value: game.nbPlayerMin, maxRange: Infinity, errorMessage: "There must be at least two players" },
+        { minRange: 0, value: game.nbPlayerMax, maxRange: 500, errorMessage: "Too many players" },
+        { minRange: today.getTime(), value: game.startDate, maxRange: Infinity, errorMessage: "Start date passed" }
     ];
 
     for (let i = 0; i < conditions.length; i++) {
@@ -105,6 +107,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
     }
 
     try {
+        console.log("creation en cours");
         await database.insertInto("games").values(game).execute();
     } catch (e) {
         res.sendStatus(500);
