@@ -1,0 +1,46 @@
+@baseUrl = 127.0.0.1:3000
+### POST user
+POST http://{{baseUrl}}/user/register/ HTTP/1.1
+content-type: application/json
+
+{
+    "username": "carrereb",
+    "password": "AZERTY1234"
+}
+###
+# @name login
+POST http://{{baseUrl}}/user/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "carrereb",
+    "password": "AZERTY1234"
+}
+###
+
+@token = {{login.response.body.token}}
+
+### POST new game
+POST http://{{baseUrl}}/game/new HTTP/1.1
+x-access-token: {{token}}
+
+{
+    "nbPlayerMin": 5,
+    "nbPlayerMax": 20,
+    "dayLength": 13,
+    "nightLength": 12,
+    "startDate": "2023-04-28T18:30:00",
+    "percentageWerewolf": 0.33,
+    "probaContamination": 0.1,
+    "probaInsomnie": 0.1,
+    "probaVoyance": 0.1,
+    "probaSpiritisme": 0.1
+}
+
+### GET list game
+GET http://{{baseUrl}}/game/search HTTP/1.1
+x-access-token: {{token}}
+
+###
+GET http://{{baseUrl}}/game/1/details HTTP/1.1
+x-access-token: {{token}}

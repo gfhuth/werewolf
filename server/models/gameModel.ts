@@ -1,6 +1,5 @@
 import { sql } from "kysely";
 import database from "../util/database";
-import { GameTable } from "../util/sql/schema";
 
 export const gamesList: Array<Game> = [];
 
@@ -103,7 +102,7 @@ export const gameSchema = async (): Promise<void> => {
         .createTable("games")
         .ifNotExists()
         .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
-        .addColumn("hostname", "text", (col) => col.notNull())
+        .addColumn("hostId", "integer", (col) => col.notNull())
         //TODO add statuts needed for the game (for example : isNight, idPersonAlives,...)
         .addColumn("currentNumberOfPlayer", "integer", (col) => col.defaultTo(1).notNull())
         //param of type gameParam
@@ -117,24 +116,5 @@ export const gameSchema = async (): Promise<void> => {
         .addColumn("probaInsomnie", "real", (col) => col.defaultTo(0).notNull())
         .addColumn("probaVoyance", "real", (col) => col.defaultTo(0).notNull())
         .addColumn("probaSpiritisme", "real", (col) => col.defaultTo(0).notNull())
-        .execute();
-
-    // add example game for test
-    await database
-        .insertInto("games")
-        .values({
-            hostname: "admin",
-            currentNumberOfPlayer: 1,
-            nbPlayerMin: 5,
-            nbPlayerMax: 20,
-            dayLength: 12,
-            nightLength: 12,
-            startDate: Date.now(),
-            percentageWerewolf: 0.5,
-            probaContamination: 0.5,
-            probaInsomnie: 0.5,
-            probaVoyance: 0.5,
-            probaSpiritisme: 0.5
-        })
         .execute();
 };

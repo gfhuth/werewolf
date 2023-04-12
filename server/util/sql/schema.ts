@@ -17,7 +17,7 @@ export interface PlayerTable {
 
 export interface GameTable {
     id: Generated<number>;
-    hostname: string;
+    hostId: number;
     currentNumberOfPlayer: number;
     nbPlayerMin: number;
     nbPlayerMax: number;
