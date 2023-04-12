@@ -1,25 +1,29 @@
-### POST user
+@baseUrl = 127.0.0.1:3000
+# @name login1
 POST http://{{baseUrl}}/user/register/ HTTP/1.1
 content-type: application/json
 
 {
-    "username": "carrereb",
+    "username": "p1",
     "password": "AZERTY1234"
 }
-
-### GET token
-POST http://{{baseUrl}}/user/login HTTP/1.1
+###
+@token1 = {{login1.response.body.token}}
+# @name login2
+POST http://{{baseUrl}}/user/register/ HTTP/1.1
 content-type: application/json
 
 {
-    "username": "carrereb",
+    "username": "p2",
     "password": "AZERTY1234"
 }
+###
+@token2 = {{login2.response.body.token}}
+
 
 ### POST new game
 POST http://{{baseUrl}}/game/new HTTP/1.1
-x-access-token: {{token}}
-content-type: application/json
+x-access-token: {{token1}}
 
 {
     "nbPlayerMin": 5,
@@ -33,3 +37,11 @@ content-type: application/json
     "probaVoyance": 0.1,
     "probaSpiritisme": 0.1
 }
+
+### join game1
+POST http://{{baseUrl}}/game/1/join HTTP/1.1
+x-access-token: {{token2}}
+
+### check update
+GET http://{{baseUrl}}/game/1/details/ HTTP/1.1
+x-access-token: {{token1}}
