@@ -13,8 +13,8 @@ export class User {
 
     private loadAsync = async (username: string): Promise<void> => {
         this.username = username;
-        const usersId: Array<{ id: number }> = await database.selectFrom("users").select(["id"]).where("username", "=", username).execute();
-        this.userId = usersId[0].id;
+        const userIdentifier: { id: number } = await database.selectFrom("users").select(["id"]).where("username", "=", username).executeTakeFirstOrThrow();
+        this.userId = userIdentifier.id;
         this.userId = 0;
         this.gamesList = [];
     };

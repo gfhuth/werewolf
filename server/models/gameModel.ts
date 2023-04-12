@@ -24,13 +24,13 @@ export class Game {
 
     private gameId: number;
     private gameParam: GameParam;
-    private hostName: string;
+    private hostId: number;
     public currentNumberOfPlayer = 1;
 
-    constructor(gameId: number, gameParam: GameParam, hostName: string) {
+    constructor(gameId: number, gameParam: GameParam, hostName: number) {
         this.gameId = gameId;
         this.gameParam = gameParam;
-        this.hostName = hostName;
+        this.hostId = hostName;
     }
 
     getGameId(): number {
@@ -44,13 +44,13 @@ export class Game {
     public toShortJson(): { [key: string]: string | number } {
         const id = this.gameId;
         const startDate = this.gameParam.startDate;
-        const hostName = this.hostName;
+        const hostId = this.hostId;
         const currentNumberOfPlayer = this.currentNumberOfPlayer;
         const nbPlayerMax = this.gameParam.nbPlayerMax;
         return {
             id: id,
             startDate: startDate.toLocaleString(),
-            hostName: hostName,
+            hostId: hostId,
             currentNumberOfPlayer: currentNumberOfPlayer,
             nbPlayerMax: nbPlayerMax
         };
@@ -59,7 +59,7 @@ export class Game {
     //return json of this object
     public toLongJson(): { [key: string]: string | number } {
         const gameParam = this.gameParam;
-        const hostName = this.hostName;
+        const hostId = this.hostId;
         const currentNumberOfPlayer = this.currentNumberOfPlayer;
         const wereWolfCount = Math.floor((gameParam.nbPlayerMax * gameParam.percentageWerewolf) / 100);
 
@@ -74,7 +74,7 @@ export class Game {
             probaInsomnie: gameParam.probaInsomnie,
             probaVoyance: gameParam.probaVoyance,
             probaSpiritisme: gameParam.probaSpiritisme,
-            hostName: hostName,
+            hostId: hostId,
             currentNumberOfPlayer: currentNumberOfPlayer,
             wereWolfCount: wereWolfCount
         };
