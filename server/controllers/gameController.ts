@@ -106,9 +106,25 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         }
     }
 
+    const gameParam: GameParam = {
+        nbPlayerMin: game.nbPlayerMin,
+        nbPlayerMax: game.nbPlayerMax,
+        dayLength: game.dayLength,
+        nightLength: game.nightLength,
+        startDate: game.startDate,
+        percentageWerewolf: game.percentageWerewolf,
+        probaContamination: game.probaContamination,
+        probaInsomnie: game.probaInsomnie,
+        probaVoyance: game.probaVoyance,
+        probaSpiritisme: game.probaSpiritisme
+    };
+
     try {
         console.log("creation en cours");
-        await database.insertInto("games").values(game).execute();
+        const gameId: { id: number } = await database.insertInto("games").values(game).returning("id").executeTakeFirstOrThrow();
+
+        // On ajoute la partie créée à la liste de toutes les parties
+        gamesList.push(new Game(gameId.id, gameParam, game.hostName));
     } catch (e) {
         res.sendStatus(500);
     }
@@ -117,7 +133,6 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const getGame = (gameId: number): Game => {
-    for (const game of gamesList) 
-        if (game.getGameId() === gameId) return game;
+    for (const game of gamesList) if (game.getGameId() === gameId) return game;
     return null;
 };
