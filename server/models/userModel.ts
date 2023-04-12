@@ -8,10 +8,16 @@ export class User {
     private gamesList: Array<Game>;
 
     constructor(username: string) {
-        this.username = username;
-        this.userId = database.selectFrom("users").select(["id"]).where("username", "=", this.username).execute()[0].id;
-        this.gamesList = [];
+        this.loadAsync(username);
     }
+
+    private loadAsync = async (username: string): Promise<void> => {
+        this.username = username;
+        const usersId: Array<{ id: number }> = await database.selectFrom("users").select(["id"]).where("username", "=", username).execute();
+        this.userId = usersId[0].id;
+        this.userId = 0;
+        this.gamesList = [];
+    };
 
     getUsername(): string {
         return this.username;
@@ -22,10 +28,8 @@ export class User {
     }
 
     playInGame(gameId: number): boolean {
-        for (const game of this.gamesList) {
-            if (gameId === game.getGameId()) 
-                return true;
-        }
+        for (const game of this.gamesList) if (gameId === game.getGameId()) return true;
+
         return false;
     }
 
