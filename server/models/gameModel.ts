@@ -2,7 +2,11 @@ import { sql } from "kysely";
 import database from "../util/database";
 
 export const gamesList: Array<Game> = [];
-
+export enum GameStatus {
+    NOT_STARTED = 0,
+    JOUR = 1,
+    NUIT = 2,
+}
 export type GameParam = {
     nbPlayerMin: number;
     nbPlayerMax: number;
@@ -90,12 +94,20 @@ export class Game {
             probaSpiritisme: row.probaSpiritisme
         };
 
-        const game = new Game(Number(row.id), gameParam, row.hostname);
+        const game = new Game(Number(row.id), gameParam, row.hostId);
         game.currentNumberOfPlayer = row.currentNumberOfPlayer;
         return game;
     }
 
+    public getStatus(): number {
+        // time in ms
+        const time = Date.now() - this.gameParam.startDate;
+        if (time < 0) return GameStatus.NOT_STARTED;
+        else return 1 + (Math.floor(time / 3600000 / (this.gameParam.dayLength + this.gameParam.nightLength)) % 2);
+    }
+
 }
+export const gameInProgress = [];
 
 export const gameSchema = async (): Promise<void> => {
     await database.schema
@@ -117,4 +129,15 @@ export const gameSchema = async (): Promise<void> => {
         .addColumn("probaVoyance", "real", (col) => col.defaultTo(0).notNull())
         .addColumn("probaSpiritisme", "real", (col) => col.defaultTo(0).notNull())
         .execute();
+
+    // On charge chaque parties en cours
+
+    const gamelist = await database.selectFrom("games").selectAll().execute();
+    for (let i = 0; i < gamelist.length; i++) {
+        const game = Game.gameDBtoGame(gamelist[i]);
+        const gameStatus = game.getStatus();
+        if (gameStatus != 0) 
+            gameInProgress.push(game);
+    }
 };
+
