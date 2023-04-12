@@ -1,5 +1,6 @@
 import { sql } from "kysely";
 import database from "../util/database";
+import { startGame } from "../controllers/gameStartedController";
 
 export const gamesList: Array<Game> = [];
 export enum GameStatus {
@@ -131,13 +132,9 @@ export const gameSchema = async (): Promise<void> => {
         .execute();
 
     // On charge chaque parties en cours
-
     const gamelist = await database.selectFrom("games").selectAll().execute();
     for (let i = 0; i < gamelist.length; i++) {
         const game = Game.gameDBtoGame(gamelist[i]);
-        const gameStatus = game.getStatus();
-        if (gameStatus != 0) 
-            gameInProgress.push(game);
+        if (game.getStatus() != 0) setTimeout(() => startGame(game.getGameId()), game.getGameParam().startDate - Date.now());
     }
 };
-

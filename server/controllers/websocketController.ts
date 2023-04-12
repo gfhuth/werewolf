@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/userModel";
 import { eventHandlers } from "./eventController";
 import { Game } from "../models/gameModel";
-import { getGame } from "./gameController";
+import { getGame } from "./gameSetupController";
 
 const { JWT_SECRET } = process.env;
 
@@ -26,8 +26,8 @@ class WebsocketConnection {
     readMessage(message: string): void {
         try {
             const data: { game_id: number; event: string; data: Record<string, any> } = JSON.parse(message);
-
-            console.log(data); //DEBUG
+            //DEBUG
+            console.log(data);
 
             if (!data || typeof data !== "object" || !data.event || !data.data || typeof data.data !== "object") {
                 this.ws.send(JSON.stringify({ status: 400, message: "Bad Request" }));
