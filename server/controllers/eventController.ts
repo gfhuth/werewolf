@@ -11,3 +11,4 @@ export const eventHandlers: {
 export function registerHandlers(): void {
     eventHandlers.CHAT_SENT = [newMessage];
 }
+

@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/userModel";
 import { eventHandlers } from "./eventController";
 import { Game } from "../models/gameModel";
-import { getGame } from "./gameController";
+import { getGame } from "./gameSetupController";
 
 const { JWT_SECRET } = process.env;
 
