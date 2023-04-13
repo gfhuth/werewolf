@@ -4,10 +4,7 @@ import { getTokenContent } from "./userController";
 import { Game, GameParam, gamesList } from "../models/gameModel";
 import database from "../util/database";
 import { startGame } from "./gameStartedController";
-
-async function getUserId(username): Promise<number> {
-    return (await database.selectFrom("users").select(["id"]).where("username", "=", username).executeTakeFirst()).id;
-}
+import { User, usersHandler } from "../models/userModel";
 
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
@@ -46,10 +43,9 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
 
 export async function searchGameByUsername(req: Request, res: Response): Promise<void> {
     try {
-        const username: string = getTokenContent(req.headers["x-access-token"] as string).username;
-        const userId: number = await getUserId(username);
+        const user: User = usersHandler[getTokenContent(req.headers["x-access-token"] as string).username];
         // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
-        const games = await database.selectFrom("games").selectAll().where("games.hostId", "=", userId).execute();
+        const games = await database.selectFrom("games").selectAll().where("games.hostId", "=", user.getUserId()).execute();
         // Convertir le jeu en JSON et l'envoyer dans la réponse
         const gamesJson = [];
         games.forEach((game) => {
@@ -64,8 +60,7 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
 
 export const newGame = async (req: Request, res: Response): Promise<void> => {
     console.log("verif en cours");
-    const hostName = getTokenContent(req.headers["x-access-token"] as string).username;
-    const hostId = await getUserId(hostName);
+    const user: User = usersHandler[getTokenContent(req.headers["x-access-token"] as string).username];
     // Valeur par défaut de la date
     const defaultDate = new Date();
     defaultDate.setDate(defaultDate.getDate() + 1);
@@ -76,7 +71,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
     const today = new Date();
 
     const game = {
-        hostId: hostId,
+        hostId: user.getUserId(),
         currentNumberOfPlayer: 1,
         nbPlayerMin: req.body.nbPlayerMin || 5,
         nbPlayerMax: req.body.nbPlayerMax || 20,
@@ -128,6 +123,14 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
     try {
         console.log("creation en cours");
         const gameId: { id: number } = await database.insertInto("games").values(game).returning("id").executeTakeFirstOrThrow();
+        const newHostGame: Game = new Game(gameId.id, gameParam, user);
+
+        // On ajoute la partie à la liste des parties
+        gamesList.push(newHostGame);
+
+        // On ajoute la partie aux parties de l'utilisateur
+        user.addGame(newHostGame);
+
         // On ajoute un evenement
         setTimeout(() => startGame(gameId.id), game.startDate - Date.now());
         res.status(200).json({ message: "New game created" });
@@ -138,12 +141,12 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 
 export const joinGame = async (req: Request, res: Response): Promise<void> => {
     try {
-        const username: string = getTokenContent(req.headers["x-access-token"] as string).username;
+        const user: User = usersHandler[getTokenContent(req.headers["x-access-token"] as string).username];
         const gameId: number = parseInt(req.params.id);
         if (!gameId) throw new Error("No game ID provided.");
 
         // Fetch the user ID using the username
-        const userId: number = await getUserId(username);
+        const userId: number = user.getUserId();
 
         //check if player already in game
         const existingPlayer = await database.selectFrom("players").select(["id"]).where("players.user", "=", userId).where("players.game", "=", gameId).executeTakeFirst();
@@ -157,7 +160,7 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
         await database
             .insertInto("players")
             .values({
-                name: username,
+                name: user.getUsername(),
                 role: "",
                 power: "",
                 user: userId,
