@@ -1,6 +1,10 @@
 import database from "../util/database";
 import { Game } from "./gameModel";
 
+export const usersHandler: {
+    [key: string]: User;
+} = {};
+
 export class User {
 
     private userId: number;
@@ -15,7 +19,6 @@ export class User {
         this.username = username;
         const userIdentifier: { id: number } = await database.selectFrom("users").select(["id"]).where("username", "=", username).executeTakeFirstOrThrow();
         this.userId = userIdentifier.id;
-        this.userId = 0;
         this.gamesList = [];
     };
 
@@ -31,6 +34,10 @@ export class User {
         for (const game of this.gamesList) if (gameId === game.getGameId()) return true;
 
         return false;
+    }
+
+    addGame(game: Game): void {
+        this.gamesList.push(game);
     }
 
 }
