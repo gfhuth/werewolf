@@ -1,7 +1,7 @@
 @baseUrl = 127.0.0.1:3000
 @contentType = application/json
 # @name login1
-POST http://{{baseUrl}}/user/login/ HTTP/1.1
+POST http://{{baseUrl}}/user/register/ HTTP/1.1
 content-type: {{contentType}}
 
 {
@@ -32,7 +32,7 @@ Content-Type: {{contentType}}
     "nbPlayerMax": 20,
     "dayLength": 13,
     "nightLength": 12,
-    "startDate": "2023-04-13T11:05:00",
+    "startDate": "2023-04-13T11:41:00",
     "percentageWerewolf": 0.33,
     "probaContamination": 0.1,
     "probaInsomnie": 0.1,
