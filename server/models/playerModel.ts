@@ -1,4 +1,22 @@
 import database from "../util/database";
+import { Game } from "./gameModel";
+
+export class Player {
+
+    public id: number;
+    public name: number;
+    public role: number;
+    public power: number;
+    public game: Game;
+    constructor(id: number, name: number, role: number, power: number, game: Game) {
+        this.id = id;
+        this.name = name;
+        this.role = role;
+        this.power = power;
+        this.game = game;
+    }
+
+}
 
 export const playerSchema = async (): Promise<void> => {
     await database.schema

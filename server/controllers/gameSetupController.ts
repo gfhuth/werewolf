@@ -3,7 +3,7 @@ import { sql } from "kysely";
 import { getTokenContent } from "./userController";
 import { Game, GameParam, gamesList } from "../models/gameModel";
 import database from "../util/database";
-import { startGame } from "./gameStartedController";
+import { initGame } from "./gameStartedController";
 
 async function getUserId(username): Promise<number> {
     return (await database.selectFrom("users").select(["id"]).where("username", "=", username).executeTakeFirst()).id;
@@ -108,7 +108,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
     try {
         const gameId: { id: number } = await database.insertInto("games").values(game).returning("id").executeTakeFirstOrThrow();
         // On ajoute un evenement
-        setTimeout(() => startGame(gameId.id), game.startDate - Date.now());
+        setTimeout(() => initGame(gameId.id), game.startDate - Date.now());
         res.status(200).json({ message: `New game created and start in ${(game.startDate - Date.now()) / 60000} min` });
     } catch (e) {
         res.sendStatus(500);

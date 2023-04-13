@@ -1,6 +1,7 @@
 import { sql } from "kysely";
 import database from "../util/database";
-import { startGame } from "../controllers/gameStartedController";
+import { initGame } from "../controllers/gameStartedController";
+import { Player } from "./playerModel";
 
 export const gamesList: Array<Game> = [];
 export enum GameStatus {
@@ -26,6 +27,7 @@ export class Game {
     private gameId: number;
     private gameParam: GameParam;
     private hostId: number;
+    private playerList:Player[] = [];
     public currentNumberOfPlayer = 1;
 
     constructor(gameId: number, gameParam: GameParam, hostName: number) {
@@ -100,11 +102,13 @@ export class Game {
         return game;
     }
 
+    /// RETURN NUMBER of day/night cyclce passed
     public getStatus(): number {
         // time in ms
         const time = Date.now() - this.gameParam.startDate;
+        const timeInHour = time / 3600000;
         if (time < 0) return GameStatus.NOT_STARTED;
-        else return 1 + (Math.floor(time / 3600000 / (this.gameParam.dayLength + this.gameParam.nightLength)) % 2);
+        else return (Math.floor(timeInHour / (this.gameParam.dayLength + this.gameParam.nightLength)));
     }
 
 }
@@ -135,6 +139,6 @@ export const gameSchema = async (): Promise<void> => {
     const gamelist = await database.selectFrom("games").selectAll().execute();
     for (let i = 0; i < gamelist.length; i++) {
         const game = Game.gameDBtoGame(gamelist[i]);
-        if (game.getStatus() != 0) setTimeout(() => startGame(game.getGameId()), game.getGameParam().startDate - Date.now());
+        if (game.getStatus() != 0) setTimeout(() => initGame(game.getGameId()), game.getGameParam().startDate - Date.now());
     }
 };
