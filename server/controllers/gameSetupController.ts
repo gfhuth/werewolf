@@ -12,7 +12,6 @@ async function getUserId(username): Promise<number> {
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
     try {
-        console.log("aaa");
         // Récupérer la liste des jeux depuis la base de données SQL et le username
         const games = await database.selectFrom("games").selectAll().execute();
 
@@ -63,17 +62,12 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
 }
 
 export const newGame = async (req: Request, res: Response): Promise<void> => {
-    console.log("verif en cours");
     const hostName = getTokenContent(req.headers["x-access-token"] as string).username;
     const hostId = await getUserId(hostName);
     // Valeur par défaut de la date
-    const defaultDate = new Date();
-    defaultDate.setDate(defaultDate.getDate() + 1);
-    defaultDate.setHours(8);
-    defaultDate.setMinutes(0);
-    defaultDate.setMilliseconds(0);
-
-    const today = new Date();
+    let date: number = Date.parse(req.body.startDate);
+    if (date) date = new Date(date).getTime();
+    else date = Date.now() + 1000 * 60 * 60 * 8;
 
     const game = {
         hostId: hostId,
@@ -82,7 +76,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         nbPlayerMax: req.body.nbPlayerMax || 20,
         dayLength: req.body.dayLength || 60 * 14,
         nightLength: req.body.nightLength || 60 * 10,
-        startDate: new Date(req.body.startDate).getTime() || defaultDate.getTime(),
+        startDate: date,
 
         percentageWerewolf: req.body.percentageWerewolf || 0.33,
         probaContamination: req.body.probaContamination || 0,
@@ -90,18 +84,17 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         probaVoyance: req.body.probaVoyance || 0,
         probaSpiritisme: req.body.probaSpiritisme || 0
     };
-    console.log(defaultDate.getTime());
     const conditions = [
         { minRange: 0, value: game.probaContamination, maxRange: 1, errorMessage: "Unvalid contamination probability" },
         { minRange: 0, value: game.probaInsomnie, maxRange: 1, errorMessage: "Unvalid contamination probability" },
         { minRange: 0, value: game.probaVoyance, maxRange: 1, errorMessage: "Unvalid contamination probability" },
         { minRange: 0, value: game.probaSpiritisme, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.percentageWerewolf, maxRange: 100, errorMessage: "Unvalid contamination probability" },
+        { minRange: 0, value: game.percentageWerewolf, maxRange: 1, errorMessage: "Unvalid contamination probability" },
         { minRange: 0, value: game.dayLength, maxRange: 24 * 60, errorMessage: "Day length too long" },
         { minRange: 0, value: game.nightLength, maxRange: 24 * 60, errorMessage: "Night length too long" },
-        { minRange: 2, value: game.nbPlayerMin, maxRange: Infinity, errorMessage: "There must be at least two players" },
-        { minRange: 0, value: game.nbPlayerMax, maxRange: 500, errorMessage: "Too many players" },
-        { minRange: today.getTime(), value: game.startDate, maxRange: Infinity, errorMessage: "Start date passed" }
+        { minRange: 2, value: game.nbPlayerMin, maxRange: 498, errorMessage: "There must be at least two players" },
+        { minRange: game.nbPlayerMin, value: game.nbPlayerMax, maxRange: 500, errorMessage: "Too many players" },
+        { minRange: Date.now(), value: game.startDate, maxRange: Infinity, errorMessage: "Start date passed" }
     ];
 
     for (let i = 0; i < conditions.length; i++) {
@@ -112,25 +105,11 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         }
     }
 
-    const gameParam: GameParam = {
-        nbPlayerMin: game.nbPlayerMin,
-        nbPlayerMax: game.nbPlayerMax,
-        dayLength: game.dayLength,
-        nightLength: game.nightLength,
-        startDate: game.startDate,
-        percentageWerewolf: game.percentageWerewolf,
-        probaContamination: game.probaContamination,
-        probaInsomnie: game.probaInsomnie,
-        probaVoyance: game.probaVoyance,
-        probaSpiritisme: game.probaSpiritisme
-    };
-
     try {
-        console.log("creation en cours");
         const gameId: { id: number } = await database.insertInto("games").values(game).returning("id").executeTakeFirstOrThrow();
         // On ajoute un evenement
         setTimeout(() => startGame(gameId.id), game.startDate - Date.now());
-        res.status(200).json({ message: "New game created" });
+        res.status(200).json({ message: `New game created and start in ${(game.startDate - Date.now()) / 60000} min` });
     } catch (e) {
         res.sendStatus(500);
     }
