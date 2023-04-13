@@ -23,10 +23,11 @@ class WebsocketConnection {
         return this.user != null;
     }
 
-    readMessage(message: string): void {
+    async readMessage(message: string): Promise<void> {
         try {
-            const data: { game_id: number; event: string; data: Record<string, any> } = JSON.parse(message);
-            //DEBUG
+            const data: { game_id?: number, event: string; data: Record<string, any> } = JSON.parse(message);
+
+            // DEBUG
             console.log(data);
 
             if (!data || typeof data !== "object" || !data.event || !data.data || typeof data.data !== "object") {
@@ -34,16 +35,22 @@ class WebsocketConnection {
                 return;
             }
             if (data.event === "AUTHENTICATION") {
-                if (this.isAuthenticated()) {
-                    this.ws.send(JSON.stringify({ status: 200, message: "Already Authentified" }));
-                    return;
-                }
                 const token: string = data.data.token;
                 if (!jwt.verify(token, JWT_SECRET)) {
                     this.ws.send(JSON.stringify({ status: 403, message: "Bad Authentication" }));
                     return;
                 }
                 const username: string = (jwt.decode(token) as { username: string }).username;
+
+                if (this.isAuthenticated()) {
+                    if (this.user.getUsername() !== username) {
+                        this.ws.send(JSON.stringify({ status: 403, message: "Bad Authentication" }));
+                        return;
+                    }
+                    this.ws.send(JSON.stringify({ status: 200, message: "Already Authentified" }));
+                    return;
+                }
+
                 this.user = new User(username);
                 this.ws.send(JSON.stringify({ status: 200, message: "User authenticated" }));
                 return;
