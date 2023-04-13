@@ -2,6 +2,7 @@ import { sql } from "kysely";
 import database from "../util/database";
 import { initGame } from "../controllers/gameStartedController";
 import { Player } from "./playerModel";
+import { User } from "./userModel";
 
 export const gamesList: Array<Game> = [];
 export enum GameStatus {
@@ -26,14 +27,14 @@ export class Game {
 
     private gameId: number;
     private gameParam: GameParam;
-    private hostId: number;
     private playerList:Player[] = [];
+    private host: User;
     public currentNumberOfPlayer = 1;
 
-    constructor(gameId: number, gameParam: GameParam, hostName: number) {
+    constructor(gameId: number, gameParam: GameParam, host: User) {
         this.gameId = gameId;
         this.gameParam = gameParam;
-        this.hostId = hostName;
+        this.host = host;
     }
 
     getGameId(): number {
@@ -47,13 +48,13 @@ export class Game {
     public toShortJson(): { [key: string]: string | number } {
         const id = this.gameId;
         const startDate = this.gameParam.startDate;
-        const hostId = this.hostId;
+        const host = this.host;
         const currentNumberOfPlayer = this.currentNumberOfPlayer;
         const nbPlayerMax = this.gameParam.nbPlayerMax;
         return {
             id: id,
             startDate: startDate.toLocaleString(),
-            hostId: hostId,
+            hostId: host.getUserId(),
             currentNumberOfPlayer: currentNumberOfPlayer,
             nbPlayerMax: nbPlayerMax
         };
@@ -62,7 +63,7 @@ export class Game {
     //return json of this object
     public toLongJson(): { [key: string]: string | number } {
         const gameParam = this.gameParam;
-        const hostId = this.hostId;
+        const host = this.host;
         const currentNumberOfPlayer = this.currentNumberOfPlayer;
         const wereWolfCount = Math.floor((gameParam.nbPlayerMax * gameParam.percentageWerewolf) / 100);
 
@@ -77,7 +78,7 @@ export class Game {
             probaInsomnie: gameParam.probaInsomnie,
             probaVoyance: gameParam.probaVoyance,
             probaSpiritisme: gameParam.probaSpiritisme,
-            hostId: hostId,
+            hostId: host.getUserId(),
             currentNumberOfPlayer: currentNumberOfPlayer,
             wereWolfCount: wereWolfCount
         };

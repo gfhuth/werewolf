@@ -1,6 +1,6 @@
 import * as WebSocket from "ws";
 import jwt from "jsonwebtoken";
-import { User } from "../models/userModel";
+import { User, usersHandler } from "../models/userModel";
 import { eventHandlers } from "./eventController";
 import { Game } from "../models/gameModel";
 import { getGame } from "./gameSetupController";
@@ -27,9 +27,6 @@ class WebsocketConnection {
         try {
             const data: { game_id?: number, event: string; data: Record<string, any> } = JSON.parse(message);
 
-            // DEBUG
-            console.log(data);
-
             if (!data || typeof data !== "object" || !data.event || !data.data || typeof data.data !== "object") {
                 this.ws.send(JSON.stringify({ status: 400, message: "Bad Request" }));
                 return;
@@ -51,7 +48,7 @@ class WebsocketConnection {
                     return;
                 }
 
-                this.user = new User(username);
+                this.user = usersHandler[username];
                 this.ws.send(JSON.stringify({ status: 200, message: "User authenticated" }));
                 return;
             }

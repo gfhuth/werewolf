@@ -3,13 +3,13 @@ import { Game } from "../models/gameModel";
 import { connections } from "./websocketController";
 import { User } from "../models/userModel";
 
-export const newMessage = (game: Game, user: User, data: {date: Date, chat_id: Chat, content: string}): void => {
+export const newMessage = (game: Game, user: User, data: {date: number, chat_id: Chat, content: string}): void => {
     const message: { game: number, chat: number; user: number; content: string, date: number } = {
         game: game.getGameId(),
         chat: data.chat_id,
         user: user.getUserId(),
         content: data.content,
-        date: data.date.getTime()
+        date: data.date
     };
     // TODO: vérifier que le message est sans erreurs
 

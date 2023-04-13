@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import database from "../util/database";
-import { insertUser, listUsers } from "../models/userModel";
+import { User, insertUser, listUsers, usersHandler } from "../models/userModel";
 
 const { JWT_SECRET } = process.env;
 
@@ -95,6 +95,10 @@ export const register = async (req: Request<any, any, { username: string; passwo
         res.sendStatus(500);
         return;
     }
+
+    // Insertion de l'utilisateur dans le dictionnaire des utilisateurs
+    const user = new User(username);
+    usersHandler[username] = user;
 
     const token: string = jwt.sign(
         {
