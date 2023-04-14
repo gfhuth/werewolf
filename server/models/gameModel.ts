@@ -99,11 +99,8 @@ export class Game {
      * @returns {number}
      */
     public getStatus(): number {
-        // time in ms
-        const time = Date.now() - this.gameParam.startDate;
-        const timeInHour = time / 3600000;
-        if (time < 0) return GameStatus.NOT_STARTED;
-        else return Math.floor(timeInHour / (this.gameParam.dayLength + this.gameParam.nightLength));
+        // TODO 
+        return 0;
     }
 
 }
@@ -165,6 +162,8 @@ export const gameSchema = async (): Promise<void> => {
         };
         const game: Game = new Game(elem.id, gameParams);
         gamesList.push(game);
-        if (game.getStatus() != 0) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
+        // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
+        if (game.getStatus() == 0) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
+        else initGame(game.getGameId());
     }
 };
