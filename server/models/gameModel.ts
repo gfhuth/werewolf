@@ -49,19 +49,7 @@ export class Game {
     }
 
     static async load(gameId: number): Promise<Game> {
-        const game: {
-            id: number;
-            nbPlayerMin: number;
-            nbPlayerMax: number;
-            dayLength: number;
-            nightLength: number;
-            startDate: number;
-            percentageWerewolf: number;
-            probaContamination: number;
-            probaInsomnie: number;
-            probaVoyance: number;
-            probaSpiritisme: number;
-        } = await database
+        const game: { id: number } & GameParam = await database
             .selectFrom("games")
             .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
             .where("id", "=", gameId)
@@ -143,19 +131,7 @@ export const gameSchema = async (): Promise<void> => {
         .execute();
 
     // On charge chaque parties en cours
-    const gamelist: Array<{
-        id: number;
-        nbPlayerMin: number;
-        nbPlayerMax: number;
-        dayLength: number;
-        nightLength: number;
-        startDate: number;
-        percentageWerewolf: number;
-        probaContamination: number;
-        probaInsomnie: number;
-        probaVoyance: number;
-        probaSpiritisme: number;
-    }> = await database
+    const gamelist: Array<{ id: number } & GameParam> = await database
         .selectFrom("games")
         .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
         .execute();
