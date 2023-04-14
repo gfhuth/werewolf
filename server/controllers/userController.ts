@@ -97,7 +97,7 @@ export const register = async (req: Request<any, any, { username: string; passwo
     }
 
     // Insertion de l'utilisateur dans le dictionnaire des utilisateurs
-    const user = new User(username);
+    const user: User = await User.load(username);
     usersHandler[username] = user;
 
     const token: string = jwt.sign(
