@@ -1,27 +1,21 @@
 import { Request, Response } from "express";
-import { sql } from "kysely";
 import { getTokenContent } from "./userController";
 import { Game, GameParam, gamesList } from "../models/gameModel";
 import database from "../util/database";
 import { initGame } from "./gameStartedController";
 
-async function getUserId(username): Promise<number> {
-    return (await database.selectFrom("users").select(["id"]).where("username", "=", username).executeTakeFirst()).id;
-}
 import { User, usersHandler } from "../models/userModel";
 
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
     try {
         // Récupérer la liste des jeux depuis la base de données SQL et le username
-        const games = await database.selectFrom("games").selectAll().execute();
+        const games: Array<{ id: number; startDate: number; hostId: number; nbPlayerMax: number; currentNumberOfPlayer: number }> = await database
+            .selectFrom("games")
+            .select(["id", "startDate", "hostId", "nbPlayerMax", "currentNumberOfPlayer"])
+            .execute();
 
-        // Convertir le jeu en JSON et l'envoyer dans la réponse
-        const gamesJson = [];
-        games.forEach((game) => {
-            gamesJson.push(Game.gameDBtoGame(game).toShortJson());
-        });
-        res.status(200).json({ games: gamesJson });
+        res.status(200).json({ games: games });
     } catch (err) {
         console.log(err);
         res.sendStatus(500);
@@ -34,10 +28,42 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
         if (!gameId) throw new Error("Invalid game ID provided.");
 
         // Récupérer le jeu depuis la base de données SQL avec l'ID
-        const games = await database.selectFrom("games").selectAll().where("id", "=", gameId).limit(1).execute();
-        if (games.length === 0) throw new Error(`Game with ID ${gameId} not found.`);
+        const game: {
+            id: number;
+            nbPlayerMax: number;
+            dayLength: number;
+            nightLength: number;
+            startDate: number;
+            percentageWerewolf: number;
+            probaContamination: number;
+            probaInsomnie: number;
+            probaVoyance: number;
+            probaSpiritisme: number;
+            hostId: number;
+            currentNumberOfPlayer: number;
+            wereWolfCount?: number;
+        } = await database
+            .selectFrom("games")
+            .select([
+                "id",
+                "nbPlayerMax",
+                "dayLength",
+                "nightLength",
+                "startDate",
+                "percentageWerewolf",
+                "probaContamination",
+                "probaInsomnie",
+                "probaVoyance",
+                "probaSpiritisme",
+                "hostId",
+                "currentNumberOfPlayer"
+            ])
+            .where("id", "=", gameId)
+            .executeTakeFirstOrThrow();
+
+        game.wereWolfCount = Math.floor((game.nbPlayerMax * game.percentageWerewolf) / 100);
         // Renvoyer la parti en longJson
-        res.status(200).json(Game.gameDBtoGame(games[0]).toLongJson());
+        res.status(200).json(game);
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: err.message });
@@ -48,13 +74,13 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
     try {
         const user: User = usersHandler[getTokenContent(req.headers["x-access-token"] as string).username];
         // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
-        const games = await database.selectFrom("games").selectAll().where("games.hostId", "=", user.getUserId()).execute();
-        // Convertir le jeu en JSON et l'envoyer dans la réponse
-        const gamesJson = [];
-        games.forEach((game) => {
-            gamesJson.push(Game.gameDBtoGame(game).toShortJson());
-        });
-        res.status(200).json({ games: gamesJson });
+        const games: Array<{ id: number; startDate: number; hostId: number; nbPlayerMax: number; currentNumberOfPlayer: number }> = await database
+            .selectFrom("games")
+            .select(["id", "startDate", "hostId", "nbPlayerMax", "currentNumberOfPlayer"])
+            .where("games.hostId", "=", user.getUserId())
+            .execute();
+
+        res.status(200).json({ games: games });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: err.message });
@@ -120,7 +146,18 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 
     try {
         const gameId: { id: number } = await database.insertInto("games").values(game).returning("id").executeTakeFirstOrThrow();
-        const newHostGame: Game = new Game(gameId.id, gameParam, user);
+        const newHostGame: Game = new Game(gameId.id, gameParam);
+
+        await database
+            .insertInto("players")
+            .values({
+                name: user.getUsername(),
+                role: null,
+                power: null,
+                user: user.getUserId(),
+                game: gameId.id
+            })
+            .execute();
 
         // On ajoute la partie à la liste des parties
         gamesList.push(newHostGame);

@@ -32,18 +32,15 @@ function startNight(game: Game): void {
 /** Function to add when a game is restored or start
  * Setup the game (probability, role, ...)
  * Add event call at each end of days (use interval or timeout), ...
- * @param {number} gameID id of the starting game 
- * */ 
-export function initGame(gameID: number): void {
-    const gameDb = database.selectFrom("games").selectAll().where("id", "=", gameID).executeTakeFirst();
-    const game = Game.gameDBtoGame(gameDb);
+ * @param {number} gameId id of the starting game
+ * */
+export async function initGame(gameId: number): Promise<void> {
+    const game: Game = await Game.load(gameId);
     addPlayerInGame(game);
     const gameStatus = game.getStatus();
     if (gameStatus <= 1) setupGame(game);
 
-    console.log(`game ${gameID} successfuly started`);
-    if (gameStatus % 2 == 1) 
-        startDay(game);
-    else 
-        startNight(game);
+    console.log(`game ${gameId} successfuly started`);
+    if (gameStatus % 2 == 1) startDay(game);
+    else startNight(game);
 }
