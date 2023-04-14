@@ -2,6 +2,7 @@ import { Chat, createMessage } from "../models/messageModel";
 import { Game } from "../models/gameModel";
 import { connections } from "./websocketController";
 import { User } from "../models/userModel";
+import { registerHandlers } from "./eventController";
 
 export const newMessage = (game: Game, user: User, data: {date: number, chat_id: Chat, content: string}): void => {
     const message: { game: number, chat: number; user: number; content: string, date: number } = {
@@ -26,4 +27,9 @@ export const newMessage = (game: Game, user: User, data: {date: number, chat_id:
             }
         }));
     }
+};
+
+// Liste des événements relatifs aux messages
+export const registerChatEvents = (): void => {
+    registerHandlers("CHAT_SENT", newMessage);
 };
