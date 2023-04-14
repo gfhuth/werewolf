@@ -88,7 +88,6 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
 }
 
 export const newGame = async (req: Request, res: Response): Promise<void> => {
-    console.log("verif en cours");
     const user: User = usersHandler[getTokenContent(req.headers["x-access-token"] as string).username];
     // Valeur par défaut de la date
     let date: number = Date.parse(req.body.startDate);
@@ -100,8 +99,8 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         currentNumberOfPlayer: 1,
         nbPlayerMin: req.body.nbPlayerMin || 5,
         nbPlayerMax: req.body.nbPlayerMax || 20,
-        dayLength: req.body.dayLength || 60 * 14,
-        nightLength: req.body.nightLength || 60 * 10,
+        dayLength: req.body.dayLength || 60 * 14 * 60,
+        nightLength: req.body.nightLength || 60 * 10 * 60,
         startDate: date,
 
         percentageWerewolf: req.body.percentageWerewolf || 0.33,
@@ -116,8 +115,8 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         { minRange: 0, value: game.probaVoyance, maxRange: 1, errorMessage: "Unvalid contamination probability" },
         { minRange: 0, value: game.probaSpiritisme, maxRange: 1, errorMessage: "Unvalid contamination probability" },
         { minRange: 0, value: game.percentageWerewolf, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.dayLength, maxRange: 24 * 60, errorMessage: "Day length too long" },
-        { minRange: 0, value: game.nightLength, maxRange: 24 * 60, errorMessage: "Night length too long" },
+        { minRange: 0, value: game.dayLength, maxRange: 24 * 60 * 60, errorMessage: "Day length too long" },
+        { minRange: 0, value: game.nightLength, maxRange: 24 * 60 * 60, errorMessage: "Night length too long" },
         { minRange: 2, value: game.nbPlayerMin, maxRange: 498, errorMessage: "There must be at least two players" },
         { minRange: game.nbPlayerMin, value: game.nbPlayerMax, maxRange: 500, errorMessage: "Too many players" },
         { minRange: Date.now(), value: game.startDate, maxRange: Infinity, errorMessage: "Start date passed" }
@@ -164,7 +163,6 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 
         // On ajoute la partie aux parties de l'utilisateur
         user.addGame(newHostGame);
-
         // On ajoute un evenement
         setTimeout(() => initGame(gameId.id), game.startDate - Date.now());
         res.status(200).json({ message: `New game created and start in ${(game.startDate - Date.now()) / 60000} min` });

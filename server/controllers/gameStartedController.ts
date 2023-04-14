@@ -1,6 +1,5 @@
 import { Game } from "../models/gameModel";
 import database from "../util/database";
-
 /** Add all the player who have join the game in the player list of game
  * @param {Game} game game to add player
  */
@@ -20,13 +19,24 @@ function setupGame(game: Game): void {
  */
 function startDay(game: Game): void {
     console.log("TODO : The sun is rising");
+    // update death player
+    // activate vote for each player, desactivate power of werewolf
+    // send a message at every connected client
+    // call startNight at the end of the day
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    setTimeout(() => startNight(game), game.getGameParam().dayLength * 1000);
 }
 
 /** Apply all action happend during the day and lunch a night
  * @param {Game} game Game to apply change
  */
 function startNight(game: Game): void {
-    console.log("TODO : The night is arriving");
+    console.log("TODO : The night falling");
+    // update death player
+    // desactivated vote for each player, activate power
+    // send a message at every connected client
+    // call startDay at the end of the day
+    setTimeout(() => startDay(game), game.getGameParam().nightLength * 1000);
 }
 
 /** Function to add when a game is restored or start
@@ -38,9 +48,9 @@ export async function initGame(gameId: number): Promise<void> {
     const game: Game = await Game.load(gameId);
     addPlayerInGame(game);
     const gameStatus = game.getStatus();
-    if (gameStatus <= 1) setupGame(game);
+    if (gameStatus.status == 0) setupGame(game);
 
     console.log(`game ${gameId} successfuly started`);
-    if (gameStatus % 2 == 1) startDay(game);
+    if (gameStatus.status % 2 == 0) startDay(game);
     else startNight(game);
 }

@@ -64,8 +64,9 @@ export class Game {
         } = await database
             .selectFrom("games")
             .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
+            .where("id", "=", gameId)
             .executeTakeFirstOrThrow();
-
+        console.log(game.dayLength);
         const gameParams: GameParam = {
             nbPlayerMin: game.nbPlayerMin,
             nbPlayerMax: game.nbPlayerMax,
@@ -94,13 +95,24 @@ export class Game {
     }
 
     /** Compute the status of the game
-     * Odd number corresponding to a night. Other are days.
-     * 0 = not started, 1 = first day, 2 = first night
-     * @returns {number}
+     * return an object of shape { status: number, timePassed: number }
+     * status :
+     *   -1 = not started, 0 = first day, 1 = first night, 2 = second days, ...
+     * timePassed : Time passed since the start of the current day or night
+     * @returns { JSON }
      */
-    public getStatus(): number {
-        // TODO 
-        return 0;
+    public getStatus(): { status: number; timePassed: number } {
+        const timeSinceGameStart: number = Date.now() - this.gameParam.startDate;
+        if (timeSinceGameStart < 0) {
+            return { status: -1, timePassed: 0 };
+        } else {
+            const timeOfOneCycle = this.gameParam.dayLength + this.gameParam.nightLength;
+            const numberOfCycle = Math.floor(timeSinceGameStart / timeOfOneCycle);
+            const timeSinceCycleStart = timeSinceGameStart - timeOfOneCycle * numberOfCycle;
+            // If we are day.
+            if (timeSinceCycleStart - this.gameParam.dayLength < 0) return { status: numberOfCycle, timePassed: timeSinceCycleStart };
+            else return { status: 2 * numberOfCycle + 1, timePassed: timeSinceCycleStart - this.gameParam.dayLength };
+        }
     }
 
 }
@@ -163,7 +175,7 @@ export const gameSchema = async (): Promise<void> => {
         const game: Game = new Game(elem.id, gameParams);
         gamesList.push(game);
         // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
-        if (game.getStatus() == 0) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
+        if (game.getStatus().status == -1) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
         else initGame(game.getGameId());
     }
 };
