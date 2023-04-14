@@ -1,8 +1,8 @@
 import database from "../util/database";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { getTokenContent } from "./userController";
 
-export async function verifyToken(req: Request, res: Response, next): Promise<void> {
+export async function verifyToken(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         if (!req.headers["x-access-token"]) {
             res.status(404).send("x-access-token field not found");
