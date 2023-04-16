@@ -62,7 +62,7 @@ class WebsocketConnection {
                 this.ws.send(JSON.stringify({ status: 409, message: "Game doesn't exist" }));
                 return;
             }
-            if (!this.user.playInGame(data.game_id)) {
+            if (!game.getPlayer(this.user.getUsername())) {
                 this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
                 return;
             }
