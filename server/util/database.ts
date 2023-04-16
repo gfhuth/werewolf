@@ -5,7 +5,7 @@ import { Database } from "./sql/schema";
 import { gameSchema } from "../models/gameModel";
 import { playerSchema } from "../models/playerModel";
 import { userSchema } from "../models/userModel";
-import { messageSchema } from "../models/messageModel";
+import { messageSchema } from "../models/chatModel";
 
 const database = new Kysely<Database>({
     dialect: new SqliteDialect({
