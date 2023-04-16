@@ -9,7 +9,7 @@ import * as WebSocket from "ws";
 
 import { onConnect } from "./controllers/websocketController";
 import userRouter from "./routers/user";
-import { registerChatEvents } from "./controllers/messageController";
+import { registerChatEvents } from "./controllers/chatController";
 
 const app = express();
 
