@@ -2,6 +2,9 @@ import { sql } from "kysely";
 import database from "../util/database";
 import { initGame } from "../controllers/gameStartedController";
 import { Player } from "./playerModel";
+import { Chat } from "./chatModel";
+import { usersHandler } from "./userModel";
+import { getGame } from "../controllers/gameSetupController";
 
 export const gamesList: Array<Game> = [];
 export enum GameStatus {
@@ -36,8 +39,9 @@ export class Game {
 
     private gameId: number;
     private gameParam: GameParam;
-    private playerList: Player[] = [];
-    public currentNumberOfPlayer = 1;
+    private playersList: Player[] = [];
+    private ChatsList: Array<Chat>;
+    private currentNumberOfPlayer;
 
     /**
      * @param {number} gameId is the id of the game
@@ -46,6 +50,8 @@ export class Game {
     constructor(gameId: number, gameParam: GameParam) {
         this.gameId = gameId;
         this.gameParam = gameParam;
+        this.ChatsList = [];
+        this.currentNumberOfPlayer = 1;
     }
 
     static async load(gameId: number): Promise<Game> {
@@ -54,7 +60,6 @@ export class Game {
             .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
             .where("id", "=", gameId)
             .executeTakeFirstOrThrow();
-        console.log(game.dayLength);
         const gameParams: GameParam = {
             nbPlayerMin: game.nbPlayerMin,
             nbPlayerMax: game.nbPlayerMax,
@@ -80,6 +85,32 @@ export class Game {
 
     public getGameParam(): GameParam {
         return this.gameParam;
+    }
+
+    public getChats(): Array<Chat> {
+        return this.ChatsList;
+    }
+
+    public getAllPlayers(): Array<Player> {
+        return this.playersList;
+    }
+
+    public getPlayer(username: string): Player {
+        for (const player of this.playersList) if (player.getUser().getUsername() === username) return player;
+        return null;
+    }
+
+    public getNbOfPlayers(): number {
+        return this.currentNumberOfPlayer;
+    }
+
+    public addPlayer(player: Player): void {
+        this.playersList.push(player);
+        this.currentNumberOfPlayer++;
+    }
+
+    public addChat(chat: Chat): void {
+        this.ChatsList.push(chat);
     }
 
     /** Compute the status of the game
@@ -153,5 +184,13 @@ export const gameSchema = async (): Promise<void> => {
         // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
         if (game.getStatus().status == -1) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
         else initGame(game.getGameId());
+    }
+
+    // Initialisation des joueurs de chaque partie
+    const players: Array<{ name: string; role: number; power: number; game: number }> = await database.selectFrom("players").select(["name", "role", "power", "game"]).execute();
+    for (const elem of players) {
+        const game: Game = getGame(elem.game);
+        const player: Player = new Player(usersHandler[elem.name], elem.role, elem.power, game);
+        game.addPlayer(player);
     }
 };
