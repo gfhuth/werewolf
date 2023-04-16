@@ -5,6 +5,12 @@ import database from "../util/database";
 import { initGame } from "./gameStartedController";
 
 import { User, usersHandler } from "../models/userModel";
+import { Player } from "../models/playerModel";
+
+export const getGame = (gameId: number): Game => {
+    for (const game of gamesList) if (game.getGameId() === gameId) return game;
+    return null;
+};
 
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
@@ -161,8 +167,11 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         // On ajoute la partie à la liste des parties
         gamesList.push(newHostGame);
 
-        // On ajoute la partie aux parties de l'utilisateur
-        user.addGame(newHostGame);
+        // On ajoute l'utilisateur aux joueurs de la partie
+        // TODO: ajuster les valeurs de role et power
+        const player: Player = new Player(user, 0, 0, newHostGame);
+        newHostGame.addPlayer(player);
+
         // On ajoute un evenement
         setTimeout(() => initGame(gameId.id), game.startDate - Date.now());
         res.status(200).json({ message: `New game created and start in ${(game.startDate - Date.now()) / 60000} min` });
@@ -177,33 +186,32 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
         const gameId: number = parseInt(req.params.id);
         if (!gameId) throw new Error("No game ID provided.");
 
-        // Fetch the user ID using the username
-        const userId: number = user.getUserId();
+        const game: Game = getGame(gameId);
+        if (!game) throw new Error("Game doesn't exist");
 
-        //check if player already in game
-        const existingPlayer = await database.selectFrom("players").select(["id"]).where("players.user", "=", userId).where("players.game", "=", gameId).executeTakeFirst();
-        if (existingPlayer) throw new Error("User is already in the game.");
+        // Check if player already in game
+        if (game.getPlayer(user.getUsername())) throw new Error("User is already in the game.");
 
-        const game = await database.selectFrom("games").selectAll().where("id", "=", gameId).limit(1).executeTakeFirst();
-        if (!game) throw new Error("Game ID not found");
-        if (game.currentNumberOfPlayer >= game.nbPlayerMax) throw new Error("Game full");
+        // Check if the game is full or not
+        if (game.getNbOfPlayers() >= game.getGameParam().nbPlayerMax) throw new Error("Game full");
+
+        // Ajout du joueur dans la liste des joueurs de la partie
+        const player: Player = new Player(user, 0, 0, game);
+        game.addPlayer(player);
 
         // Insert a new record in the user_games table
         await database
             .insertInto("players")
             .values({
                 name: user.getUsername(),
-                role: "",
-                power: "",
-                user: userId,
+                role: 0,
+                power: 0,
+                user: user.getUserId(),
                 game: gameId
             })
             .execute();
-        await database
-            .updateTable("games")
-            .set({ currentNumberOfPlayer: game.currentNumberOfPlayer + 1 })
-            .where("id", "=", gameId)
-            .executeTakeFirst();
+
+        await database.updateTable("games").set({ currentNumberOfPlayer: game.getNbOfPlayers() }).where("id", "=", gameId).executeTakeFirst();
 
         res.status(200).json({ message: "game successfully join" });
     } catch (err) {
@@ -214,9 +222,4 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
 
 export const leaveGame = async (req: Request, res: Response): Promise<void> => {
     res.status(404).json({ message: "Not implemented yet" });
-};
-
-export const getGame = (gameId: number): Game => {
-    for (const game of gamesList) if (game.getGameId() === gameId) return game;
-    return null;
 };
