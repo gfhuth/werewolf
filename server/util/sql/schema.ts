@@ -9,8 +9,8 @@ export interface UserTable {
 export interface PlayerTable {
     id: Generated<number>;
     name: string;
-    role: string;
-    power: string;
+    role: number;
+    power: number;
     user: number;
     game: number;
 }
@@ -34,8 +34,8 @@ export interface GameTable {
 export interface MessageTable {
     id: Generated<number>;
     game: number;
-    chat: number,
-    user: number;
+    type: number,
+    player: number;
     content: string;
     date: number;
 }
