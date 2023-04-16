@@ -1,5 +1,6 @@
+import { Chat, Chat_type } from "../models/chatModel";
 import { Game } from "../models/gameModel";
-import database from "../util/database";
+import { getGame } from "./gameSetupController";
 /** Add all the player who have join the game in the player list of game
  * @param {Game} game game to add player
  */
@@ -19,6 +20,8 @@ function setupGame(game: Game): void {
  */
 function startDay(game: Game): void {
     console.log("TODO : The sun is rising");
+    // Initialisation du chat
+    game.addChat(new Chat(Chat_type.CHAT_GLOBAL, game.getAllPlayers()));
     // update death player
     // activate vote for each player, desactivate power of werewolf
     // send a message at every connected client
@@ -32,6 +35,11 @@ function startDay(game: Game): void {
  */
 function startNight(game: Game): void {
     console.log("TODO : The night falling");
+    // Initialisation des chats
+    // TODO: remplacer la valeur 0 par la valeur qui indique que le joueur est un loup garou
+    game.addChat(new Chat(Chat_type.CHAT_LOUP, game.getAllPlayers().filter(player => player.getRole() === 0)));
+    // TODO: mettre dans ce chat le chaman et le mort avec lequel il parle
+    game.addChat(new Chat(Chat_type.CHAT_CHAMAN, game.getAllPlayers()));
     // update death player
     // desactivated vote for each player, activate power
     // send a message at every connected client
@@ -45,7 +53,7 @@ function startNight(game: Game): void {
  * @param {number} gameId id of the starting game
  * */
 export async function initGame(gameId: number): Promise<void> {
-    const game: Game = await Game.load(gameId);
+    const game: Game = getGame(gameId);
     addPlayerInGame(game);
     const gameStatus = game.getStatus();
     if (gameStatus.status == 0) setupGame(game);
