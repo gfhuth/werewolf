@@ -11,16 +11,16 @@ import { UserContext } from "../context/UserContext";
 import request from "../utils/request";
 
 type FormFieldsValue = {
-    nbPlayerMin: number;
-    nbPlayerMax: number;
-    dayLength: number;
-    nightLength: number;
-    startDate: number;
-    percentageWerewolf: number;
-    probaContamination: number;
-    probaInsomnie: number;
-    probaVoyance: number;
-    probaSpiritisme: number;
+    nbPlayerMin: string;
+    nbPlayerMax: string;
+    dayLength: string;
+    nightLength: string;
+    startDate: string;
+    percentageWerewolf: string;
+    probaContamination: string;
+    probaInsomnie: string;
+    probaVoyance: string;
+    probaSpiritisme: string;
 }
 
 export default function CreateGame(): React.ReactElement {
@@ -48,23 +48,23 @@ export default function CreateGame(): React.ReactElement {
     };
 
     const submitCreateGame = (fieldValues: FormFieldsValue): void => {
-        request(`${API_BASE_URL}/game/create`, {
+        request(`${API_BASE_URL}/game/new`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "x-access-token": token
             },
             body: JSON.stringify({
-                nbPlayerMin: fieldValues.nbPlayerMin,
-                nbPlayerMax: fieldValues.nbPlayerMax,
-                dayLength: fieldValues.dayLength,
-                nightLength: fieldValues.nightLength,
-                startDate: fieldValues.startDate,
-                percentageWerewolf: fieldValues.percentageWerewolf,
-                probaContamination: fieldValues.probaContamination / 100,
-                probaInsomnie: fieldValues.probaInsomnie / 100,
-                probaVoyance: fieldValues.probaVoyance / 100,
-                probaSpiritisme: fieldValues.probaSpiritisme / 100
+                nbPlayerMin: parseInt(fieldValues.nbPlayerMin),
+                nbPlayerMax: parseInt(fieldValues.nbPlayerMax),
+                dayLength: parseInt(fieldValues.dayLength),
+                nightLength: parseInt(fieldValues.nightLength),
+                startDate: new Date(fieldValues.startDate).getTime() / 1000,
+                percentageWerewolf: parseInt(fieldValues.percentageWerewolf) / 100,
+                probaContamination: parseInt(fieldValues.probaContamination) / 100,
+                probaInsomnie: parseInt(fieldValues.probaInsomnie) / 100,
+                probaVoyance: parseInt(fieldValues.probaVoyance) / 100,
+                probaSpiritisme: parseInt(fieldValues.probaSpiritisme) / 100
             })
         });
     };

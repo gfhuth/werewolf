@@ -8,7 +8,7 @@ import { useFonts } from "expo-font";
 import Settings from "./screens/Settings";
 import { View, Text } from "react-native";
 import CreateGame from "./screens/CreateGame";
-import Jeux from "./screens/Jeux";
+import Jeux from "./screens/Game";
 
 export type StackParamList = {
     Home: undefined;
