@@ -10,11 +10,15 @@ export default function Home(): React.ReactElement {
     const createGame = (): void => {
         navigation.navigate("CreateGame");
     };
+    const goToGame = (): void => {
+        navigation.navigate("Jeux");
+    };
 
     return (
         <Background>
             <NavigationUI allowBack={false} />
             <Button onPress={createGame} title="Create game" />
+            <Button onPress={goToGame} title="Go to game" />
         </Background>
     );
 }
