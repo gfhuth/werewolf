@@ -27,6 +27,10 @@ export class Chat {
         return this.type;
     }
 
+    public resetMessages(): void {
+        this.messages.length = 0;
+    }
+
     public addMessage(message: Message, author: User): void {
         this.messages.push(message);
 

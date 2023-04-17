@@ -7,11 +7,6 @@ import { initGame } from "./gameStartedController";
 import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
 
-export const getGame = (gameId: number): Game => {
-    for (const game of Game.getAllGames()) if (game.getGameId() === gameId) return game;
-    return null;
-};
-
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
     try {
@@ -186,7 +181,7 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
         const gameId: number = parseInt(req.params.id);
         if (!gameId) throw new Error("No game ID provided.");
 
-        const game: Game = getGame(gameId);
+        const game: Game = Game.getGame(gameId);
         if (!game) throw new Error("Game doesn't exist");
 
         // Check if player already in game

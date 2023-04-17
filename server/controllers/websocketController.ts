@@ -2,7 +2,6 @@ import * as WebSocket from "ws";
 import jwt from "jsonwebtoken";
 import { User } from "../models/userModel";
 import { Game } from "../models/gameModel";
-import { getGame } from "./gameSetupController";
 import { Event } from "./eventController";
 
 const { JWT_SECRET } = process.env;
@@ -65,7 +64,7 @@ export class WebsocketConnection {
                 return;
             }
 
-            const game: Game = getGame(data.game_id);
+            const game: Game = Game.getGame(data.game_id);
             if (!game) {
                 this.ws.send(JSON.stringify({ status: 409, message: "Game doesn't exist" }));
                 return;

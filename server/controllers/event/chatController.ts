@@ -17,10 +17,7 @@ export const newMessage = async (game: Game, user: User, data: { date: number; c
     await database.insertInto("messages").values(message).execute();
 
     // On récupère le chat concerné
-    const chat: Chat = game
-        .getChats()
-        .reverse()
-        .find((c) => c.getType() === message.type);
+    const chat: Chat = game.getChat(data.chat_type);
 
     // On envoie le message sur ce chat
     chat.addMessage(message, user);

@@ -2,10 +2,9 @@ import { sql } from "kysely";
 import database from "../util/database";
 import { initGame } from "../controllers/gameStartedController";
 import { Player } from "./playerModel";
-import { Chat } from "./chatModel";
-import { getGame } from "../controllers/gameSetupController";
+import { Chat, Chat_type } from "./chatModel";
 import { User } from "./userModel";
-import { Villager } from "./villagerModel";
+import { Villager, Werewolf } from "./villagerModel";
 
 export enum GameStatus {
     NOT_STARTED = 0,
@@ -42,7 +41,9 @@ export class Game {
     private gameId: number;
     private gameParam: GameParam;
     private playersList: Player[] = [];
-    private ChatsList: Array<Chat>;
+    private villageChat: Chat;
+    private werewolfChat: Chat;
+    private spiritismChat: Chat;
     private currentNumberOfPlayer;
 
     /**
@@ -52,7 +53,9 @@ export class Game {
     constructor(gameId: number, gameParam: GameParam) {
         this.gameId = gameId;
         this.gameParam = gameParam;
-        this.ChatsList = [];
+        this.villageChat = null;
+        this.werewolfChat = null;
+        this.spiritismChat = null;
         this.currentNumberOfPlayer = 1;
     }
 
@@ -82,6 +85,12 @@ export class Game {
         return Game.gamesList;
     }
 
+    public static getGame = (gameId: number): Game => {
+        const filter: Array<Game> = Game.gamesList.filter((game) => game.getGameId() === gameId);
+        if (filter.length === 0) return null;
+        return filter[0];
+    };
+
     public static addGameInList(game: Game): void {
         Game.gamesList.push(game);
     }
@@ -97,8 +106,18 @@ export class Game {
         return this.gameParam;
     }
 
-    public getChats(): Array<Chat> {
-        return this.ChatsList;
+    public getChat(type: Chat_type): Chat {
+        if (type === Chat_type.CHAT_GLOBAL) return this.villageChat;
+        if (type === Chat_type.CHAT_LOUP) return this.werewolfChat;
+        if (type === Chat_type.CHAT_CHAMAN) return this.spiritismChat;
+        return null;
+    }
+
+    public initChats(): void {
+        this.villageChat = new Chat(Chat_type.CHAT_GLOBAL, this.playersList);
+        this.werewolfChat = new Chat(Chat_type.CHAT_GLOBAL, this.playersList.filter(player => player.getRole() instanceof Werewolf));
+        // TODO: modifier la liste des joueurs du spirtismChat
+        this.spiritismChat = new Chat(Chat_type.CHAT_CHAMAN, this.playersList);
     }
 
     public getAllPlayers(): Array<Player> {
@@ -119,9 +138,6 @@ export class Game {
         this.currentNumberOfPlayer++;
     }
 
-    public addChat(chat: Chat): void {
-        this.ChatsList.push(chat);
-    }
     /** Compute the status of the game
      * return an object of shape { status: number, timePassed: number }
      * status :
@@ -196,7 +212,7 @@ export class Game {
         // Initialisation des joueurs de chaque partie
         const players: Array<{ name: string; role: number; power: number; game: number }> = await database.selectFrom("players").select(["name", "role", "power", "game"]).execute();
         for (const elem of players) {
-            const game: Game = getGame(elem.game);
+            const game: Game = Game.getGame(elem.game);
             const player: Player = new Player(User.getUser(elem.name), Villager.load(elem.role), elem.power, game);
             game.addPlayer(player);
         }

@@ -1,9 +1,7 @@
-import { Chat, Chat_type } from "../models/chatModel";
+import { Chat_type } from "../models/chatModel";
 import { Game } from "../models/gameModel";
 import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Spiritism } from "../models/powersModel";
-import { Human, Werewolf } from "../models/villagerModel";
-import { getGame } from "./gameSetupController";
 
 function randint(a: number, b: number): number {
     return Math.floor(Math.random() * b) + a;
@@ -34,33 +32,29 @@ function setupGame(game: Game): void {
     if (randint(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
     if (randint(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Contamination());
     if (randint(0, 1) <= gameParam.probaSpiritisme) {
-        if (randint(0, 1) <= gameParam.percentageWerewolf) 
-            powersWerewolf.push(new Spiritism());
-        else 
-            powersHuman.push(new Spiritism());
+        if (randint(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Spiritism());
+        else powersHuman.push(new Spiritism());
     }
     if (randint(0, 1) <= gameParam.probaVoyance) {
-        if (randint(0, 1) <= gameParam.percentageWerewolf) 
-            powersWerewolf.push(new Clairvoyant());
-        else 
-            powersHuman.push(new Clairvoyant());
+        if (randint(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Clairvoyant());
+        else powersHuman.push(new Clairvoyant());
     }
     shuffle(players);
     let i;
     // attribution des roles loups garous et des pouvoirs loups garous
-    for (i = 0; i < Math.floor(gameParam.percentageWerewolf * game.getNbOfPlayers()); i++) {
-        players[i].setRole(new Werewolf(null, null, null));
-        if (i < powersWerewolf.length) 
-            players[i].getRole().setPower(powersWerewolf[i]);
-    }
+    // for (i = 0; i < Math.floor(gameParam.percentageWerewolf * game.getNbOfPlayers()); i++) {
+    //     players[i].setRole(new Werewolf(null, null, null));
+    //     if (i < powersWerewolf.length)
+    //         players[i].getRole().setPower(powersWerewolf[i]);
+    // }
     const startIndex = i;
 
     // attribution des roles humains et des pouvoir humains
-    for (i = startIndex; i < game.getNbOfPlayers(); i++) {
-        players[i].setRole(new Human(null, null));
-        if (i - startIndex < powersHuman.length) 
-            players[i].getRole().setPower(powersHuman[i]);
-    }
+    // for (i = startIndex; i < game.getNbOfPlayers(); i++) {
+    //     players[i].setRole(new Human(null, null));
+    //     if (i - startIndex < powersHuman.length)
+    //         players[i].getRole().setPower(powersHuman[i]);
+    // }
 }
 
 /** Apply all action happend during the night and lunch a day
@@ -68,8 +62,8 @@ function setupGame(game: Game): void {
  */
 function startDay(game: Game): void {
     console.log(`The sun is rising, status : ${game.getStatus().status} for game :${game.getGameId()}`);
-    // Initialisation du chat
-    game.addChat(new Chat(Chat_type.CHAT_GLOBAL, game.getAllPlayers()));
+    // Réinitialisation du chat
+    game.getChat(Chat_type.CHAT_GLOBAL).resetMessages();
     // update death player
 
     // TODO: Update table player
@@ -86,15 +80,10 @@ function startDay(game: Game): void {
  */
 function startNight(game: Game): void {
     console.log(`The night falling, status : ${game.getStatus().status} for game :${game.getGameId()}`);
-    // Initialisation des chats
-    game.addChat(
-        new Chat(
-            Chat_type.CHAT_LOUP,
-            game.getAllPlayers().filter((player) => player.getRole() instanceof Werewolf)
-        )
-    );
+    // Réinitialisation des chats
+    game.getChat(Chat_type.CHAT_LOUP).resetMessages();
+    game.getChat(Chat_type.CHAT_CHAMAN).resetMessages();
     // TODO: mettre dans ce chat le chaman et le mort avec lequel il parle
-    game.addChat(new Chat(Chat_type.CHAT_CHAMAN, game.getAllPlayers()));
 
     // TODO: Update table player
 
@@ -111,7 +100,11 @@ function startNight(game: Game): void {
  * @param {number} gameId id of the starting game
  * */
 export async function initGame(gameId: number): Promise<void> {
-    const game: Game = getGame(gameId);
+    const game: Game = Game.getGame(gameId);
+
+    // Initialisation des chats
+    game.initChats();
+
     const gameStatus = game.getStatus();
     if (gameStatus.status == 0) setupGame(game);
 
