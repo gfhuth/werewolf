@@ -87,11 +87,10 @@ function startDay(game: Game): void {
 function startNight(game: Game): void {
     console.log(`The night falling, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Initialisation des chats
-    // TODO: remplacer la valeur 0 par la valeur qui indique que le joueur est un loup garou
     game.addChat(
         new Chat(
             Chat_type.CHAT_LOUP,
-            game.getAllPlayers().filter((player) => player.getRole().getRoleValue() === 0)
+            game.getAllPlayers().filter((player) => player.getRole() instanceof Werewolf)
         )
     );
     // TODO: mettre dans ce chat le chaman et le mort avec lequel il parle
