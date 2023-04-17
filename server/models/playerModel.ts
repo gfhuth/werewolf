@@ -2,16 +2,17 @@ import database from "../util/database";
 import { Chat, Message } from "./chatModel";
 import { Game } from "./gameModel";
 import { User } from "./userModel";
+import { Villager } from "./villagerModel";
 
 export class Player {
 
     private user: User;
-    private role: number;
+    private role: Villager;
     private power: number;
     private game: Game;
     private isAlive: Boolean;
 
-    constructor(user: User, role: number, power: number, game: Game) {
+    constructor(user: User, role: Villager, power: number, game: Game) {
         this.user = user;
         this.role = role;
         this.power = power;
@@ -23,8 +24,13 @@ export class Player {
         return this.user;
     }
 
-    public getRole(): number {
+    public getRole(): Villager {
         return this.role;
+    }
+    
+    public setRole(role:Villager):void {
+        if (this.role == null) 
+            this.role = role;
     }
 
     public addMessage(message: Message): void {
@@ -35,6 +41,13 @@ export class Player {
             .find((c) => c.getType() === message.type);
         // On envoie le message sur ce chat
         chat.addMessage(message, this.user);
+    }
+
+    /** Send at all client of the game the new status of the game
+     * @param {boolean} isDay new status of the game (true : day, false : night)
+     */
+    public sendNewGameStatus(isDay: boolean): void {
+        //TODO
     }
 
 }

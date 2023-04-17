@@ -169,7 +169,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 
         // On ajoute l'utilisateur aux joueurs de la partie
         // TODO: ajuster les valeurs de role et power
-        const player: Player = new Player(user, 0, 0, newHostGame);
+        const player: Player = new Player(user, null, null, newHostGame);
         newHostGame.addPlayer(player);
 
         // On ajoute un evenement
@@ -196,7 +196,7 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
         if (game.getNbOfPlayers() >= game.getGameParam().nbPlayerMax) throw new Error("Game full");
 
         // Ajout du joueur dans la liste des joueurs de la partie
-        const player: Player = new Player(user, 0, 0, game);
+        const player: Player = new Player(user, null, null, game);
         game.addPlayer(player);
 
         // Insert a new record in the user_games table
