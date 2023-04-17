@@ -63,7 +63,7 @@ function setupGame(game: Game): void {
 function startDay(game: Game): void {
     console.log(`The sun is rising, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Réinitialisation du chat
-    game.getChat(Chat_type.CHAT_GLOBAL).resetMessages();
+    game.getChat(Chat_type.CHAT_VILLAGE).resetMessages();
     // update death player
 
     // TODO: Update table player
@@ -81,8 +81,8 @@ function startDay(game: Game): void {
 function startNight(game: Game): void {
     console.log(`The night falling, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Réinitialisation des chats
-    game.getChat(Chat_type.CHAT_LOUP).resetMessages();
-    game.getChat(Chat_type.CHAT_CHAMAN).resetMessages();
+    game.getChat(Chat_type.CHAT_WEREWOLF).resetMessages();
+    game.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
     // TODO: mettre dans ce chat le chaman et le mort avec lequel il parle
 
     // TODO: Update table player

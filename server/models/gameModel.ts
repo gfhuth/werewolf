@@ -107,17 +107,17 @@ export class Game {
     }
 
     public getChat(type: Chat_type): Chat {
-        if (type === Chat_type.CHAT_GLOBAL) return this.villageChat;
-        if (type === Chat_type.CHAT_LOUP) return this.werewolfChat;
-        if (type === Chat_type.CHAT_CHAMAN) return this.spiritismChat;
+        if (type === Chat_type.CHAT_VILLAGE) return this.villageChat;
+        if (type === Chat_type.CHAT_WEREWOLF) return this.werewolfChat;
+        if (type === Chat_type.CHAT_SPIRITISM) return this.spiritismChat;
         return null;
     }
 
     public initChats(): void {
-        this.villageChat = new Chat(Chat_type.CHAT_GLOBAL, this.playersList);
-        this.werewolfChat = new Chat(Chat_type.CHAT_GLOBAL, this.playersList.filter(player => player.getRole() instanceof Werewolf));
+        this.villageChat = new Chat(Chat_type.CHAT_VILLAGE, this.playersList);
+        this.werewolfChat = new Chat(Chat_type.CHAT_VILLAGE, this.playersList.filter(player => player.getRole() instanceof Werewolf));
         // TODO: modifier la liste des joueurs du spirtismChat
-        this.spiritismChat = new Chat(Chat_type.CHAT_CHAMAN, this.playersList);
+        this.spiritismChat = new Chat(Chat_type.CHAT_SPIRITISM, this.playersList);
     }
 
     public getAllPlayers(): Array<Player> {

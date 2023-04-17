@@ -4,9 +4,9 @@ import { User } from "./userModel";
 import { Player } from "./playerModel";
 
 export enum Chat_type {
-    CHAT_GLOBAL,
-    CHAT_LOUP,
-    CHAT_CHAMAN,
+    CHAT_VILLAGE,
+    CHAT_WEREWOLF,
+    CHAT_SPIRITISM,
 }
 
 export type Message = { game: number; type: number; player: number; content: string; date: number };
