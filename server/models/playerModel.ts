@@ -9,12 +9,14 @@ export class Player {
     private role: number;
     private power: number;
     private game: Game;
+    private isAlive: Boolean;
 
     constructor(user: User, role: number, power: number, game: Game) {
         this.user = user;
         this.role = role;
         this.power = power;
         this.game = game;
+        this.isAlive = true;
     }
 
     public getUser(): User {

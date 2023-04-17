@@ -1,12 +1,6 @@
 import { Chat, Chat_type } from "../models/chatModel";
 import { Game } from "../models/gameModel";
 import { getGame } from "./gameSetupController";
-/** Add all the player who have join the game in the player list of game
- * @param {Game} game game to add player
- */
-function addPlayerInGame(game: Game): void {
-    console.log("TODO : Adding player in game");
-}
 
 /** Set all role in the game
  * @param {Game} game Game with all player added
@@ -23,6 +17,7 @@ function startDay(game: Game): void {
     // Initialisation du chat
     game.addChat(new Chat(Chat_type.CHAT_GLOBAL, game.getAllPlayers()));
     // update death player
+    
     // activate vote for each player, desactivate power of werewolf
     // send a message at every connected client
     // call startNight at the end of the day
