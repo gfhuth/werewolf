@@ -63,7 +63,7 @@ class Spiritism implements HumanPower, WerewolfPower {
 
 }
 
-class Clairvoyant implements WerewolfPower {
+class Clairvoyant implements HumanPower, WerewolfPower {
 
     private victim: Player;
 
