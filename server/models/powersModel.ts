@@ -1,21 +1,17 @@
 import { Player } from "./playerModel";
 
-export interface HumanPower {
+export abstract class Power {
 
-    showPower(): void;
-    usePower(): void;
-
-}
-
-export interface WerewolfPower {
-
-    showPower(): void;
-    usePower(): void;
+    public abstract showPower(): void;
+    public abstract usePower(): void;
 
 }
 
-class Insomnia implements HumanPower {
+export type HumanPower = Power;
 
+export type WerewolfPower = Power;
+
+export class Insomnia implements HumanPower {
 
     showPower(): void {
         console.log("Insomnia options:");
@@ -27,7 +23,7 @@ class Insomnia implements HumanPower {
 
 }
 
-class Contamination implements WerewolfPower {
+export class Contamination implements WerewolfPower {
 
     private victim: Player;
 
@@ -45,7 +41,7 @@ class Contamination implements WerewolfPower {
 
 }
 
-class Spiritism implements HumanPower, WerewolfPower {
+export class Spiritism implements HumanPower, WerewolfPower {
 
     private victim: Player;
 
@@ -63,7 +59,7 @@ class Spiritism implements HumanPower, WerewolfPower {
 
 }
 
-class Clairvoyant implements WerewolfPower {
+export class Clairvoyant implements WerewolfPower {
 
     private victim: Player;
 
@@ -74,7 +70,7 @@ class Clairvoyant implements WerewolfPower {
     usePower(): void {
         console.log("See victim's power");
     }
-    
+
     setVictim(player: Player): void {
         this.victim = player;
     }

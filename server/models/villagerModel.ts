@@ -1,11 +1,12 @@
 import { Chat } from "./chatModel.js";
-import { HumanPower, WerewolfPower } from "./powersModel.js";
+import { HumanPower, Power, WerewolfPower } from "./powersModel.js";
 
 export abstract class Villager {
 
     protected chatHuman: Chat;
     protected chatWerewolf: Chat;
     protected chatSpirit: Chat;
+    protected power: Power;
 
     setChatSpirit(chat: Chat): void {
         this.chatSpirit = chat;
@@ -13,25 +14,30 @@ export abstract class Villager {
 
     public abstract getRoleValue(): number;
 
+    public getPower(): Power {
+        return this.power;
+    }
+    public setPower(power: Power): void {
+        this.power = power;
+    }
+
     public static load(type: number): Villager {
-        if (type == 0) 
+        if (type == 0)
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
             return new Human(null, null);
-        else 
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            return new Werewolf(null, null, null);
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        else return new Werewolf(null, null, null);
     }
 
 }
 
 export class Human extends Villager {
 
-    protected power: HumanPower;
 
     constructor(chatHuman: Chat, power: HumanPower) {
         super();
         this.chatHuman = chatHuman;
-        this.power = power;
+        this.setPower(power);
     }
 
     public getRoleValue(): number {
@@ -50,7 +56,6 @@ export class Werewolf extends Villager {
         this.chatWerewolf = chatWerewolf;
         this.power = power;
     }
-
     public getRoleValue(): number {
         return 1;
     }
