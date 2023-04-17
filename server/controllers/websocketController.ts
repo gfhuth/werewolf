@@ -1,15 +1,15 @@
 import * as WebSocket from "ws";
 import jwt from "jsonwebtoken";
-import { User, usersHandler } from "../models/userModel";
-import { eventHandlers } from "./eventController";
+import { User } from "../models/userModel";
 import { Game } from "../models/gameModel";
 import { getGame } from "./gameSetupController";
+import { Event } from "./eventController";
 
 const { JWT_SECRET } = process.env;
 
 export const connections: Array<WebsocketConnection> = [];
 
-class WebsocketConnection {
+export class WebsocketConnection {
 
     ws: WebSocket;
     user: User;
@@ -48,7 +48,7 @@ class WebsocketConnection {
                     return;
                 }
 
-                this.user = usersHandler[username];
+                this.user = User.getUser(username);
                 this.ws.send(JSON.stringify({ status: 200, message: "User authenticated" }));
                 return;
             }
@@ -66,7 +66,11 @@ class WebsocketConnection {
                 this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
                 return;
             }
-            for (const func of eventHandlers[data.event]) func(game, this.user, data.data);
+            if (!Event.getEventActions(data.event)) {
+                this.ws.send(JSON.stringify({ status: 500, message: "Event doesn't exist" }));
+                return;
+            }
+            for (const func of Event.getEventActions(data.event)) func(game, this.user, data.data);
         } catch (e) {
             console.log(e);
             this.ws.send(JSON.stringify({ status: 500, message: "Server Internal Error" }));

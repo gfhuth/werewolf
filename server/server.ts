@@ -4,12 +4,13 @@ import express from "express";
 import { createSchema } from "./util/database";
 import gameRouter from "./routers/game";
 import cors from "cors";
-import * as http from "http";
 import * as WebSocket from "ws";
 
 import { onConnect } from "./controllers/websocketController";
 import userRouter from "./routers/user";
-import { registerChatEvents } from "./controllers/chatController";
+
+import requireDirectory from "require-dir";
+requireDirectory("./controllers/event");
 
 const app = express();
 
@@ -29,8 +30,6 @@ app.use(
 app.use(express.json());
 app.use("/game", gameRouter);
 app.use("/user", userRouter);
-
-registerChatEvents();
 
 wss.on("connection", (ws: WebSocket) => {
     onConnect(ws);

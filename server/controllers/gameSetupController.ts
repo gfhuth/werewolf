@@ -4,7 +4,7 @@ import { Game, GameParam, gamesList } from "../models/gameModel";
 import database from "../util/database";
 import { initGame } from "./gameStartedController";
 
-import { User, usersHandler } from "../models/userModel";
+import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
 
 export const getGame = (gameId: number): Game => {
@@ -78,7 +78,7 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
 
 export async function searchGameByUsername(req: Request, res: Response): Promise<void> {
     try {
-        const user: User = usersHandler[getTokenContent(req.headers["x-access-token"] as string).username];
+        const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
         // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
         const games: Array<{ id: number; startDate: number; hostId: number; nbPlayerMax: number; currentNumberOfPlayer: number }> = await database
             .selectFrom("games")
@@ -94,7 +94,7 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
 }
 
 export const newGame = async (req: Request, res: Response): Promise<void> => {
-    const user: User = usersHandler[getTokenContent(req.headers["x-access-token"] as string).username];
+    const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
     // Valeur par défaut de la date
     let date: number = Date.parse(req.body.startDate);
     if (date) date = new Date(date).getTime();
@@ -182,7 +182,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 
 export const joinGame = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user: User = usersHandler[getTokenContent(req.headers["x-access-token"] as string).username];
+        const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
         const gameId: number = parseInt(req.params.id);
         if (!gameId) throw new Error("No game ID provided.");
 

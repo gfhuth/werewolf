@@ -1,22 +1,25 @@
+import { WebsocketConnection } from "../controllers/websocketController";
 import database from "../util/database";
-
-export const usersHandler: {
-    [key: string]: User;
-} = {};
 
 export class User {
 
+    private static usersSet: { [key: string]: User } = {};
+
     private userId: number;
     private username: string;
+    private ws: WebsocketConnection;
 
     constructor(userId: number, username: string) {
         this.username = username;
         this.userId = userId;
+        this.ws = null;
     }
 
     static async load(username: string): Promise<User> {
         const userId: { id: number } = await database.selectFrom("users").select(["id"]).where("username", "=", username).executeTakeFirstOrThrow();
-        return new User(userId.id, username);
+        const user: User = new User(userId.id, username);
+        User.usersSet[user.getUsername()] = user;
+        return user;
     }
 
     public getUsername(): string {
@@ -25,6 +28,14 @@ export class User {
 
     public getUserId(): number {
         return this.userId;
+    }
+
+    public static getUser(username: string): User {
+        return User.usersSet[username];
+    }
+
+    public setWebsocket(ws: WebsocketConnection): void {
+        this.ws = ws;
     }
 
 }
@@ -39,10 +50,8 @@ export const userSchema = async (): Promise<void> => {
         .execute();
 
     const users: Array<{ username: string }> = await database.selectFrom("users").select("username").execute();
-    for (const elem of users) {
-        const user: User = await User.load(elem.username);
-        usersHandler[elem.username] = user;
-    }
+    for (const elem of users) 
+        await User.load(elem.username);
 };
 
 export const insertUser = async (user: { username: string; password: string }): Promise<void> => {

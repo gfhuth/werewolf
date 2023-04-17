@@ -1,9 +1,9 @@
-import { Chat_type, Message, createMessage } from "../models/chatModel";
-import { Game } from "../models/gameModel";
-import { User } from "../models/userModel";
-import { registerHandlers } from "./eventController";
+import { Chat_type, Message, createMessage } from "../../models/chatModel";
+import { Game } from "../../models/gameModel";
+import { User } from "../../models/userModel";
+import { Event } from "../eventController";
 
-export const newMessage = (game: Game, user: User, data: {date: number, chat_type: Chat_type, content: string}): void => {
+export const newMessage = (game: Game, user: User, data: { date: number; chat_type: Chat_type; content: string }): void => {
     const message: Message = {
         game: game.getGameId(),
         type: data.chat_type,
@@ -20,6 +20,5 @@ export const newMessage = (game: Game, user: User, data: {date: number, chat_typ
 };
 
 // Liste des événements relatifs aux messages
-export const registerChatEvents = (): void => {
-    registerHandlers("CHAT_SENT", newMessage);
-};
+Event.registerHandlers("CHAT_SENT", newMessage);
+console.log(Event.getEventActions("CHAT_SENT"));

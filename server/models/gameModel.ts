@@ -3,8 +3,8 @@ import database from "../util/database";
 import { initGame } from "../controllers/gameStartedController";
 import { Player } from "./playerModel";
 import { Chat } from "./chatModel";
-import { usersHandler } from "./userModel";
 import { getGame } from "../controllers/gameSetupController";
+import { User } from "./userModel";
 
 export const gamesList: Array<Game> = [];
 export enum GameStatus {
@@ -190,7 +190,7 @@ export const gameSchema = async (): Promise<void> => {
     const players: Array<{ name: string; role: number; power: number; game: number }> = await database.selectFrom("players").select(["name", "role", "power", "game"]).execute();
     for (const elem of players) {
         const game: Game = getGame(elem.game);
-        const player: Player = new Player(usersHandler[elem.name], elem.role, elem.power, game);
+        const player: Player = new Player(User.getUser(elem.name), elem.role, elem.power, game);
         game.addPlayer(player);
     }
 };

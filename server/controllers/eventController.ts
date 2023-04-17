@@ -3,12 +3,20 @@ import { User } from "../models/userModel";
 
 type functionHandler = (game: Game, user: User, data: Record<string, any>) => void;
 
-export const eventHandlers: {
-    [key: string]: Array<functionHandler>;
-} = {};
+export class Event {
 
-export function registerHandlers(event: string, func: functionHandler): void {
-    if (eventHandlers[event]) eventHandlers[event].push(func);
-    else eventHandlers[event] = [func];
+    private static eventHandlers: {
+        [key: string]: Array<functionHandler>;
+    } = {};
+
+    public static getEventActions(event: string): Array<functionHandler> {
+        if (Event.eventHandlers[event]) return Event.eventHandlers[event];
+        return null;
+    }
+
+    public static registerHandlers(event: string, func: functionHandler): void {
+        if (Event.eventHandlers[event]) Event.eventHandlers[event].push(func);
+        else Event.eventHandlers[event] = [func];
+    }
+
 }
-
