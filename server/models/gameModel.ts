@@ -5,6 +5,7 @@ import { Player } from "./playerModel";
 import { Chat } from "./chatModel";
 import { getGame } from "../controllers/gameSetupController";
 import { User } from "./userModel";
+import { Villager } from "./villagerModel";
 
 export const gamesList: Array<Game> = [];
 export enum GameStatus {
@@ -112,7 +113,6 @@ export class Game {
     public addChat(chat: Chat): void {
         this.ChatsList.push(chat);
     }
-
     /** Compute the status of the game
      * return an object of shape { status: number, timePassed: number }
      * status :
@@ -126,10 +126,10 @@ export class Game {
             return { status: -1, timePassed: 0 };
         } else {
             const timeOfOneCycle = this.gameParam.dayLength + this.gameParam.nightLength;
-            const numberOfCycle = Math.floor(timeSinceGameStart / timeOfOneCycle);
+            const numberOfCycle = Math.floor(timeSinceGameStart / (timeOfOneCycle * 1000));
             const timeSinceCycleStart = timeSinceGameStart - timeOfOneCycle * numberOfCycle;
             // If we are day.
-            if (timeSinceCycleStart - this.gameParam.dayLength < 0) return { status: numberOfCycle, timePassed: timeSinceCycleStart };
+            if (timeSinceCycleStart - this.gameParam.dayLength <= 0) return { status: 2 * numberOfCycle, timePassed: timeSinceCycleStart };
             else return { status: 2 * numberOfCycle + 1, timePassed: timeSinceCycleStart - this.gameParam.dayLength };
         }
     }
@@ -190,7 +190,7 @@ export const gameSchema = async (): Promise<void> => {
     const players: Array<{ name: string; role: number; power: number; game: number }> = await database.selectFrom("players").select(["name", "role", "power", "game"]).execute();
     for (const elem of players) {
         const game: Game = getGame(elem.game);
-        const player: Player = new Player(User.getUser(elem.name), elem.role, elem.power, game);
+        const player: Player = new Player(User.getUser(elem.name), Villager.load(elem.role), elem.power, game);
         game.addPlayer(player);
     }
 };

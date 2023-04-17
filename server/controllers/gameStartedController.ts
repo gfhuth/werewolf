@@ -1,31 +1,82 @@
 import { Chat, Chat_type } from "../models/chatModel";
 import { Game } from "../models/gameModel";
+import { Player } from "../models/playerModel";
+import { Clairvoyant, Contamination, Spiritism } from "../models/powersModel";
+import { Human, Werewolf } from "../models/villagerModel";
 import { getGame } from "./gameSetupController";
-/** Add all the player who have join the game in the player list of game
- * @param {Game} game game to add player
+
+function randint(a: number, b: number): number {
+    return Math.floor(Math.random() * b) + a;
+}
+/** Create a new permutation of players
+ * @param {Player[]} players players to shuffle
  */
-function addPlayerInGame(game: Game): void {
-    console.log("TODO : Adding player in game");
+function shuffle(players: Player[]): void {
+    for (let i = 0; i < players.length; i++) {
+        const playerTemp = players[i];
+        //Bettween i and players.length
+        const j = randint(i, players.length);
+        players[i] = players[j];
+        players[j] = playerTemp;
+    }
 }
 
 /** Set all role in the game
  * @param {Game} game Game with all player added
  */
 function setupGame(game: Game): void {
-    console.log("TODO : Start game by setting all role and data");
+    const gameParam = game.getGameParam();
+    const players = game.getAllPlayers();
+
+    const powersWerewolf = [];
+    const powersHuman = [];
+    // On choisi si on utilise les pouvoirs
+    if (randint(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
+    if (randint(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Contamination());
+    if (randint(0, 1) <= gameParam.probaSpiritisme) {
+        if (randint(0, 1) <= gameParam.percentageWerewolf) 
+            powersWerewolf.push(new Spiritism());
+        else 
+            powersHuman.push(new Spiritism());
+    }
+    if (randint(0, 1) <= gameParam.probaVoyance) {
+        if (randint(0, 1) <= gameParam.percentageWerewolf) 
+            powersWerewolf.push(new Clairvoyant());
+        else 
+            powersHuman.push(new Clairvoyant());
+    }
+    shuffle(players);
+    let i;
+    // attribution des roles loups garous et des pouvoirs loups garous
+    for (i = 0; i < Math.floor(gameParam.percentageWerewolf * game.getNbOfPlayers()); i++) {
+        players[i].setRole(new Werewolf(null, null, null));
+        if (i < powersWerewolf.length) 
+            players[i].getRole().setPower(powersWerewolf[i]);
+    }
+    const startIndex = i;
+
+    // attribution des roles humains et des pouvoir humains
+    for (i = startIndex; i < game.getNbOfPlayers(); i++) {
+        players[i].setRole(new Human(null, null));
+        if (i - startIndex < powersHuman.length) 
+            players[i].getRole().setPower(powersHuman[i]);
+    }
 }
 
 /** Apply all action happend during the night and lunch a day
  * @param {Game} game Game to apply change
  */
 function startDay(game: Game): void {
-    console.log("TODO : The sun is rising");
+    console.log(`The sun is rising, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Initialisation du chat
     game.addChat(new Chat(Chat_type.CHAT_GLOBAL, game.getAllPlayers()));
     // update death player
-    // activate vote for each player, desactivate power of werewolf
-    // send a message at every connected client
-    // call startNight at the end of the day
+
+    // TODO: Update table player
+
+    // TODO : Send a message at every connected client
+    for (let i = 0; i < game.getAllPlayers().length; i++) game.getAllPlayers()[i].sendNewGameStatus(true);
+
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     setTimeout(() => startNight(game), game.getGameParam().dayLength * 1000);
 }
@@ -34,15 +85,23 @@ function startDay(game: Game): void {
  * @param {Game} game Game to apply change
  */
 function startNight(game: Game): void {
-    console.log("TODO : The night falling");
+    console.log(`The night falling, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Initialisation des chats
     // TODO: remplacer la valeur 0 par la valeur qui indique que le joueur est un loup garou
-    game.addChat(new Chat(Chat_type.CHAT_LOUP, game.getAllPlayers().filter(player => player.getRole() === 0)));
+    game.addChat(
+        new Chat(
+            Chat_type.CHAT_LOUP,
+            game.getAllPlayers().filter((player) => player.getRole().getRoleValue() === 0)
+        )
+    );
     // TODO: mettre dans ce chat le chaman et le mort avec lequel il parle
     game.addChat(new Chat(Chat_type.CHAT_CHAMAN, game.getAllPlayers()));
-    // update death player
-    // desactivated vote for each player, activate power
-    // send a message at every connected client
+
+    // TODO: Update table player
+
+    // TODO : Send a message at every client
+    for (let i = 0; i < game.getAllPlayers().length; i++) game.getAllPlayers()[i].sendNewGameStatus(false);
+
     // call startDay at the end of the day
     setTimeout(() => startDay(game), game.getGameParam().nightLength * 1000);
 }
@@ -54,7 +113,6 @@ function startNight(game: Game): void {
  * */
 export async function initGame(gameId: number): Promise<void> {
     const game: Game = getGame(gameId);
-    addPlayerInGame(game);
     const gameStatus = game.getStatus();
     if (gameStatus.status == 0) setupGame(game);
 
