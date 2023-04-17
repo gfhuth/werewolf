@@ -83,7 +83,6 @@ function startNight(game: Game): void {
     // Réinitialisation des chats
     game.getChat(Chat_type.CHAT_WEREWOLF).resetMessages();
     game.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
-    // TODO: mettre dans ce chat le chaman et le mort avec lequel il parle
 
     // TODO: Update table player
 

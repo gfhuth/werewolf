@@ -35,7 +35,7 @@ export interface MessageTable {
     id: Generated<number>;
     game: number;
     type: number,
-    player: number;
+    user: number;
     content: string;
     date: number;
 }
