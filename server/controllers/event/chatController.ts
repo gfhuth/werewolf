@@ -20,8 +20,16 @@ const newMessage = async (game: Game, user: User, data: { date: number; chat_typ
     const chat: Chat = game.getChat(data.chat_type);
 
     // On envoie le message sur ce chat
-    if (chat) chat.addMessage(message);
-    else user.getWebsocket().send(JSON.stringify({ status: 500, message: "Chat null" }));
+    if (chat) {
+        if (chat.getMembers().length === 0) {
+            user.getWebsocket().send(JSON.stringify({ status: 500, message: "There is no member in the chat" }));
+            return;
+        }
+        chat.addMessage(message);
+    } else {
+        user.getWebsocket().send(JSON.stringify({ status: 500, message: "Chat null" }));
+        return;
+    }
 };
 
 const updateChat = (game: Game, user: User, data: { dead_player: string }): void => {

@@ -64,6 +64,7 @@ function startDay(game: Game): void {
     console.log(`The sun is rising, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Réinitialisation du chat
     game.getChat(Chat_type.CHAT_VILLAGE).resetMessages();
+    game.getChat(Chat_type.CHAT_SPIRITISM).resetChatMembers([]);
     // update death player
 
     // TODO: Update table player
