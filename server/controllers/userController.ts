@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import database from "../util/database";
-import { User, insertUser, listUsers } from "../models/userModel";
+import { User } from "../models/userModel";
 
 const { JWT_SECRET } = process.env;
 
@@ -90,7 +90,7 @@ export const register = async (req: Request<any, any, { username: string; passwo
 
     // Insertion de l'utilisateur dans la base de données
     try {
-        insertUser({ username: username, password: hashPassword });
+        await database.insertInto("users").values({ username: username, password: hashPassword }).execute();
     } catch (e) {
         res.sendStatus(500);
         return;
@@ -111,57 +111,9 @@ export const register = async (req: Request<any, any, { username: string; passwo
     });
 };
 
-export const reinitDatabase = async (req: Request, res: Response): Promise<void> => {
-    // Suppression des anciennes valeurs de la base de données
-    database.deleteFrom("users").execute();
-
-    // Insertion des valeurs d'initialisation
-    let hashPassword: string = await bcrypt.hash("Gieules", 10);
-    try {
-        insertUser({ username: "Damien", password: hashPassword });
-    } catch (e) {
-        res.sendStatus(500);
-        return;
-    }
-
-    hashPassword = await bcrypt.hash("Voland", 10);
-    try {
-        insertUser({ username: "Dorian", password: hashPassword });
-    } catch (e) {
-        res.sendStatus(500);
-        return;
-    }
-
-    hashPassword = await bcrypt.hash("Thiken", 10);
-    try {
-        insertUser({ username: "Samuel", password: hashPassword });
-    } catch (e) {
-        res.sendStatus(500);
-        return;
-    }
-
-    hashPassword = await bcrypt.hash("Huth", 10);
-    try {
-        insertUser({ username: "Guilherme", password: hashPassword });
-    } catch (e) {
-        res.sendStatus(500);
-        return;
-    }
-
-    hashPassword = await bcrypt.hash("Carrère", 10);
-    try {
-        insertUser({ username: "Bruno", password: hashPassword });
-    } catch (e) {
-        res.sendStatus(500);
-        return;
-    }
-
-    res.status(200).send("Database reinit");
-};
-
 export const debugUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        const users = await listUsers();
+        const users = await database.selectFrom("users").select(["username", "password"]).execute();
         res.status(200).json(users);
     } catch (e) {
         res.sendStatus(404);

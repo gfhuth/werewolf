@@ -57,9 +57,3 @@ export const userSchema = async (): Promise<void> => {
     for (const elem of users) 
         await User.load(elem.username);
 };
-
-export const insertUser = async (user: { username: string; password: string }): Promise<void> => {
-    await database.insertInto("users").values(user).execute();
-};
-
-export const listUsers = async (): Promise<Array<{ username: string; password: string }>> => await database.selectFrom("users").select(["username", "password"]).execute();
