@@ -4,7 +4,7 @@ import { User } from "../../models/userModel";
 import database from "../../util/database";
 import { Event } from "../eventController";
 
-export const newMessage = (game: Game, user: User, data: { date: number; chat_type: Chat_type; content: string }): void => {
+export const newMessage = async (game: Game, user: User, data: { date: number; chat_type: Chat_type; content: string }): Promise<void> => {
     const message: Message = {
         game: game.getGameId(),
         type: data.chat_type,
@@ -14,7 +14,7 @@ export const newMessage = (game: Game, user: User, data: { date: number; chat_ty
     };
     // TODO: vérifier que le message est sans erreurs
 
-    database.insertInto("messages").values(message).execute();
+    await database.insertInto("messages").values(message).execute();
 
     // On récupère le chat concerné
     const chat: Chat = game
