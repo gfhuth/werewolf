@@ -48,17 +48,17 @@ export class Chat {
         );
     }
 
-}
+    public static schema = async (): Promise<void> => {
+        await database.schema
+            .createTable("messages")
+            .ifNotExists()
+            .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
+            .addColumn("game", "integer", (col) => col.notNull())
+            .addColumn("type", "integer", (col) => col.notNull())
+            .addColumn("player", "integer", (col) => col.notNull())
+            .addColumn("content", "text", (col) => col.notNull())
+            .addColumn("date", "integer", (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
+            .execute();
+    };
 
-export const messageSchema = async (): Promise<void> => {
-    await database.schema
-        .createTable("messages")
-        .ifNotExists()
-        .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
-        .addColumn("game", "integer", (col) => col.notNull())
-        .addColumn("type", "integer", (col) => col.notNull())
-        .addColumn("player", "integer", (col) => col.notNull())
-        .addColumn("content", "text", (col) => col.notNull())
-        .addColumn("date", "integer", (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
-        .execute();
-};
+}

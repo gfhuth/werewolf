@@ -3,14 +3,7 @@ import { HumanPower, Power, WerewolfPower } from "./powersModel.js";
 
 export abstract class Villager {
 
-    protected chatHuman: Chat;
-    protected chatWerewolf: Chat;
-    protected chatSpirit: Chat;
     protected power: Power;
-
-    setChatSpirit(chat: Chat): void {
-        this.chatSpirit = chat;
-    }
 
     public abstract getRoleValue(): number;
 
@@ -36,7 +29,6 @@ export class Human extends Villager {
 
     constructor(chatHuman: Chat, power: HumanPower) {
         super();
-        this.chatHuman = chatHuman;
         this.setPower(power);
     }
 
@@ -52,8 +44,6 @@ export class Werewolf extends Villager {
 
     constructor(chatHuman: Chat, chatWerewolf: Chat, power: WerewolfPower) {
         super();
-        this.chatHuman = chatHuman;
-        this.chatWerewolf = chatWerewolf;
         this.power = power;
     }
     public getRoleValue(): number {

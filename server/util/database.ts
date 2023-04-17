@@ -2,10 +2,10 @@ import betterSqlite3 from "better-sqlite3";
 import { Kysely, SqliteDialect } from "kysely";
 
 import { Database } from "./sql/schema";
-import { gameSchema } from "../models/gameModel";
-import { playerSchema } from "../models/playerModel";
-import { userSchema } from "../models/userModel";
-import { messageSchema } from "../models/chatModel";
+import { Game } from "../models/gameModel";
+import { Player } from "../models/playerModel";
+import { User } from "../models/userModel";
+import { Chat } from "../models/chatModel";
 
 const database = new Kysely<Database>({
     dialect: new SqliteDialect({
@@ -14,10 +14,10 @@ const database = new Kysely<Database>({
 });
 
 export const createSchema = async (): Promise<void> => {
-    userSchema();
-    playerSchema();
-    gameSchema();
-    messageSchema();
+    User.schema();
+    Player.schema();
+    Game.schema();
+    Chat.schema();
 };
 
 export default database;

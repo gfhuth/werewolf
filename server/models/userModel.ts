@@ -42,18 +42,18 @@ export class User {
         this.ws = ws;
     }
 
+    public static schema = async (): Promise<void> => {
+        await database.schema
+            .createTable("users")
+            .ifNotExists()
+            .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
+            .addColumn("username", "text", (col) => col.unique().notNull())
+            .addColumn("password", "text", (col) => col.notNull())
+            .execute();
+    
+        const users: Array<{ username: string }> = await database.selectFrom("users").select("username").execute();
+        for (const elem of users) 
+            await User.load(elem.username);
+    };
+
 }
-
-export const userSchema = async (): Promise<void> => {
-    await database.schema
-        .createTable("users")
-        .ifNotExists()
-        .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
-        .addColumn("username", "text", (col) => col.unique().notNull())
-        .addColumn("password", "text", (col) => col.notNull())
-        .execute();
-
-    const users: Array<{ username: string }> = await database.selectFrom("users").select("username").execute();
-    for (const elem of users) 
-        await User.load(elem.username);
-};
