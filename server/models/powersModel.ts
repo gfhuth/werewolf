@@ -7,11 +7,15 @@ export abstract class Power {
 
 }
 
-export type HumanPower = Power;
+export interface WerewolfPower {
+    usePower(): void;
+}
 
-export type WerewolfPower = Power;
+export interface HumanPower {
+    usePower(): void;
+}
 
-export class Insomnia implements HumanPower {
+export class Insomnia extends Power implements HumanPower {
 
     showPower(): void {
         console.log("Insomnia options:");
@@ -23,7 +27,7 @@ export class Insomnia implements HumanPower {
 
 }
 
-export class Contamination implements WerewolfPower {
+export class Contamination extends Power implements WerewolfPower {
 
     private victim: Player;
 
@@ -41,7 +45,7 @@ export class Contamination implements WerewolfPower {
 
 }
 
-export class Spiritism implements HumanPower, WerewolfPower {
+export class Spiritism extends Power implements HumanPower, WerewolfPower {
 
     private victim: Player;
 
@@ -59,7 +63,7 @@ export class Spiritism implements HumanPower, WerewolfPower {
 
 }
 
-export class Clairvoyant implements HumanPower, WerewolfPower {
+export class Clairvoyant extends Power implements HumanPower, WerewolfPower {
 
     private victim: Player;
 
