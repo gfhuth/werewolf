@@ -7,9 +7,9 @@ import { Event } from "./eventController";
 
 const { JWT_SECRET } = process.env;
 
-export const connections: Array<WebsocketConnection> = [];
-
 export class WebsocketConnection {
+
+    private static connections: Array<WebsocketConnection> = [];
 
     private ws: WebSocket;
     private user: User;
@@ -23,9 +23,16 @@ export class WebsocketConnection {
         return this.user != null;
     }
 
+    public static onConnect = (ws: WebSocket): void => {
+        // créer un connexion et le mettre dans une liste contenant toutes les connexions
+        const connect: WebsocketConnection = new WebsocketConnection(ws);
+        WebsocketConnection.connections.push(connect);
+        ws.on("message", (message: string) => connect.readMessage(message));
+    };
+
     async readMessage(message: string): Promise<void> {
         try {
-            const data: { game_id?: number, event: string; data: Record<string, any> } = JSON.parse(message);
+            const data: { game_id?: number; event: string; data: Record<string, any> } = JSON.parse(message);
 
             if (!data || typeof data !== "object" || !data.event || !data.data || typeof data.data !== "object") {
                 this.ws.send(JSON.stringify({ status: 400, message: "Bad Request" }));
@@ -79,10 +86,3 @@ export class WebsocketConnection {
     }
 
 }
-
-export const onConnect = (ws: WebSocket): void => {
-    // créer un connexion et le mettre dans une liste contenant toutes les connexions
-    const connect: WebsocketConnection = new WebsocketConnection(ws);
-    connections.push(connect);
-    ws.on("message", (message: string) => connect.readMessage(message));
-};

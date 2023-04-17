@@ -6,7 +6,7 @@ import gameRouter from "./routers/game";
 import cors from "cors";
 import * as WebSocket from "ws";
 
-import { onConnect } from "./controllers/websocketController";
+import { WebsocketConnection } from "./controllers/websocketController";
 import userRouter from "./routers/user";
 
 import requireDirectory from "require-dir";
@@ -32,7 +32,7 @@ app.use("/game", gameRouter);
 app.use("/user", userRouter);
 
 wss.on("connection", (ws: WebSocket) => {
-    onConnect(ws);
+    WebsocketConnection.onConnect(ws);
 });
 
 const server = app.listen(parseInt(PORT), HOST, () => {
