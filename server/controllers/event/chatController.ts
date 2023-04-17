@@ -1,6 +1,7 @@
-import { Chat_type, Message, createMessage } from "../../models/chatModel";
+import { Chat, Chat_type, Message } from "../../models/chatModel";
 import { Game } from "../../models/gameModel";
 import { User } from "../../models/userModel";
+import database from "../../util/database";
 import { Event } from "../eventController";
 
 export const newMessage = (game: Game, user: User, data: { date: number; chat_type: Chat_type; content: string }): void => {
@@ -13,10 +14,16 @@ export const newMessage = (game: Game, user: User, data: { date: number; chat_ty
     };
     // TODO: vérifier que le message est sans erreurs
 
-    createMessage(message);
+    database.insertInto("messages").values(message).execute();
 
-    // Ajout du message dans le chat et envoie à tous les autres joueurs concernés
-    game.getPlayer(user.getUsername()).addMessage(message);
+    // On récupère le chat concerné
+    const chat: Chat = game
+        .getChats()
+        .reverse()
+        .find((c) => c.getType() === message.type);
+
+    // On envoie le message sur ce chat
+    chat.addMessage(message, user);
 };
 
 // Liste des événements relatifs aux messages

@@ -1,4 +1,4 @@
-import { WebsocketConnection } from "../controllers/websocketController";
+import * as WebSocket from "ws";
 import database from "../util/database";
 
 export class User {
@@ -7,7 +7,7 @@ export class User {
 
     private userId: number;
     private username: string;
-    private ws: WebsocketConnection;
+    private ws: WebSocket;
 
     constructor(userId: number, username: string) {
         this.username = username;
@@ -34,7 +34,11 @@ export class User {
         return User.usersSet[username];
     }
 
-    public setWebsocket(ws: WebsocketConnection): void {
+    public getWebsocket(): WebSocket {
+        return this.ws;
+    }
+
+    public setWebsocket(ws: WebSocket): void {
         this.ws = ws;
     }
 

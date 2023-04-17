@@ -1,5 +1,4 @@
 import database from "../util/database";
-import { Chat, Message } from "./chatModel";
 import { Game } from "./gameModel";
 import { User } from "./userModel";
 import { Villager } from "./villagerModel";
@@ -31,16 +30,6 @@ export class Player {
     public setRole(role:Villager):void {
         if (this.role == null) 
             this.role = role;
-    }
-
-    public addMessage(message: Message): void {
-        // On récupère le chat concerné
-        const chat: Chat = this.game
-            .getChats()
-            .reverse()
-            .find((c) => c.getType() === message.type);
-        // On envoie le message sur ce chat
-        chat.addMessage(message, this.user);
     }
 
     /** Send at all client of the game the new status of the game

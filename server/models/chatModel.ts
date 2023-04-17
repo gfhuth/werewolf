@@ -1,7 +1,6 @@
 import { sql } from "kysely";
 import database from "../util/database";
 import { User } from "./userModel";
-import { connections } from "../controllers/websocketController";
 import { Player } from "./playerModel";
 
 export enum Chat_type {
@@ -31,10 +30,11 @@ export class Chat {
     public addMessage(message: Message, author: User): void {
         this.messages.push(message);
 
-        const addressee: Array<User> = this.members.map<User>((player) => player.getUser());
-        for (const connection of connections) {
-            if (addressee.includes(connection.user)) {
-                connection.ws.send(
+        this.members.forEach((player) =>
+            player
+                .getUser()
+                .getWebsocket()
+                .send(
                     JSON.stringify({
                         event: "CHAT_RECEIVED",
                         data: {
@@ -44,9 +44,8 @@ export class Chat {
                             content: message.content
                         }
                     })
-                );
-            }
-        }
+                )
+        );
     }
 
 }
@@ -71,8 +70,4 @@ export type MessageObject = {
     player: number;
     content: string;
     date: number;
-};
-
-export const createMessage = (message: { game: number; type: number; player: number; content: string; date: number }): void => {
-    database.insertInto("messages").values(message).execute();
 };

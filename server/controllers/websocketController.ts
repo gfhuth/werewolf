@@ -11,8 +11,8 @@ export const connections: Array<WebsocketConnection> = [];
 
 export class WebsocketConnection {
 
-    ws: WebSocket;
-    user: User;
+    private ws: WebSocket;
+    private user: User;
 
     constructor(ws: WebSocket) {
         this.ws = ws;
@@ -49,6 +49,7 @@ export class WebsocketConnection {
                 }
 
                 this.user = User.getUser(username);
+                this.user.setWebsocket(this.ws);
                 this.ws.send(JSON.stringify({ status: 200, message: "User authenticated" }));
                 return;
             }
