@@ -17,7 +17,7 @@ function startDay(game: Game): void {
     // Initialisation du chat
     game.addChat(new Chat(Chat_type.CHAT_GLOBAL, game.getAllPlayers()));
     // update death player
-    
+
     // activate vote for each player, desactivate power of werewolf
     // send a message at every connected client
     // call startNight at the end of the day
@@ -49,7 +49,6 @@ function startNight(game: Game): void {
  * */
 export async function initGame(gameId: number): Promise<void> {
     const game: Game = getGame(gameId);
-    addPlayerInGame(game);
     const gameStatus = game.getStatus();
     if (gameStatus.status == 0) setupGame(game);
 
