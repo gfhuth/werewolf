@@ -7,7 +7,6 @@ import { getGame } from "../controllers/gameSetupController";
 import { User } from "./userModel";
 import { Villager } from "./villagerModel";
 
-export const gamesList: Array<Game> = [];
 export enum GameStatus {
     NOT_STARTED = 0,
     JOUR = 1,
@@ -37,6 +36,8 @@ export type GameParam = {
  *  getStatus()         Return an number corresponding to the status of the game
  */
 export class Game {
+
+    private static gamesList: Array<Game> = [];
 
     private gameId: number;
     private gameParam: GameParam;
@@ -75,6 +76,14 @@ export class Game {
         };
 
         return new Game(gameId, gameParams);
+    }
+
+    public static getAllGames(): Array<Game> {
+        return Game.gamesList;
+    }
+
+    public static addGameInList(game: Game): void {
+        Game.gamesList.push(game);
     }
 
     /** Return Id of the game
@@ -180,7 +189,7 @@ export const gameSchema = async (): Promise<void> => {
             probaSpiritisme: elem.probaSpiritisme
         };
         const game: Game = new Game(elem.id, gameParams);
-        gamesList.push(game);
+        Game.addGameInList(game);
         // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
         if (game.getStatus().status == -1) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
         else initGame(game.getGameId());

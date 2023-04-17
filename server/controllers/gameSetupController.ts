@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getTokenContent } from "./userController";
-import { Game, GameParam, gamesList } from "../models/gameModel";
+import { Game, GameParam } from "../models/gameModel";
 import database from "../util/database";
 import { initGame } from "./gameStartedController";
 
@@ -8,7 +8,7 @@ import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
 
 export const getGame = (gameId: number): Game => {
-    for (const game of gamesList) if (game.getGameId() === gameId) return game;
+    for (const game of Game.getAllGames()) if (game.getGameId() === gameId) return game;
     return null;
 };
 
@@ -165,7 +165,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
             .execute();
 
         // On ajoute la partie à la liste des parties
-        gamesList.push(newHostGame);
+        Game.addGameInList(newHostGame);
 
         // On ajoute l'utilisateur aux joueurs de la partie
         // TODO: ajuster les valeurs de role et power
