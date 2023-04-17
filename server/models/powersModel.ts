@@ -59,7 +59,7 @@ export class Spiritism implements HumanPower, WerewolfPower {
 
 }
 
-export class Clairvoyant implements WerewolfPower {
+export class Clairvoyant implements HumanPower, WerewolfPower {
 
     private victim: Player;
 
