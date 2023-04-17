@@ -62,12 +62,3 @@ export const messageSchema = async (): Promise<void> => {
         .addColumn("date", "integer", (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
         .execute();
 };
-
-export type MessageObject = {
-    id: number;
-    game: number;
-    type: number;
-    player: number;
-    content: string;
-    date: number;
-};
