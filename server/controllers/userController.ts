@@ -7,10 +7,9 @@ import { User } from "../models/userModel";
 const { JWT_SECRET } = process.env;
 
 export const getTokenContent = (token: string): { username: string } => {
-    const isValid = jwt.verify(token, JWT_SECRET);
-    if (!isValid) throw new Error("Invalid Token !");
+    if (!jwt.verify(token, JWT_SECRET)) throw new Error("Invalid Token !");
 
-    const username = (jwt.decode(token) as { username: string }).username;
+    const username: string = (jwt.decode(token) as { username: string }).username;
     return {
         username: username
     };
