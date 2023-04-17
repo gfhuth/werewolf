@@ -143,63 +143,63 @@ export class Game {
         }
     }
 
+    /**
+     * Function use to create a game table in the database if it is necessary
+     * Next, load all game in the database and create an event to start a game at the starting date
+     */
+    public static schema = async (): Promise<void> => {
+        await database.schema
+            .createTable("games")
+            .ifNotExists()
+            .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
+            .addColumn("hostId", "integer", (col) => col.notNull())
+            //TODO add statuts needed for the game (for example : isNight, idPersonAlives,...)
+            .addColumn("currentNumberOfPlayer", "integer", (col) => col.defaultTo(1).notNull())
+            //param of type gameParam
+            .addColumn("nbPlayerMin", "integer", (col) => col.defaultTo(5).notNull())
+            .addColumn("nbPlayerMax", "integer", (col) => col.defaultTo(20).notNull())
+            .addColumn("dayLength", "integer", (col) => col.defaultTo(10).notNull())
+            .addColumn("nightLength", "integer", (col) => col.defaultTo(12).notNull())
+            .addColumn("startDate", "integer", (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
+            .addColumn("percentageWerewolf", "real", (col) => col.defaultTo(0.33).notNull())
+            .addColumn("probaContamination", "real", (col) => col.defaultTo(0).notNull())
+            .addColumn("probaInsomnie", "real", (col) => col.defaultTo(0).notNull())
+            .addColumn("probaVoyance", "real", (col) => col.defaultTo(0).notNull())
+            .addColumn("probaSpiritisme", "real", (col) => col.defaultTo(0).notNull())
+            .execute();
+
+        // On charge chaque parties en cours
+        const gamelist: Array<{ id: number } & GameParam> = await database
+            .selectFrom("games")
+            .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
+            .execute();
+        for (const elem of gamelist) {
+            const gameParams: GameParam = {
+                nbPlayerMin: elem.nbPlayerMin,
+                nbPlayerMax: elem.nbPlayerMax,
+                dayLength: elem.dayLength,
+                nightLength: elem.nightLength,
+                startDate: elem.startDate,
+                percentageWerewolf: elem.percentageWerewolf,
+                probaContamination: elem.probaContamination,
+                probaInsomnie: elem.probaInsomnie,
+                probaVoyance: elem.probaVoyance,
+                probaSpiritisme: elem.probaSpiritisme
+            };
+            const game: Game = new Game(elem.id, gameParams);
+            Game.addGameInList(game);
+            // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
+            if (game.getStatus().status == -1) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
+            else initGame(game.getGameId());
+        }
+
+        // Initialisation des joueurs de chaque partie
+        const players: Array<{ name: string; role: number; power: number; game: number }> = await database.selectFrom("players").select(["name", "role", "power", "game"]).execute();
+        for (const elem of players) {
+            const game: Game = getGame(elem.game);
+            const player: Player = new Player(User.getUser(elem.name), Villager.load(elem.role), elem.power, game);
+            game.addPlayer(player);
+        }
+    };
+
 }
-
-/**
- * Function use to create a game table in the database if it is necessary
- * Next, load all game in the database and create an event to start a game at the starting date
- */
-export const gameSchema = async (): Promise<void> => {
-    await database.schema
-        .createTable("games")
-        .ifNotExists()
-        .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
-        .addColumn("hostId", "integer", (col) => col.notNull())
-        //TODO add statuts needed for the game (for example : isNight, idPersonAlives,...)
-        .addColumn("currentNumberOfPlayer", "integer", (col) => col.defaultTo(1).notNull())
-        //param of type gameParam
-        .addColumn("nbPlayerMin", "integer", (col) => col.defaultTo(5).notNull())
-        .addColumn("nbPlayerMax", "integer", (col) => col.defaultTo(20).notNull())
-        .addColumn("dayLength", "integer", (col) => col.defaultTo(10).notNull())
-        .addColumn("nightLength", "integer", (col) => col.defaultTo(12).notNull())
-        .addColumn("startDate", "integer", (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
-        .addColumn("percentageWerewolf", "real", (col) => col.defaultTo(0.33).notNull())
-        .addColumn("probaContamination", "real", (col) => col.defaultTo(0).notNull())
-        .addColumn("probaInsomnie", "real", (col) => col.defaultTo(0).notNull())
-        .addColumn("probaVoyance", "real", (col) => col.defaultTo(0).notNull())
-        .addColumn("probaSpiritisme", "real", (col) => col.defaultTo(0).notNull())
-        .execute();
-
-    // On charge chaque parties en cours
-    const gamelist: Array<{ id: number } & GameParam> = await database
-        .selectFrom("games")
-        .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
-        .execute();
-    for (const elem of gamelist) {
-        const gameParams: GameParam = {
-            nbPlayerMin: elem.nbPlayerMin,
-            nbPlayerMax: elem.nbPlayerMax,
-            dayLength: elem.dayLength,
-            nightLength: elem.nightLength,
-            startDate: elem.startDate,
-            percentageWerewolf: elem.percentageWerewolf,
-            probaContamination: elem.probaContamination,
-            probaInsomnie: elem.probaInsomnie,
-            probaVoyance: elem.probaVoyance,
-            probaSpiritisme: elem.probaSpiritisme
-        };
-        const game: Game = new Game(elem.id, gameParams);
-        Game.addGameInList(game);
-        // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
-        if (game.getStatus().status == -1) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
-        else initGame(game.getGameId());
-    }
-
-    // Initialisation des joueurs de chaque partie
-    const players: Array<{ name: string; role: number; power: number; game: number }> = await database.selectFrom("players").select(["name", "role", "power", "game"]).execute();
-    for (const elem of players) {
-        const game: Game = getGame(elem.game);
-        const player: Player = new Player(User.getUser(elem.name), Villager.load(elem.role), elem.power, game);
-        game.addPlayer(player);
-    }
-};
