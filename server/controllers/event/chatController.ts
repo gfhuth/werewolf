@@ -19,6 +19,11 @@ const newMessage = async (game: Game, user: User, data: { date: number; chat_typ
     // On récupère le chat concerné
     const chat: Chat = game.getChat(data.chat_type);
 
+    if (data.date < game.getGameParam().startDate) {
+        user.getWebsocket().send(JSON.stringify({ status: 500, message: "Game is not started" }));
+        return;
+    }
+
     // On envoie le message sur ce chat
     if (chat) {
         if (chat.getMembers().length === 0) {
