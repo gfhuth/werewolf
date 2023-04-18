@@ -1,11 +1,7 @@
 import request from "supertest";
-import { app, server } from "../server";
+import { app } from "../server";
 
 import jwt from "jsonwebtoken";
-
-afterAll(() => {
-    server.close();
-});
 
 describe("Test users", () => {
     test("Create user and test whoami", async () => {
