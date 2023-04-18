@@ -71,7 +71,7 @@ export default function CreateGame(): React.ReactElement {
 
     return (
         <Background>
-            <NavigationUI allowBack={false} />
+            <NavigationUI allowBack={true} />
 
             <View>
                 {Object.keys(fields).map((n, i) => {
