@@ -20,6 +20,7 @@ export default function request(input: RequestInfo | URL, init?: RequestInit | u
                 }
             })
             .catch((e) => {
+                console.log("Request error:", e);
                 reject({
                     message: e.message,
                     status: -1,
