@@ -79,13 +79,10 @@ export const register = async (req: Request<any, any, { username: string; passwo
     const hashPassword = await bcrypt.hash(password, 10);
 
     // On s'assure que le nom d'utilisateur n'est pas déjà utilisé
-    try {
-        const user = (await database.selectFrom("users").select(["username"]).where("username", "=", username).executeTakeFirstOrThrow()).username;
-        if (user) {
-            res.status(409).send("User already exists");
-            return;
-        }
-    } catch (e) {}
+    if (User.getUser(username)) {
+        res.status(409).send("User already register");
+        return;
+    }
 
     // Insertion de l'utilisateur dans la base de données
     try {
