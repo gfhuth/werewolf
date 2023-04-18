@@ -45,4 +45,5 @@ server.on("upgrade", (request, socket, head) => {
     });
 });
 
-export default app;
+// Export pour les tests
+export { app, server };

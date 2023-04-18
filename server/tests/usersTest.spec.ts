@@ -1,7 +1,11 @@
 import request from "supertest";
-import app from "../server";
+import { app, server } from "../server";
 
 import jwt from "jsonwebtoken";
+
+afterAll(() => {
+    server.close();
+});
 
 describe("Test users", () => {
     test("Create user and test whoami", async () => {
@@ -34,21 +38,24 @@ describe("Test users", () => {
         let res = await request(app)
             .post("/user/register")
             .set("content-type", "application/json")
-            .send(JSON.stringify({ username: "carrereb", password: "AZERTY1234" })).expect(409);
+            .send(JSON.stringify({ username: "carrereb", password: "AZERTY1234" }))
+            .expect(409);
         expect(res.text).toEqual("User already register");
 
         // Il manque le mot de passe
         res = await request(app)
             .post("/user/register")
             .set("content-type", "application/json")
-            .send(JSON.stringify({ username: "thikens" })).expect(400);
+            .send(JSON.stringify({ username: "thikens" }))
+            .expect(400);
         expect(res.text).toEqual("Missing password");
 
         // Il manque le nom d'utilisateur
         res = await request(app)
             .post("/user/register")
             .set("content-type", "application/json")
-            .send(JSON.stringify({ password: "AZERTY1234" })).expect(400);
+            .send(JSON.stringify({ password: "AZERTY1234" }))
+            .expect(400);
         expect(res.text).toEqual("Missing username");
     });
 
@@ -57,28 +64,32 @@ describe("Test users", () => {
         let res = await request(app)
             .post("/user/login")
             .set("content-type", "application/json")
-            .send(JSON.stringify({ username: "carrere", password: "AZERTY1234" })).expect(500);
+            .send(JSON.stringify({ username: "carrere", password: "AZERTY1234" }))
+            .expect(500);
         expect(res.text).toEqual("Invalid username or invalid password");
 
         // Mot de passe invalide
         res = await request(app)
             .post("/user/login")
             .set("content-type", "application/json")
-            .send(JSON.stringify({ username: "carrereb", password: "AZERT1234" })).expect(500);
+            .send(JSON.stringify({ username: "carrereb", password: "AZERT1234" }))
+            .expect(500);
         expect(res.text).toEqual("Invalid username or invalid password");
 
         // Il manque le mot de passe
         res = await request(app)
             .post("/user/login")
             .set("content-type", "application/json")
-            .send(JSON.stringify({ username: "thikens" })).expect(400);
+            .send(JSON.stringify({ username: "thikens" }))
+            .expect(400);
         expect(res.text).toEqual("Missing password");
 
         // Il manque le nom d'utilisateur
         res = await request(app)
             .post("/user/login")
             .set("content-type", "application/json")
-            .send(JSON.stringify({ password: "AZERTY1234" })).expect(400);
+            .send(JSON.stringify({ password: "AZERTY1234" }))
+            .expect(400);
         expect(res.text).toEqual("Missing username");
 
         // Échec de l'authentification d'un utilisateur avec un token
