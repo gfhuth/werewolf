@@ -44,6 +44,3 @@ server.on("upgrade", (request, socket, head) => {
         wss.emit("connection", s, request);
     });
 });
-
-// Export pour les tests
-export { app, server };
