@@ -15,17 +15,26 @@ export default function request(input: string, init?: RequestInit | undefined): 
             headers: init?.headers,
             method: init?.method,
             data: init?.body
-        } as AxiosRequestConfig).then((res) => {
-            if (Math.floor(res.status / 100) === 2) {
-                resolve(res.data); 
-            } else {
+        } as AxiosRequestConfig)
+            .then((res) => {
+                if (Math.floor(res.status / 100) === 2) {
+                    resolve(res.data);
+                } else {
+                    reject({
+                        message: res.statusText,
+                        status: res.status,
+                        response: res
+                    });
+                }
+            })
+            .catch((e) => {
+                console.log("Request error:", e);
                 reject({
-                    message: res.statusText,
-                    status: res.status,
-                    response: res
-                }); 
-            }
-        });
+                    message: e.message,
+                    status: -1,
+                    error: e
+                });
+            });
 
         // fetch(input, init)
         //     .then(async (res) => {
