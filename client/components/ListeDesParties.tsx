@@ -22,6 +22,7 @@ export default function ListeDesParties(): React.ReactElement {
         id: number;
         nbPlayerMax: number;
         startDate: number;
+        date : String;
     };
     const [listeParties, setListeParties] = useState<Array<Partie>>([]);
 
@@ -37,6 +38,9 @@ export default function ListeDesParties(): React.ReactElement {
             .then((res) => res.json())
             .then((res) => {
                 console.log(res.games);
+                res.games.map((info: Partie) => {
+                    info.date = (new Date(info.startDate)).toString();   
+                });
                 setListeParties(res.games);
             })
             .catch((e) => console.log(e));
@@ -61,7 +65,8 @@ export default function ListeDesParties(): React.ReactElement {
                         <Text style={styles.baseText}>hostId :{informationPartie.hostId}</Text>
                         <Text style={styles.baseText}>id :{informationPartie.id}</Text>
                         <Text style={styles.baseText}>nbPlayerMax :{informationPartie.nbPlayerMax}</Text>
-                        <Text style={styles.baseText}>startDate :{informationPartie.startDate}</Text>
+                        <Text style={styles.baseText}>startDate : {informationPartie.startDate}</Text>
+                        <Text style={styles.baseText}>Date : {informationPartie.date}</Text>
                     </View>
                 ))}
         </View>
