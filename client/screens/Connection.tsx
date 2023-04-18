@@ -36,6 +36,13 @@ const styles = StyleSheet.create({
     },
     Button: {
         marginTop: 10
+    },
+    Erreur: {
+        color: "red",
+        marginTop: 4,
+        paddingTop: 5,
+        fontSize: 20,
+        fontFamily: "pixel"
     }
 });
 
@@ -45,6 +52,7 @@ export default function Login(): React.ReactElement {
     const [loginOrRegister, setLoginOrRegister] = useState(0);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [messageErreur, setMessageErreur] = useState("");
 
     const context = useContext(UserContext);
 
@@ -65,7 +73,7 @@ export default function Login(): React.ReactElement {
                 context.setToken(res.token);
                 navigation.navigate("Home");
             })
-            .catch((e) => console.log(e));
+            .catch((e) => setMessageErreur(e.message));
     };
 
     const registerUser = (): void => {
@@ -113,6 +121,8 @@ export default function Login(): React.ReactElement {
                             </Text>
                         </>
                     )}
+
+                    <Text style={styles.Erreur}>{messageErreur}</Text>
                 </Box>
             </ImageBackground>
         </View>

@@ -1,18 +1,34 @@
-import React, { useContext } from "react";
-import { View } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { Button, View, Text, StyleSheet } from "react-native";
 import { API_BASE_URL } from "@env";
 import { UserContext } from "../context/UserContext";
 import request from "../utils/request";
 import Message from "./Message";
 
+const styles = StyleSheet.create({
+    baseText: {
+        height: 30,
+        marginTop: 10,
+        color: "#fff",
+        paddingLeft: 10
+    }
+});
 
-export default function ListeDesParties(props: { children: React.ReactNode }): React.ReactElement {
+export default function ListeDesParties(): React.ReactElement {
     const context = useContext(UserContext);
-    let listeParties:Array<String> = [];
-    
-    const RequestListeDesParties = (): void => {
-        request(`${API_BASE_URL}/user/login`, {
-            method: "POST",
+    type Partie = {
+        currentNumberOfPlayer: number;
+        hostId: number;
+        id: number;
+        nbPlayerMax: number;
+        startDate: number;
+        date : String;
+    };
+    const [listeParties, setListeParties] = useState<Array<Partie>>([]);
+
+    const requestListeDesParties = (): void => {
+        request(`${API_BASE_URL}/game/search`, {
+            method: "GET",
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
@@ -21,14 +37,38 @@ export default function ListeDesParties(props: { children: React.ReactNode }): R
         })
             .then((res) => res.json())
             .then((res) => {
-                listeParties = res.games;
+                console.log(res.games);
+                res.games.map((info: Partie) => {
+                    info.date = (new Date(info.startDate)).toString();   
+                });
+                setListeParties(res.games);
             })
             .catch((e) => console.log(e));
     };
 
-    return <View>
+    useEffect(() => {
+        requestListeDesParties();
+    }, []);
 
-        {listeParties.map((el: any, i: React.Key | null | undefined) => <Message message={el} key={i} />)}
-
-    </View>;
+    return (
+        <View>
+            {listeParties &&
+                listeParties.map((informationPartie) => (
+                    <View
+                        key={informationPartie.id}
+                        style={{
+                            borderBottomColor: "white",
+                            borderBottomWidth: StyleSheet.hairlineWidth
+                        }}
+                    >
+                        <Text style={styles.baseText}>currentNumberOfPlayer :{informationPartie.currentNumberOfPlayer}</Text>
+                        <Text style={styles.baseText}>hostId :{informationPartie.hostId}</Text>
+                        <Text style={styles.baseText}>id :{informationPartie.id}</Text>
+                        <Text style={styles.baseText}>nbPlayerMax :{informationPartie.nbPlayerMax}</Text>
+                        <Text style={styles.baseText}>startDate : {informationPartie.startDate}</Text>
+                        <Text style={styles.baseText}>Date : {informationPartie.date}</Text>
+                    </View>
+                ))}
+        </View>
+    );
 }
