@@ -113,6 +113,8 @@ export default function Login(): React.ReactElement {
                             </Text>
                         </>
                     )}
+
+                    
                 </Box>
             </ImageBackground>
         </View>

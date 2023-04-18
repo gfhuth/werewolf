@@ -3,6 +3,8 @@ import { Button } from "react-native";
 import { StackNavigation } from "../App";
 import Background from "../components/Background";
 import NavigationUI from "../components/NavigationUI";
+import ListeDesParties from "../components/ListeDesParties";
+
 
 export default function Home(): React.ReactElement {
     const navigation = useNavigation<StackNavigation>();
@@ -19,6 +21,9 @@ export default function Home(): React.ReactElement {
             <NavigationUI allowBack={false} />
             <Button onPress={createGame} title="Create game" />
             <Button onPress={goToGame} title="Go to game" />
+
+
+            <ListeDesParties></ListeDesParties>
         </Background>
     );
 }
