@@ -31,6 +31,7 @@ export class User {
     }
 
     public static getUser(username: string): User {
+        if (User.usersSet[username] === undefined) return null;
         return User.usersSet[username];
     }
 

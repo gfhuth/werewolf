@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express from "express";
+import express, { Application } from "express";
 import { createSchema } from "./util/database";
 import gameRouter from "./routers/game";
 import cors from "cors";
@@ -12,7 +12,7 @@ import userRouter from "./routers/user";
 import requireDirectory from "require-dir";
 requireDirectory("./controllers/event");
 
-const app = express();
+const app: Application = express();
 
 //initialize the WebSocket server instance
 const wss = new WebSocket.Server({ noServer: true });
@@ -44,3 +44,6 @@ server.on("upgrade", (request, socket, head) => {
         wss.emit("connection", s, request);
     });
 });
+
+// Export pour les tests
+export { app, server };

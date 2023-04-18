@@ -111,15 +111,15 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         probaSpiritisme: req.body.probaSpiritisme || 0
     };
     const conditions = [
-        { minRange: 0, value: game.probaContamination, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.probaInsomnie, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.probaVoyance, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.probaSpiritisme, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.percentageWerewolf, maxRange: 1, errorMessage: "Unvalid contamination probability" },
-        { minRange: 0, value: game.dayLength, maxRange: 24 * 60 * 60, errorMessage: "Day length too long" },
-        { minRange: 0, value: game.nightLength, maxRange: 24 * 60 * 60, errorMessage: "Night length too long" },
+        { minRange: 0, value: game.probaContamination, maxRange: 1, errorMessage: "Unvalid contamination probabilityShould be in [0,1]" },
+        { minRange: 0, value: game.probaInsomnie, maxRange: 1, errorMessage: "Unvalid Insomnie probabilityShould be in [0,1]" },
+        { minRange: 0, value: game.probaVoyance, maxRange: 1, errorMessage: "Unvalid Voyance probabilityShould be in [0,1]" },
+        { minRange: 0, value: game.probaSpiritisme, maxRange: 1, errorMessage: "Unvalid Spiritisme probability Should be in [0,1]" },
+        { minRange: 0, value: game.percentageWerewolf, maxRange: 1, errorMessage: "Unvalid wereWolf quantity : Should be in [0,1]" },
+        { minRange: 0, value: game.dayLength, maxRange: 24 * 60 * 60, errorMessage: "Day length in seconde too long " },
+        { minRange: 0, value: game.nightLength, maxRange: 24 * 60 * 60, errorMessage: "Night length in seconde too long" },
         { minRange: 2, value: game.nbPlayerMin, maxRange: 498, errorMessage: "There must be at least two players" },
-        { minRange: game.nbPlayerMin, value: game.nbPlayerMax, maxRange: 500, errorMessage: "Too many players" },
+        { minRange: game.nbPlayerMin, value: game.nbPlayerMax, maxRange: 500, errorMessage: "Too many players (MAX 500)" },
         { minRange: Date.now(), value: game.startDate, maxRange: Infinity, errorMessage: "Start date passed" }
     ];
 

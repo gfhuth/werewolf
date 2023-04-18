@@ -7,10 +7,9 @@ import { User } from "../models/userModel";
 const { JWT_SECRET } = process.env;
 
 export const getTokenContent = (token: string): { username: string } => {
-    const isValid = jwt.verify(token, JWT_SECRET);
-    if (!isValid) throw new Error("Invalid Token !");
+    if (!jwt.verify(token, JWT_SECRET)) throw new Error("Invalid Token !");
 
-    const username = (jwt.decode(token) as { username: string }).username;
+    const username: string = (jwt.decode(token) as { username: string }).username;
     return {
         username: username
     };
@@ -80,13 +79,10 @@ export const register = async (req: Request<any, any, { username: string; passwo
     const hashPassword = await bcrypt.hash(password, 10);
 
     // On s'assure que le nom d'utilisateur n'est pas déjà utilisé
-    try {
-        const user = (await database.selectFrom("users").select(["username"]).where("username", "=", username).executeTakeFirstOrThrow()).username;
-        if (user) {
-            res.status(409).send("User already exists");
-            return;
-        }
-    } catch (e) {}
+    if (User.getUser(username)) {
+        res.status(409).send("User already register");
+        return;
+    }
 
     // Insertion de l'utilisateur dans la base de données
     try {

@@ -1,6 +1,5 @@
 import { sql } from "kysely";
 import database from "../util/database";
-import { User } from "./userModel";
 import { Player } from "./playerModel";
 
 export enum Chat_type {
@@ -9,7 +8,7 @@ export enum Chat_type {
     CHAT_SPIRITISM,
 }
 
-export type Message = { game: number; type: number; player: number; content: string; date: number };
+export type Message = { game: number; type: number; user: number; content: string; date: number };
 
 export class Chat {
 
@@ -27,11 +26,19 @@ export class Chat {
         return this.type;
     }
 
+    public getMembers(): Array<Player> {
+        return this.members;
+    }
+
     public resetMessages(): void {
         this.messages.length = 0;
     }
 
-    public addMessage(message: Message, author: User): void {
+    public resetChatMembers(newMembers: Array<Player>): void {
+        this.members = newMembers;
+    }
+
+    public addMessage(message: Message): void {
         this.messages.push(message);
 
         this.members.forEach((player) =>
@@ -42,7 +49,7 @@ export class Chat {
                     JSON.stringify({
                         event: "CHAT_RECEIVED",
                         data: {
-                            author: author.getUsername(),
+                            author: message.user,
                             date: message.date,
                             chat_type: message.type,
                             content: message.content
@@ -59,7 +66,7 @@ export class Chat {
             .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
             .addColumn("game", "integer", (col) => col.notNull())
             .addColumn("type", "integer", (col) => col.notNull())
-            .addColumn("player", "integer", (col) => col.notNull())
+            .addColumn("user", "integer", (col) => col.notNull())
             .addColumn("content", "text", (col) => col.notNull())
             .addColumn("date", "integer", (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
             .execute();
