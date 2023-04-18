@@ -25,7 +25,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
             const data = JSON.parse(event.data);
             const eventName = data.event as string;
             const handler = eventHandlers[eventName];
-            if (handler) handler(data);
+            if (handler) handler(data.data);
         } catch (e) {
             console.error("Failed to handle message : ", event.data, e);
         }

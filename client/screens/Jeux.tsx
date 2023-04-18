@@ -20,7 +20,7 @@ export default function Jeux(): React.ReactElement {
 
     return (
         <Background>
-            <NavigationUI allowBack={false} />
+            <NavigationUI allowBack />
 
             <ChatComponent />
         </Background>

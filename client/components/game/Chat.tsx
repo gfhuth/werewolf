@@ -21,7 +21,7 @@ export default function ChatComponent(): React.ReactElement {
 
     const sendMessage = (fields: FormFieldsValue): void => {
         const message = fields.message;
-        gameContext.sendJsonMessage("CHAT_SENT", { date: new Date().getTime(), content: message, chat_type: 0    });
+        gameContext.sendJsonMessage("CHAT_SENT", { date: new Date().getTime(), content: message, chat_type: 0 });
     };
 
     const onMessage = (data: { date: number; author: string; chat_type: string; content: string }): void => {
@@ -42,8 +42,8 @@ export default function ChatComponent(): React.ReactElement {
     return (
         <View>
             <ScrollView>
-                {messages.map((message) => (
-                    <View>
+                {messages.map((message, i) => (
+                    <View key={i}>
                         <Text>
                             {message.author} : {message.content}
                         </Text>
