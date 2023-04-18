@@ -28,7 +28,7 @@ export default function InputDate(props: { control: Control<any, any>; defaultVa
 
     const onConfirmDate = (params: { date: any & { getDate: () => number} }): void => {
         if (!params.date) return;
-        setDate(new Date(params.date.getDate()));
+        setDate(new Date(params.date.getFullYear(), params.date.getMonth(), params.date.getDate()));
         setDateOpen(false);
         setTimeOpen(true);
     };
@@ -49,8 +49,8 @@ export default function InputDate(props: { control: Control<any, any>; defaultVa
             <Pressable onPress={(): void => setDateOpen(true)}>
                 <TextInput style={styles.textInput} value={new Date(field.value).toISOString()} {...props.options} />
             </Pressable>
-            <DatePickerModal visible={dateOpen} date={date} mode="single" onConfirm={onConfirmDate} onDismiss={onDismiss} locale="fr" />
-            <TimePickerModal visible={timeOpen} hours={hours} minutes={minutes} onConfirm={onConfirmTime} onDismiss={onDismiss} locale="fr" />
+            <DatePickerModal visible={dateOpen} date={date} mode="single" onConfirm={onConfirmDate} onDismiss={onDismiss} locale="en" />
+            <TimePickerModal visible={timeOpen} hours={hours} minutes={minutes} onConfirm={onConfirmTime} onDismiss={onDismiss} />
         </>
     );
 }

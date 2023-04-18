@@ -59,7 +59,7 @@ export default function CreateGame(): React.ReactElement {
                 nbPlayerMax: parseInt(fieldValues.nbPlayerMax),
                 dayLength: parseInt(fieldValues.dayLength),
                 nightLength: parseInt(fieldValues.nightLength),
-                startDate: new Date(fieldValues.startDate).getTime() / 1000,
+                startDate: new Date(fieldValues.startDate).getTime(),
                 percentageWerewolf: parseInt(fieldValues.percentageWerewolf) / 100,
                 probaContamination: parseInt(fieldValues.probaContamination) / 100,
                 probaInsomnie: parseInt(fieldValues.probaInsomnie) / 100,
@@ -74,16 +74,16 @@ export default function CreateGame(): React.ReactElement {
             <NavigationUI allowBack={false} />
 
             <View>
-                {Object.keys(fields).map((n) => {
+                {Object.keys(fields).map((n, i) => {
                     const name = n as keyof FormFieldsValue;
                     const field = fields[name];
                     switch (field.type) {
                     case "text":
-                        return <InputText control={control} name={name} defaultValue={field.defaultValue} options={register(name, { ...field.validation })} />;
+                        return <InputText key={i} control={control} name={name} defaultValue={field.defaultValue} options={register(name, { ...field.validation })} />;
                     case "number":
-                        return <InputNumber control={control} name={name} defaultValue={field.defaultValue} options={register(name, { ...field.validation })} />;
+                        return <InputNumber key={i} control={control} name={name} defaultValue={field.defaultValue} options={register(name, { ...field.validation })} />;
                     case "date":
-                        return <InputDate control={control} name={name} defaultValue={field.defaultValue} options={register(name, { ...field.validation })} />;
+                        return <InputDate key={i} control={control} name={name} defaultValue={field.defaultValue} options={register(name, { ...field.validation })} />;
                     }
                 })}
             </View>

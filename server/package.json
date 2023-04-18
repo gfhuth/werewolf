@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node server.ts",
-    "test": "rm db.sqlite & jest --coverage"
+    "test": "rm db.sqlite & jest --coverage",
+    "fix": "yarn install && rm db.sqlite"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
