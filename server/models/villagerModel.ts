@@ -1,10 +1,12 @@
+import { throws } from "assert";
 import { Chat } from "./chatModel.js";
-import { HumanPower, WerewolfPower } from "./powersModel.js";
+import { HumanPower, Power, WerewolfPower } from "./powersModel.js";
 
 export abstract class Villager {
 
     public abstract getRoleValue(): number;
-
+    public abstract setPower(power:Power):void;
+    
     public static load(type: number): Villager {
         if (type == 0) 
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -29,6 +31,12 @@ export class Human extends Villager {
         return 0;
     }
 
+    public setPower(power:Power):void{
+        if (power.isHumanPower()){
+            this.power = power;
+        }
+        throw new Error("A werewolf power is given but a Human power is required.");
+    }
 }
 
 export class Werewolf extends Villager {
@@ -42,6 +50,13 @@ export class Werewolf extends Villager {
 
     public getRoleValue(): number {
         return 1;
+    }
+
+    public setPower(power:Power):void{
+        if (power.isWerewolfPower()){
+            this.power = power;
+        }
+        throw new Error("A Human power is given but a Werewolf power is required.");
     }
 
 }
