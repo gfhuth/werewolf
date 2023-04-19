@@ -3,23 +3,15 @@ import { HumanPower, WerewolfPower } from "./powersModel.js";
 
 export abstract class Villager {
 
-    protected chatHuman: Chat;
-    protected chatWerewolf: Chat;
-    protected chatSpirit: Chat;
-
-    setChatSpirit(chat: Chat): void {
-        this.chatSpirit = chat;
-    }
-
     public abstract getRoleValue(): number;
 
     public static load(type: number): Villager {
         if (type == 0) 
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            return new Human(null, null);
+            return new Human(null);
         else 
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            return new Werewolf(null, null, null);
+            return new Werewolf(null);
     }
 
 }
@@ -28,9 +20,8 @@ export class Human extends Villager {
 
     protected power: HumanPower;
 
-    constructor(chatHuman: Chat, power: HumanPower) {
+    constructor(power: HumanPower) {
         super();
-        this.chatHuman = chatHuman;
         this.power = power;
     }
 
@@ -44,10 +35,8 @@ export class Werewolf extends Villager {
 
     protected power: WerewolfPower;
 
-    constructor(chatHuman: Chat, chatWerewolf: Chat, power: WerewolfPower) {
+    constructor(power: WerewolfPower) {
         super();
-        this.chatHuman = chatHuman;
-        this.chatWerewolf = chatWerewolf;
         this.power = power;
     }
 

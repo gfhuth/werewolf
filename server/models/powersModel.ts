@@ -7,9 +7,13 @@ export abstract class Power {
 
 }
 
-export type HumanPower = Power;
+export interface HumanPower extends Power{
 
-export type WerewolfPower = Power;
+}
+
+export interface WerewolfPower extends Power{
+
+}
 
 export class Insomnia implements HumanPower {
 
