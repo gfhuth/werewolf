@@ -25,15 +25,6 @@ export type GameParam = {
     probaSpiritisme: number;
 };
 
-/** class Game
- * represente a game
- * usefield
- *  currentNumberOfPlayer current number of player who have join the game
- * fonction
- *  getGameId()         return the id of this game
- *  getGameParam()      return the GameParam object of this game
- *  getStatus()         Return an number corresponding to the status of the game
- */
 export class Game {
 
     private static gamesList: Array<Game> = [];
@@ -93,10 +84,8 @@ export class Game {
     };
 
     public static removeGame = (gameId: number): void => {
-        for (let i = 0; i < Game.gamesList.length; i++) {
-            if (Game.gamesList[i].getGameId() === gameId) 
-                Game.gamesList.splice(i, 1);
-        }
+        for (let i = 0; i < Game.gamesList.length; i++) 
+            if (Game.gamesList[i].getGameId() === gameId) Game.gamesList.splice(i, 1);
     };
 
     public static addGameInList(game: Game): void {
