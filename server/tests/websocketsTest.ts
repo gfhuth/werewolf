@@ -73,6 +73,7 @@ describe("Test des websockets", () => {
 
         const res: Record<string, any> = await client.getNextMessage();
         expect(res.status).toEqual(200);
+        expect(res.message).toEqual("User authenticated");
 
         client.closeSocket();
     });
