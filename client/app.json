@@ -25,21 +25,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-        [
-          "./plugins/withAndroidMainActivityAttributes",
-          {
-            "android:showWhenLocked": true,
-            "android:turnScreenOn": true
-          }
-        ],
-        [
-          "./plugins/withAndroidApplicationAttributes",
-          {
-            "android:usesCleartextTraffic": true
-          }
-        ]
-      ]
+    }
   }
 }
