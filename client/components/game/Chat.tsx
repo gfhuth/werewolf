@@ -2,7 +2,7 @@ import { Button, ScrollView, View, Text } from "react-native";
 import InputText from "../inputs/InputText";
 import { useForm } from "react-hook-form";
 import { GameContext } from "../../context/GameContext";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 
 type FormFieldsValue = {
     message: string;
@@ -24,16 +24,16 @@ export default function ChatComponent(): React.ReactElement {
         gameContext.sendJsonMessage("CHAT_SENT", { date: new Date().getTime(), content: message, chat_type: 0 });
     };
 
-    const onMessage = (data: { date: number; author: string; chat_type: string; content: string }): void => {
-        setMessages([
-            ...messages,
+    const onMessage = useCallback((data: { date: number; author: string; chat_type: string; content: string }): void => {
+        setMessages((currentMessages) => [
+            ...currentMessages,
             {
                 date: new Date(data.date),
                 author: data.author,
                 content: data.content
             }
         ]);
-    };
+    }, []);
 
     useEffect(() => {
         gameContext.registerEventHandler("CHAT_RECEIVED", onMessage);

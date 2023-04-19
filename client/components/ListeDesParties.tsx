@@ -27,6 +27,7 @@ export default function ListeDesParties(): React.ReactElement {
     const [listeParties, setListeParties] = useState<Array<Partie>>([]);
 
     const requestListeDesParties = (): void => {
+        console.log(API_BASE_URL);
         request(`${API_BASE_URL}/game/search`, {
             method: "GET",
             headers: {

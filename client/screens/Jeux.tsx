@@ -5,9 +5,9 @@ import { TextInput } from "react-native-gesture-handler";
 import { ImageBackground, Button, StyleSheet, Text, View } from "react-native";
 import React, { useState, useCallback, useEffect, useContext } from "react";
 import { UserContext } from "../context/UserContext";
-import { WS } from "@env";
 import { GameContext } from "../context/GameContext";
 import ChatComponent from "../components/game/Chat";
+import Collapsible from "../components/Collapsible";
 
 export default function Jeux(): React.ReactElement {
     const gameContext = useContext(GameContext);
@@ -22,7 +22,9 @@ export default function Jeux(): React.ReactElement {
         <Background>
             <NavigationUI allowBack />
 
-            <ChatComponent />
+            <Collapsible name="Chat" isDefaultOpen={false}>
+                <ChatComponent />
+            </Collapsible>
         </Background>
     );
 }
