@@ -43,18 +43,18 @@ function setupGame(game: Game): void {
     }
     shuffle(players);
     let i;
-    // // attribution des roles loups garous et des pouvoirs loups garous
-    // for (i = 0; i < Math.floor(gameParam.percentageWerewolf * game.getAllPlayers().length); i++) {
-    //     players[i].setRole(new Werewolf(null));
-    //     if (i < powersWerewolf.length) players[i].getRole().setPower(powersWerewolf[i]);
-    // }
-    // const startIndex = i;
+    // attribution des roles loups garous et des pouvoirs loups garous
+    for (i = 0; i < Math.floor(gameParam.percentageWerewolf * game.getAllPlayers().length); i++) {
+        players[i].setRole(new Werewolf(null));
+        if (i < powersWerewolf.length) players[i].getRole().setPower(powersWerewolf[i]);
+    }
+    const startIndex = i;
 
-    // // attribution des roles humains et des pouvoir humains
-    // for (i = startIndex; i < game.getAllPlayers().length; i++) {
-    //     players[i].setRole(new Human(null));
-    //     if (i - startIndex < powersHuman.length) players[i].getRole().setPower(powersHuman[i]);
-    // }
+    // attribution des roles humains et des pouvoir humains
+    for (i = startIndex; i < game.getAllPlayers().length; i++) {
+        players[i].setRole(new Human(null));
+        if (i - startIndex < powersHuman.length) players[i].getRole().setPower(powersHuman[i]);
+    }
     console.log("affectation Complete");
 }
 
