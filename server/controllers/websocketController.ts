@@ -39,7 +39,12 @@ export class WebsocketConnection {
             }
             if (data.event === "AUTHENTICATION") {
                 const token: string = data.data.token;
-                if (!jwt.verify(token, JWT_SECRET)) {
+                try {
+                    if (!jwt.verify(token, JWT_SECRET)) {
+                        this.ws.send(JSON.stringify({ status: 403, message: "Bad Authentication" }));
+                        return;
+                    }
+                } catch (e) {
                     this.ws.send(JSON.stringify({ status: 403, message: "Bad Authentication" }));
                     return;
                 }

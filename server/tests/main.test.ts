@@ -1,0 +1,2 @@
+require("./usersTest");
+require("./websocketsTest");
