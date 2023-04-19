@@ -1,60 +1,34 @@
-import { ImageBackground, Button, StyleSheet, Text, View } from "react-native";
+import { ImageBackground, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../App";
 import { TextInput } from "react-native-gesture-handler";
 import { useContext, useEffect, useState } from "react";
 import { API_BASE_URL } from "@env";
-import Box from "../components/Box";
+import { Box, Button, Divider, Heading, Input, Text, useToast } from "native-base";
 import { UserContext } from "../context/UserContext";
 import request from "../utils/request";
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center"
-    },
-    image: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flex: 1,
-        width: "100%",
-        height: "100%"
-    },
-    texte: {
-        flex: 1,
-        color: "white",
-        fontFamily: "pixel",
-        fontSize: 25
-    },
-    TextInput: {
-        height: 30,
-        marginTop: 10,
-        backgroundColor: "#fff",
-        paddingLeft: 10
-    },
-    Button: {
-        marginTop: 10
-    },
-    Erreur: {
-        color: "red",
-        marginTop: 4,
-        paddingTop: 5,
-        fontSize: 20,
-        fontFamily: "pixel"
-    }
-});
+import Background from "../components/Background";
 
 export default function Login(): React.ReactElement {
     const navigation = useNavigation<StackNavigation>();
 
-    const [loginOrRegister, setLoginOrRegister] = useState(0);
+    const [isAchievingLogin, setIsAchievingLogin] = useState(true);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [messageErreur, setMessageErreur] = useState("");
 
     const context = useContext(UserContext);
+
+    const toast = useToast();
+
+    const setMessageErreur = (message: string): void => {
+        toast.show({
+            title: "Erreur",
+            description: message,
+            variant: "subtle",
+            borderColor: "red.700",
+            borderLeftWidth: 3
+        });
+    };
 
     const verifyUserAndPass = (): void => {
         request(`${API_BASE_URL}/user/login`, {
@@ -97,34 +71,34 @@ export default function Login(): React.ReactElement {
     };
 
     return (
-        <View style={styles.container}>
-            <ImageBackground source={require("../assets/pxArt_6.png")} resizeMode="cover" style={styles.image}>
-                <Box>
-                    {loginOrRegister === 0 ? (
-                        <>
-                            <Text style={styles.texte}>Login</Text>
-                            <TextInput placeholder="Login" aria-label="Login" onChangeText={setUsername} style={styles.TextInput} />
-                            <TextInput placeholder="Mot de passe" aria-label="Mot de passe" onChangeText={setPassword} style={styles.TextInput} secureTextEntry />
-                            <Button onPress={verifyUserAndPass} title="Login" />
-                            <Text style={{ color: "white", marginTop: 4 }} onPress={(): void => setLoginOrRegister(loginOrRegister + 1)}>
-                                Vous n'avez pas de compte, Enregistez vous!
-                            </Text>
-                        </>
-                    ) : (
-                        <>
-                            <Text style={styles.texte}>Register</Text>
-                            <TextInput placeholder="Pseudo" aria-label="Pseudo" onChangeText={setUsername} style={styles.TextInput} />
-                            <TextInput placeholder="Mot de passe" aria-label="Mot de passe" onChangeText={setPassword} style={styles.TextInput} secureTextEntry />
-                            <Button onPress={registerUser} title="Register" />
-                            <Text style={{ color: "white", marginTop: 4 }} onPress={(): void => setLoginOrRegister(loginOrRegister - 1)}>
-                                Vous avez deja un compte, Connectez vous!
-                            </Text>
-                        </>
-                    )}
-
-                    <Text style={styles.Erreur}>{messageErreur}</Text>
-                </Box>
-            </ImageBackground>
-        </View>
+        <Background>
+            <Box padding={10} bgColor={"light.100"} borderRadius={5}>
+                {isAchievingLogin ? (
+                    <>
+                        <Heading>Connexion</Heading>
+                        <Divider my={5} />
+                        <Input mt={2} placeholder="Pseudo" onChangeText={setUsername} />
+                        <Input mt={2} placeholder="Mot de passe" type="password" onChangeText={setPassword} />
+                        <Button mt={2} onPress={verifyUserAndPass}>
+                            Connexion
+                        </Button>
+                        <Divider my={5} />
+                        <Text onPress={(): void => setIsAchievingLogin(false)}>Vous n'avez pas de compte, Enregistez vous!</Text>
+                    </>
+                ) : (
+                    <>
+                        <Heading>Inscription</Heading>
+                        <Divider my={5} />
+                        <Input mt={2} placeholder="Pseudo" onChangeText={setUsername} />
+                        <Input mt={2} placeholder="Mot de passe" type="password" onChangeText={setPassword} />
+                        <Button mt={2} onPress={registerUser}>
+                            S'inscrire
+                        </Button>
+                        <Divider my={5} />
+                        <Text onPress={(): void => setIsAchievingLogin(true)}>Vous avez deja un compte, Connectez vous!</Text>
+                    </>
+                )}
+            </Box>
+        </Background>
     );
 }
