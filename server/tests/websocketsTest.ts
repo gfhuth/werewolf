@@ -2,12 +2,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import * as WebSocket from "ws";
+import { token } from "./usersTest";
 
 const { PORT, HOST } = process.env;
 
 const url = `ws://${HOST}:${PORT}`;
 
-class Client {
+export class Client {
 
     private ws: WebSocket.WebSocket;
     private messages: Array<string>;
@@ -36,6 +37,10 @@ class Client {
         return message;
     }
 
+    public sendMessage(message: string): void {
+        this.ws.send(message);
+    }
+
     public connect(): Promise<void> {
         return new Promise((resolve) => {
             this.ws.on("open", () => {
@@ -51,6 +56,17 @@ class Client {
                 }
             });
         });
+    }
+
+    public async authenticate(clientToken: string): Promise<boolean> {
+        this.sendMessage(
+            JSON.stringify({
+                event: "AUTHENTICATION",
+                data: { token: clientToken }
+            })
+        );
+        const res: Record<string, any> = await this.getNextMessage();
+        return res.status === 200;
     }
 
     public closeSocket(): void {
@@ -72,7 +88,7 @@ afterAll(() => {
 
 describe("Test websockets", () => {
     test("Utilisateur non authentifié", async () => {
-        client.getWebSocket().send(
+        client.sendMessage(
             JSON.stringify({
                 game_id: 1,
                 event: "CHAT_SENT",
@@ -86,7 +102,7 @@ describe("Test websockets", () => {
     });
 
     test("Mauvais format des données envoyées", async () => {
-        client.getWebSocket().send(
+        client.sendMessage(
             JSON.stringify({
                 game_id: 1,
                 event: "CHAT_SENT",
@@ -100,10 +116,10 @@ describe("Test websockets", () => {
     });
 
     test("Authentification d'un utilisateur", async () => {
-        client.getWebSocket().send(
+        client.sendMessage(
             JSON.stringify({
                 event: "AUTHENTICATION",
-                data: { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhcnJlcmViIiwiaWF0IjoxNjc5OTkzNTI5fQ.ZqXY29e2mcejz2ycLwEk00xE2dzdMCm0K4A-3uR4LuA" }
+                data: { token: token }
             })
         );
 
@@ -113,10 +129,10 @@ describe("Test websockets", () => {
     });
 
     test("Utilisateur déjà authentifié", async () => {
-        client.getWebSocket().send(
+        client.sendMessage(
             JSON.stringify({
                 event: "AUTHENTICATION",
-                data: { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhcnJlcmViIiwiaWF0IjoxNjc5OTkzNTI5fQ.ZqXY29e2mcejz2ycLwEk00xE2dzdMCm0K4A-3uR4LuA" }
+                data: { token: token }
             })
         );
 
@@ -126,7 +142,7 @@ describe("Test websockets", () => {
     });
 
     test("Mauvaise authentification d'un utilisateur", async () => {
-        client.getWebSocket().send(
+        client.sendMessage(
             JSON.stringify({
                 event: "AUTHENTICATION",
                 data: { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhcnJlcmViIiwiaWF0IjoxNjc5OTkzNTI5fQ.ZqXY29e2mcejz2ycLwEk00xE2dzdMCm0K4A-3uR4LuB" }

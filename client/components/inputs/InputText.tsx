@@ -1,22 +1,5 @@
-import { Control, useController, UseFormRegisterReturn } from "react-hook-form";
-import { TextInput, StyleSheet } from "react-native";
+import { Input } from "native-base";
 
-const styles = StyleSheet.create({
-    textInput: {
-        height: 30,
-        marginTop: 5,
-        marginBottom: 5,
-        backgroundColor: "#fff",
-        paddingLeft: 10
-    }
-});
-
-export default function InputText(props: { control: Control<any, any>; defaultValue: string; name: string; options?: UseFormRegisterReturn<string> }): React.ReactElement {
-    const { field } = useController({
-        control: props.control,
-        defaultValue: props.defaultValue,
-        name: props.name
-    });
-
-    return <TextInput style={styles.textInput} onChangeText={field.onChange} value={field.value} {...props.options} />;
+export default function InputText(props: { value: string; onChange: (value: string) => void }): React.ReactElement {
+    return <Input mt={2} onChangeText={(value): void => props.onChange(value)} value={props.value} />;
 }
