@@ -4,6 +4,8 @@ import { StackNavigation } from "../App";
 import Background from "../components/Background";
 import NavigationUI from "../components/NavigationUI";
 import ListeDesParties from "../components/ListeDesParties";
+import { Fab, Icon } from "native-base";
+import { AntDesign } from "@expo/vector-icons";
 
 
 export default function Home(): React.ReactElement {
@@ -19,11 +21,10 @@ export default function Home(): React.ReactElement {
     return (
         <Background>
             <NavigationUI allowBack={false} />
-            <Button onPress={createGame} title="Create game" />
-            <Button onPress={goToGame} title="Go to game" />
-
 
             <ListeDesParties></ListeDesParties>
+
+            <Fab onPress={createGame} renderInPortal={false} shadow={2} size="sm" icon={<Icon color="white" as={AntDesign} name="plus" size="sm" />} />
         </Background>
     );
 }
