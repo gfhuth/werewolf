@@ -1,3 +1,5 @@
+import axios, { AxiosRequestConfig } from "axios";
+
 export type RequestError = {
     message: string;
     status: number;
@@ -5,16 +7,21 @@ export type RequestError = {
     error?: any;
 };
 
-export default function request(input: RequestInfo | URL, init?: RequestInit | undefined): Promise<Response> {
+export default function request(input: string, init?: RequestInit | undefined): Promise<Response> {
     return new Promise((resolve, reject) => {
         console.log(init?.body);
-        fetch(input, init)
-            .then(async (res) => {
-                if (res.ok) {
-                    resolve(res);
+        axios({
+            url: input.toString(),
+            headers: init?.headers,
+            method: init?.method,
+            data: init?.body
+        } as AxiosRequestConfig)
+            .then((res) => {
+                if (Math.floor(res.status / 100) === 2) {
+                    resolve(res.data);
                 } else {
                     reject({
-                        message: await res.text(),
+                        message: res.statusText,
                         status: res.status,
                         response: res
                     });
@@ -28,5 +35,26 @@ export default function request(input: RequestInfo | URL, init?: RequestInit | u
                     error: e
                 });
             });
+
+        // fetch(input, init)
+        //     .then(async (res) => {
+        //         if (res.ok) {
+        //             resolve(res);
+        //         } else {
+        //             reject({
+        //                 message: await res.text(),
+        //                 status: res.status,
+        //                 response: res
+        //             });
+        //         }
+        //     })
+        //     .catch((e) => {
+        //         console.log("Request error:", e);
+        //         reject({
+        //             message: e.message,
+        //             status: -1,
+        //             error: e
+        //         });
+        //     });
     });
 }
