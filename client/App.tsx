@@ -9,6 +9,7 @@ import Settings from "./screens/Settings";
 import { View, Text } from "react-native";
 import CreateGame from "./screens/CreateGame";
 import Jeux from "./screens/Game";
+import { NativeBaseProvider, extendTheme } from "native-base";
 
 export type StackParamList = {
     Home: undefined;
@@ -39,13 +40,15 @@ export default function App(): React.ReactElement {
 
     if (isLoaded) {
         return (
-            <SettingsProvider>
-                <UserProvider>
-                    <NavigationContainer>
-                        <MyStack />
-                    </NavigationContainer>
-                </UserProvider>
-            </SettingsProvider>
+            <NativeBaseProvider>
+                <SettingsProvider>
+                    <UserProvider>
+                        <NavigationContainer>
+                            <MyStack />
+                        </NavigationContainer>
+                    </UserProvider>
+                </SettingsProvider>
+            </NativeBaseProvider>
         );
     } else {
         return (
