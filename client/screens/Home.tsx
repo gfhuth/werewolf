@@ -4,9 +4,8 @@ import { StackNavigation } from "../App";
 import Background from "../components/Background";
 import NavigationUI from "../components/NavigationUI";
 import ListeDesParties from "../components/ListeDesParties";
-import { Fab, Icon } from "native-base";
+import { Fab, Icon, ScrollView } from "native-base";
 import { AntDesign } from "@expo/vector-icons";
-
 
 export default function Home(): React.ReactElement {
     const navigation = useNavigation<StackNavigation>();
@@ -22,8 +21,9 @@ export default function Home(): React.ReactElement {
         <Background>
             <NavigationUI allowBack={false} />
 
-            <ListeDesParties></ListeDesParties>
-
+            <ScrollView>
+                <ListeDesParties></ListeDesParties>
+            </ScrollView>
             <Fab onPress={createGame} renderInPortal={false} shadow={2} size="sm" icon={<Icon color="white" as={AntDesign} name="plus" size="sm" />} />
         </Background>
     );
