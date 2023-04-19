@@ -154,10 +154,10 @@ export class Game {
             return { status: -1, timePassed: 0 };
         } else {
             const timeOfOneCycle = this.gameParam.dayLength + this.gameParam.nightLength;
-            const numberOfCycle = Math.floor(timeSinceGameStart / (timeOfOneCycle * 1000));
-            const timeSinceCycleStart = timeSinceGameStart - timeOfOneCycle * numberOfCycle;
+            const numberOfCycle = Math.floor(timeSinceGameStart / timeOfOneCycle);
+            const timeSinceCycleStart = timeSinceGameStart % timeOfOneCycle;
             // If we are day.
-            if (timeSinceCycleStart - this.gameParam.dayLength <= 0) return { status: 2 * numberOfCycle, timePassed: timeSinceCycleStart };
+            if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return { status: 2 * numberOfCycle, timePassed: timeSinceCycleStart };
             else return { status: 2 * numberOfCycle + 1, timePassed: timeSinceCycleStart - this.gameParam.dayLength };
         }
     }

@@ -91,8 +91,8 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
 export const newGame = async (req: Request, res: Response): Promise<void> => {
     const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
     // Valeur par défaut de la date
-    let date: number = Date.parse(req.body.startDate);
-    if (date) date = new Date(date).getTime();
+    let date:number;
+    if (req.body.startDate) date = parseInt(req.body.startDate);
     else date = Date.now() + 1000 * 60 * 60 * 8;
 
     const game = {
@@ -100,8 +100,8 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         currentNumberOfPlayer: 1,
         nbPlayerMin: req.body.nbPlayerMin || 5,
         nbPlayerMax: req.body.nbPlayerMax || 20,
-        dayLength: req.body.dayLength || 60 * 14 * 60,
-        nightLength: req.body.nightLength || 60 * 10 * 60,
+        dayLength: req.body.dayLength || 14 * 60 * 60 * 1000,
+        nightLength: req.body.nightLength || 10 * 60 * 60 * 1000,
         startDate: date,
 
         percentageWerewolf: req.body.percentageWerewolf || 0.33,
@@ -116,8 +116,8 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         { minRange: 0, value: game.probaVoyance, maxRange: 1, errorMessage: "Unvalid Voyance probabilityShould be in [0,1]" },
         { minRange: 0, value: game.probaSpiritisme, maxRange: 1, errorMessage: "Unvalid Spiritisme probability Should be in [0,1]" },
         { minRange: 0, value: game.percentageWerewolf, maxRange: 1, errorMessage: "Unvalid wereWolf quantity : Should be in [0,1]" },
-        { minRange: 0, value: game.dayLength, maxRange: 24 * 60 * 60, errorMessage: "Day length in seconde too long " },
-        { minRange: 0, value: game.nightLength, maxRange: 24 * 60 * 60, errorMessage: "Night length in seconde too long" },
+        { minRange: 0, value: game.dayLength, maxRange: 24 * 60 * 60 * 1000, errorMessage: "Day length in seconde too long " },
+        { minRange: 0, value: game.nightLength, maxRange: 24 * 60 * 60 * 1000, errorMessage: "Night length in seconde too long" },
         { minRange: 2, value: game.nbPlayerMin, maxRange: 498, errorMessage: "There must be at least two players" },
         { minRange: game.nbPlayerMin, value: game.nbPlayerMax, maxRange: 500, errorMessage: "Too many players (MAX 500)" },
         { minRange: Date.now(), value: game.startDate, maxRange: Infinity, errorMessage: "Start date passed" }

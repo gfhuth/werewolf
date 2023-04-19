@@ -5,8 +5,8 @@ export default function Background(props: { children: React.ReactNode }): React.
     return (
         <View
             style={{
-                minHeight: "100vh",
-                minWidth: "100vw"
+                minHeight: "100%",
+                minWidth: "100%"
             }}
         >
             <ImageBackground

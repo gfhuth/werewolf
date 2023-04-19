@@ -2,7 +2,7 @@ import { ImageBackground, Button, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../App";
 import { TextInput } from "react-native-gesture-handler";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { API_BASE_URL } from "@env";
 import Box from "../components/Box";
 import { UserContext } from "../context/UserContext";
