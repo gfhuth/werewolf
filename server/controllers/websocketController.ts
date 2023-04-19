@@ -78,10 +78,12 @@ export class WebsocketConnection {
                 this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
                 return;
             }
+
             if (!Event.getEventActions(data.event)) {
                 this.ws.send(JSON.stringify({ status: 500, message: "Event doesn't exist" }));
                 return;
             }
+            // Exécute les méthodes relatives à un événement
             for (const func of Event.getEventActions(data.event)) func(game, this.user, data.data);
         } catch (e) {
             console.log(e);

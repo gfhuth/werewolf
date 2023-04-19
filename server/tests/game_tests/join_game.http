@@ -32,7 +32,7 @@ Content-Type: {{contentType}}
     "nbPlayerMax": 20,
     "dayLength": 2000,
     "nightLength": 2000,
-    "startDate": 1681915351086,
+    "startDate": 1681915913629,
     "percentageWerewolf": 0.33,
     "probaContamination": 0.1,
     "probaInsomnie": 0.1,
