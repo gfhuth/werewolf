@@ -2,6 +2,7 @@ import { Chat_type } from "../models/chatModel";
 import { Game } from "../models/gameModel";
 import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Spiritism } from "../models/powersModel";
+import { Human, Werewolf } from "../models/villagerModel";
 import database from "../util/database";
 
 function randint(a: number, b: number): number {
@@ -43,19 +44,18 @@ function setupGame(game: Game): void {
     shuffle(players);
     let i;
     // attribution des roles loups garous et des pouvoirs loups garous
-    // for (i = 0; i < Math.floor(gameParam.percentageWerewolf * game.getNbOfPlayers()); i++) {
-    //     players[i].setRole(new Werewolf(null, null, null));
-    //     if (i < powersWerewolf.length)
-    //         players[i].getRole().setPower(powersWerewolf[i]);
-    // }
+    for (i = 0; i < Math.floor(gameParam.percentageWerewolf * game.getAllPlayers().length); i++) {
+        players[i].setRole(new Werewolf(null));
+        if (i < powersWerewolf.length) players[i].getRole().setPower(powersWerewolf[i]);
+    }
     const startIndex = i;
 
     // attribution des roles humains et des pouvoir humains
-    // for (i = startIndex; i < game.getNbOfPlayers(); i++) {
-    //     players[i].setRole(new Human(null, null));
-    //     if (i - startIndex < powersHuman.length)
-    //         players[i].getRole().setPower(powersHuman[i]);
-    // }
+    for (i = startIndex; i < game.getAllPlayers().length; i++) {
+        players[i].setRole(new Human(null));
+        if (i - startIndex < powersHuman.length) players[i].getRole().setPower(powersHuman[i]);
+    }
+    console.log("affectation Complete");
 }
 
 /** Apply all action happend during the night and lunch a day
@@ -74,7 +74,7 @@ function startDay(game: Game): void {
     for (let i = 0; i < game.getAllPlayers().length; i++) game.getAllPlayers()[i].sendNewGameStatus(true);
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    setTimeout(() => startNight(game), game.getGameParam().dayLength * 1000);
+    setTimeout(() => startNight(game), game.getGameParam().dayLength);
 }
 
 /** lunch a night
@@ -92,7 +92,7 @@ function startNight(game: Game): void {
     for (let i = 0; i < game.getAllPlayers().length; i++) game.getAllPlayers()[i].sendNewGameStatus(false);
 
     // call startDay at the end of the day
-    setTimeout(() => startDay(game), game.getGameParam().nightLength * 1000);
+    setTimeout(() => startDay(game), game.getGameParam().nightLength);
 }
 
 /** Function to add when a game is restored or start
@@ -102,12 +102,12 @@ function startNight(game: Game): void {
  * */
 export async function initGame(gameId: number): Promise<void> {
     const game: Game = Game.getGame(gameId);
-    if (game.getGameParam().nbPlayerMin > game.getNbOfPlayers()){
-        Game.removeGame(game.getGameId());
-        await database.deleteFrom("games").where("games.id","=",game.getGameId()).executeTakeFirst();
-        return;
-    }
-    // Initialisation des chats
+    // if (game.getGameParam().nbPlayerMin > game.getNbOfPlayers()) {
+    //     Game.removeGame(game.getGameId());
+    //     await database.deleteFrom("games").where("games.id", "=", game.getGameId()).executeTakeFirst();
+    //     return;
+    // }
+    // // Initialisation des chats
     game.initChats();
     const gameStatus = game.getStatus();
     if (gameStatus.status == 0) setupGame(game);

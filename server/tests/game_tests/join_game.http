@@ -30,9 +30,9 @@ Content-Type: {{contentType}}
 {
     "nbPlayerMin": 5,
     "nbPlayerMax": 20,
-    "dayLength": 13,
-    "nightLength": 12,
-    "startDate": "2023-04-13T11:41:00",
+    "dayLength": 2000,
+    "nightLength": 2000,
+    "startDate": 1681915913629,
     "percentageWerewolf": 0.33,
     "probaContamination": 0.1,
     "probaInsomnie": 0.1,

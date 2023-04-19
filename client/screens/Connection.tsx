@@ -83,7 +83,7 @@ export default function Login(): React.ReactElement {
                             Connexion
                         </Button>
                         <Divider my={5} />
-                        <Text onPress={(): void => setIsAchievingLogin(false)}>Vous n'avez pas de compte, Enregistez vous!</Text>
+                        <Text onPress={(): void => setIsAchievingLogin(false)}>Vous n'avez pas de compte, <Text color="info.500">Enregistez vous!</Text></Text>
                     </>
                 ) : (
                     <>
@@ -95,7 +95,7 @@ export default function Login(): React.ReactElement {
                             S'inscrire
                         </Button>
                         <Divider my={5} />
-                        <Text onPress={(): void => setIsAchievingLogin(true)}>Vous avez deja un compte, Connectez vous!</Text>
+                        <Text onPress={(): void => setIsAchievingLogin(true)}>Vous avez deja un compte, <Text color="info.500">Connectez vous!</Text></Text>
                     </>
                 )}
             </Box>
