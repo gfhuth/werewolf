@@ -58,29 +58,28 @@ export default function ListeDesParties(): React.ReactElement {
         navigation.navigate("Jeux");
     };
 
-
     return (
         <View>
-            <Text fontSize="2xl" color={"light.100"}>Liste des parties existantes:</Text>
+            <Text fontSize="2xl" color={"light.100"}>
+                Liste des parties existantes:
+            </Text>
             {listeParties &&
                 listeParties.map((informationPartie) => (
-                    <>
-                        <>
-                            <Box key={informationPartie.id} padding={3} bgColor={"light.100"} borderRadius={5}>
-                                <Heading>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Heading>
-                                <Text fontSize="lg">hostId :{informationPartie.hostId}</Text>
-                                <Text fontSize="lg">id :{informationPartie.id}</Text>
-                                <Text fontSize="lg">Nombre maximum de joueur :{informationPartie.nbPlayerMax}</Text>
-                                <Text fontSize="lg">Date : {informationPartie.date}</Text>
-                                <Center>
-                                    <Button size="md" fontSize="lg" width={"20"} onPress={goToGame}>
-                                        Go to game
-                                    </Button>
-                                </Center>
-                            </Box>
-                        </>
+                    <View key={informationPartie.id}>
+                        <Box padding={3} bgColor={"light.100"} borderRadius={5}>
+                            <Heading>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Heading>
+                            <Text fontSize="lg">hostId :{informationPartie.hostId}</Text>
+                            <Text fontSize="lg">id :{informationPartie.id}</Text>
+                            <Text fontSize="lg">Nombre maximum de joueur :{informationPartie.nbPlayerMax}</Text>
+                            <Text fontSize="lg">Date : {informationPartie.date}</Text>
+                            <Center>
+                                <Button size="md" fontSize="lg" width={"20"} onPress={goToGame}>
+                                    Go to game
+                                </Button>
+                            </Center>
+                        </Box>
                         <Divider my={5} thickness="0" />
-                    </>
+                    </View>
                 ))}
         </View>
     );
