@@ -9,11 +9,21 @@ export class Event {
         [key: string]: Array<functionHandler>;
     } = {};
 
+    /**
+     * Renvoie la liste des méthodes associées à un événement
+     * @param {string} event nom de l'événement
+     * @returns {Array<functionHandler>} Liste des méthodes associées à l'événement
+     */
     public static getEventActions(event: string): Array<functionHandler> {
         if (Event.eventHandlers[event]) return Event.eventHandlers[event];
         return null;
     }
 
+    /**
+     * Enregistre une méthode à exécuter lors de l'arrivé d'un événement
+     * @param {string} event nom de l'événement
+     * @param {functionHandler} func méthode à exécuter lors de l'arrivée de l'événement
+     */
     public static registerHandlers(event: string, func: functionHandler): void {
         if (Event.eventHandlers[event]) Event.eventHandlers[event].push(func);
         else Event.eventHandlers[event] = [func];
