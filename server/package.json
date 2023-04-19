@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node server.ts",
+    "build-test": "rm db.sqlite && ts-node server.ts",
     "test": "jest --coverage --detectOpenHandles",
     "fix": "yarn install && rm db.sqlite"
   },
