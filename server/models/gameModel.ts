@@ -55,6 +55,11 @@ export class Game {
         this.currentNumberOfPlayer = 1;
     }
 
+    /**
+     * Charge une partie depuis la base de données
+     * @param {number} gameId Id de la partie
+     * @returns {Game}
+     */
     static async load(gameId: number): Promise<Game> {
         const game: { id: number } & GameParam = await database
             .selectFrom("games")
@@ -114,6 +119,9 @@ export class Game {
         return this.chatslist[type];
     }
 
+    /**
+     * Initialisation des chats lors de la création d'une partie
+     */
     public initChats(): void {
         this.chatslist.push(new Chat(Chat_type.CHAT_VILLAGE, this.playersList));
         this.chatslist.push(
@@ -125,6 +133,12 @@ export class Game {
         this.chatslist.push(new Chat(Chat_type.CHAT_SPIRITISM, []));
     }
 
+    /**
+     * Mise à jour du chat du chaman
+     * @param {Player} chaman Joueur ayant le pouvoir de spiritisme
+     * @param {Player} deadPlayer Joueur mort qui échange avec lui la nuit
+     * @returns {void}
+     */
     public updateSpiritismChat(chaman: Player, deadPlayer: Player): void {
         if (this.chatslist.length !== 3) return;
         this.chatslist[2].resetChatMembers([chaman, deadPlayer]);
