@@ -51,7 +51,7 @@ export default function Login(): React.ReactElement {
     };
 
     const registerUser = (): void => {
-        fetch(`${API_BASE_URL}/user/register`, {
+        request(`${API_BASE_URL}/user/register`, {
             method: "POST",
             headers: {
                 Accept: "application/json",

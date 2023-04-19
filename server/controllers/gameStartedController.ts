@@ -2,6 +2,7 @@ import { Chat_type } from "../models/chatModel";
 import { Game } from "../models/gameModel";
 import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Spiritism } from "../models/powersModel";
+import database from "../util/database";
 
 function randint(a: number, b: number): number {
     return Math.floor(Math.random() * b) + a;
@@ -76,7 +77,7 @@ function startDay(game: Game): void {
     setTimeout(() => startNight(game), game.getGameParam().dayLength * 1000);
 }
 
-/** Apply all action happend during the day and lunch a night
+/** lunch a night
  * @param {Game} game Game to apply change
  */
 function startNight(game: Game): void {
@@ -101,14 +102,17 @@ function startNight(game: Game): void {
  * */
 export async function initGame(gameId: number): Promise<void> {
     const game: Game = Game.getGame(gameId);
-
+    if (game.getGameParam().nbPlayerMin > game.getNbOfPlayers()){
+        Game.removeGame(game.getGameId());
+        await database.deleteFrom("games").where("games.id","=",game.getGameId()).executeTakeFirst();
+        return;
+    }
     // Initialisation des chats
     game.initChats();
-
     const gameStatus = game.getStatus();
     if (gameStatus.status == 0) setupGame(game);
 
-    console.log(`game ${gameId} successfuly started`);
+    console.log(`game ${gameId} successfuly initialized`);
     if (gameStatus.status % 2 == 0) startDay(game);
     else startNight(game);
 }

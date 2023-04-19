@@ -87,6 +87,14 @@ export class Game {
         return filter[0];
     };
 
+    public static removeGame = (gameId: number): void => {
+        for(let i = 0; i < Game.gamesList.length; i++){
+            if (Game.gamesList[i].getGameId() === gameId){
+                Game.gamesList.splice(i,1)
+            }
+        }
+    };
+
     public static addGameInList(game: Game): void {
         Game.gamesList.push(game);
     }
