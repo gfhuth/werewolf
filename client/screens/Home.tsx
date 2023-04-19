@@ -67,11 +67,11 @@ export default function Home(): React.ReactElement {
                         listeParties.map((informationPartie) => (
                             <View key={informationPartie.id}>
                                 <Box padding={3} bgColor={"light.100"} borderRadius={5}>
-                                    <Heading>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Heading>
-                                    <Text fontSize="lg">hostId :{informationPartie.hostId}</Text>
-                                    <Text fontSize="lg">id :{informationPartie.id}</Text>
-                                    <Text fontSize="lg">Nombre maximum de joueur :{informationPartie.nbPlayerMax}</Text>
-                                    <Text fontSize="lg">Date : {informationPartie.date}</Text>
+                                    <Text>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Text>
+                                    <Text>hostId :{informationPartie.hostId}</Text>
+                                    <Text>id :{informationPartie.id}</Text>
+                                    <Text>Nombre maximum de joueur :{informationPartie.nbPlayerMax}</Text>
+                                    <Text>Date : {informationPartie.date}</Text>
                                     <Center>
                                         <Button size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
                                             Go to game
