@@ -1,9 +1,9 @@
 import { GameProvider } from "../context/GameContext";
 import Jeux from "./Jeux";
 
-export default function GameScreen(): React.ReactElement {
+export default function GameScreen(props: { route: { params: { gameId: number } } }): React.ReactElement {
     return (
-        <GameProvider gameId={1}>
+        <GameProvider gameId={props.route.params.gameId}>
             <Jeux />
         </GameProvider>
     );

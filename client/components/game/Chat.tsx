@@ -1,12 +1,8 @@
-import { Button, ScrollView, View, Text } from "react-native";
 import InputText from "../inputs/InputText";
-import { useForm } from "react-hook-form";
 import { GameContext } from "../../context/GameContext";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { ScrollView, View, Text, Button } from "native-base";
 
-type FormFieldsValue = {
-    message: string;
-};
 type Message = {
     date: Date;
     author: string;
@@ -14,13 +10,12 @@ type Message = {
 };
 
 export default function ChatComponent(): React.ReactElement {
-    const { control, handleSubmit } = useForm<FormFieldsValue>();
     const gameContext = useContext(GameContext);
 
     const [messages, setMessages] = useState<Array<Message>>([]);
+    const [message, setMessage] = useState("");
 
-    const sendMessage = (fields: FormFieldsValue): void => {
-        const message = fields.message;
+    const sendMessage = (): void => {
         gameContext.sendJsonMessage("CHAT_SENT", { date: new Date().getTime(), content: message, chat_type: 0 });
     };
 
@@ -42,16 +37,16 @@ export default function ChatComponent(): React.ReactElement {
     return (
         <View>
             <ScrollView>
-                {messages.map((message, i) => (
+                {messages.map((msg, i) => (
                     <View key={i}>
                         <Text>
-                            {message.author} : {message.content}
+                            {msg.author} : {msg.content}
                         </Text>
                     </View>
                 ))}
             </ScrollView>
-            <InputText control={control} name="message" defaultValue="" />
-            <Button onPress={handleSubmit(sendMessage)} title="Send" />
+            <InputText value={message} onChange={setMessage} />
+            <Button onPress={sendMessage}>Send</Button>
         </View>
     );
 }

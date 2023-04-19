@@ -9,14 +9,14 @@ import Settings from "./screens/Settings";
 import { View, Text } from "react-native";
 import CreateGame from "./screens/CreateGame";
 import Jeux from "./screens/Game";
-import { NativeBaseProvider, extendTheme } from "native-base";
+import { NativeBaseProvider } from "native-base";
 
 export type StackParamList = {
     Home: undefined;
     Connection: undefined;
     Settings: undefined;
     CreateGame: undefined;
-    Jeux: undefined;
+    Jeux: { gameId: number };
 };
 export type StackNavigation = NavigationProp<StackParamList>;
 

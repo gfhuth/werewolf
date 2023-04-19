@@ -1,10 +1,8 @@
 import { API_BASE_URL } from "@env";
 import { useContext, useState } from "react";
-import { useForm } from "react-hook-form";
 import Background from "../components/Background";
 import InputDate from "../components/inputs/InputDate";
 import InputNumber from "../components/inputs/InputNumber";
-import InputText from "../components/inputs/InputText";
 import NavigationUI from "../components/NavigationUI";
 import { UserContext } from "../context/UserContext";
 import request from "../utils/request";
@@ -65,7 +63,7 @@ export default function CreateGame(): React.ReactElement {
             })
         })
             .then((res) => res.json())
-            .then((res) => {
+            .then(() => {
                 toast.show({
                     title: "Succès !",
                     description: "Partie crée",
