@@ -5,11 +5,18 @@ export abstract class Power {
     public abstract showPower(): void;
     public abstract usePower(): void;
 
+    public abstract isHumanPower():Boolean;
+    public abstract isWerewolfPower():Boolean;
+
 }
 
-export type HumanPower = Power;
+export interface HumanPower extends Power{
 
-export type WerewolfPower = Power;
+}
+
+export interface WerewolfPower extends Power{
+
+}
 
 export class Insomnia implements HumanPower {
 
@@ -21,6 +28,8 @@ export class Insomnia implements HumanPower {
         console.log("Observe Werewolf chat");
     }
 
+    isHumanPower():Boolean { return true;}
+    isWerewolfPower():Boolean { return false;}
 }
 
 export class Contamination implements WerewolfPower {
@@ -39,6 +48,8 @@ export class Contamination implements WerewolfPower {
         this.victim = player;
     }
 
+    isHumanPower():Boolean { return false;}
+    isWerewolfPower():Boolean { return true;}
 }
 
 export class Spiritism implements HumanPower, WerewolfPower {
@@ -56,7 +67,9 @@ export class Spiritism implements HumanPower, WerewolfPower {
     setVictim(player: Player): void {
         this.victim = player;
     }
-
+    
+    isHumanPower():Boolean { return true;}
+    isWerewolfPower():Boolean { return true;}
 }
 
 export class Clairvoyant implements HumanPower, WerewolfPower {
@@ -75,4 +88,6 @@ export class Clairvoyant implements HumanPower, WerewolfPower {
         this.victim = player;
     }
 
+    isHumanPower():Boolean { return true;}
+    isWerewolfPower():Boolean { return true;}
 }
