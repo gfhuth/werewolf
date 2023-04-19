@@ -88,10 +88,9 @@ export class Game {
     };
 
     public static removeGame = (gameId: number): void => {
-        for(let i = 0; i < Game.gamesList.length; i++){
-            if (Game.gamesList[i].getGameId() === gameId){
-                Game.gamesList.splice(i,1)
-            }
+        for (let i = 0; i < Game.gamesList.length; i++) {
+            if (Game.gamesList[i].getGameId() === gameId) 
+                Game.gamesList.splice(i, 1);
         }
     };
 

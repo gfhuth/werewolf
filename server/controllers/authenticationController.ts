@@ -4,6 +4,7 @@ import { getTokenContent } from "./userController";
 
 export async function verifyToken(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+        console.log("start identification"); 
         if (!req.headers["x-access-token"]) {
             res.status(404).send("x-access-token field not found");
             return;
