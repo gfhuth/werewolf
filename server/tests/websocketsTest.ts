@@ -59,11 +59,47 @@ class Client {
 
 }
 
-describe("Test des websockets", () => {
-    test("Authentification par websocket", async () => {
-        const client: Client = new Client();
-        await client.connect();
+let client: Client;
 
+beforeAll(async () => {
+    client = new Client();
+    await client.connect();
+});
+
+afterAll(() => {
+    client.closeSocket();
+});
+
+describe("Test websockets", () => {
+    test("Utilisateur non authentifié", async () => {
+        client.getWebSocket().send(
+            JSON.stringify({
+                game_id: 1,
+                event: "CHAT_SENT",
+                data: { chat_type: 1, message: "Salut" }
+            })
+        );
+
+        const res: Record<string, any> = await client.getNextMessage();
+        expect(res.status).toEqual(403);
+        expect(res.message).toEqual("Not Authenticated");
+    });
+
+    test("Mauvais format des données envoyées", async () => {
+        client.getWebSocket().send(
+            JSON.stringify({
+                game_id: 1,
+                event: "CHAT_SENT",
+                data: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhcnJlcmViIiwiaWF0IjoxNjc5OTkzNTI5fQ.ZqXY29e2mcejz2ycLwEk00xE2dzdMCm0K4A-3uR4LuA"
+            })
+        );
+
+        const res: Record<string, any> = await client.getNextMessage();
+        expect(res.status).toEqual(400);
+        expect(res.message).toEqual("Bad Request");
+    });
+
+    test("Authentification d'un utilisateur", async () => {
         client.getWebSocket().send(
             JSON.stringify({
                 event: "AUTHENTICATION",
@@ -74,7 +110,31 @@ describe("Test des websockets", () => {
         const res: Record<string, any> = await client.getNextMessage();
         expect(res.status).toEqual(200);
         expect(res.message).toEqual("User authenticated");
+    });
 
-        client.closeSocket();
+    test("Utilisateur déjà authentifié", async () => {
+        client.getWebSocket().send(
+            JSON.stringify({
+                event: "AUTHENTICATION",
+                data: { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhcnJlcmViIiwiaWF0IjoxNjc5OTkzNTI5fQ.ZqXY29e2mcejz2ycLwEk00xE2dzdMCm0K4A-3uR4LuA" }
+            })
+        );
+
+        const res: Record<string, any> = await client.getNextMessage();
+        expect(res.status).toEqual(200);
+        expect(res.message).toEqual("Already Authentified");
+    });
+
+    test("Mauvaise authentification d'un utilisateur", async () => {
+        client.getWebSocket().send(
+            JSON.stringify({
+                event: "AUTHENTICATION",
+                data: { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhcnJlcmViIiwiaWF0IjoxNjc5OTkzNTI5fQ.ZqXY29e2mcejz2ycLwEk00xE2dzdMCm0K4A-3uR4LuB" }
+            })
+        );
+
+        const res: Record<string, any> = await client.getNextMessage();
+        expect(res.status).toEqual(403);
+        expect(res.message).toEqual("Bad Authentication");
     });
 });
