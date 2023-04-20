@@ -84,8 +84,7 @@ export class Game {
     };
 
     public static removeGame = (gameId: number): void => {
-        for (let i = 0; i < Game.gamesList.length; i++) 
-            if (Game.gamesList[i].getGameId() === gameId) Game.gamesList.splice(i, 1);
+        for (let i = 0; i < Game.gamesList.length; i++) if (Game.gamesList[i].getGameId() === gameId) Game.gamesList.splice(i, 1);
     };
 
     public static addGameInList(game: Game): void {
@@ -150,6 +149,14 @@ export class Game {
         this.playersList.push(player);
         this.currentNumberOfPlayer++;
     }
+    public removePlayer(player: Player): void {
+        for (let i = 0; i < this.playersList.length; i++) {
+            if (this.playersList[i] == player) {
+                this.playersList.splice(i, 1);
+                this.currentNumberOfPlayer--;
+            }
+        }
+    }
 
     /** Compute the status of the game
      * return an object of shape { status: number, timePassed: number }
@@ -167,8 +174,8 @@ export class Game {
             const numberOfCycle = Math.floor(timeSinceGameStart / timeOfOneCycle);
             const timeSinceCycleStart = timeSinceGameStart % timeOfOneCycle;
             // If we are day.
-            if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return { status: 2 * numberOfCycle, timePassed: timeSinceCycleStart };
-            else return { status: 2 * numberOfCycle + 1, timePassed: timeSinceCycleStart - this.gameParam.dayLength };
+            if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return { status: 1 + 2 * numberOfCycle, timePassed: timeSinceCycleStart };
+            else return { status: 2 * (numberOfCycle + 1), timePassed: timeSinceCycleStart - this.gameParam.nightLength };
         }
     }
 

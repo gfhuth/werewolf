@@ -91,7 +91,7 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
 export const newGame = async (req: Request, res: Response): Promise<void> => {
     const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
     // Valeur par défaut de la date
-    let date:number;
+    let date: number;
     if (req.body.startDate) date = parseInt(req.body.startDate);
     else date = Date.now() + 1000 * 60 * 60 * 8;
 
@@ -183,6 +183,7 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
 
         const game: Game = Game.getGame(gameId);
         if (!game) throw new Error("Game doesn't exist");
+        if (game.getStatus().status > 0) throw new Error("Game aleary started");
 
         // Check if player already in game
         if (game.getPlayer(user.getUsername())) throw new Error("User is already in the game.");
@@ -216,5 +217,28 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const leaveGame = async (req: Request, res: Response): Promise<void> => {
-    res.status(404).json({ message: "Not implemented yet" });
+    try {
+        const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
+        const gameId: number = parseInt(req.params.id);
+        if (!gameId) throw new Error("No game ID provided.");
+
+        const game: Game = Game.getGame(gameId);
+        if (!game) throw new Error("Game doesn't exist");
+        if (game.getStatus().status > 0) throw new Error("Game aleary started");
+
+        // Check if player already in game
+        if (!game.getPlayer(user.getUsername())) throw new Error("User haven't join this game.");
+
+        // Supressions du joueur dans la liste des joueurs de la partie
+        const player: Player = game.getPlayer(user.getUsername());
+        game.removePlayer(player);
+
+        // Insert a new record in the user_games table
+        await database.deleteFrom("players").where("players.game", "=", gameId).where("players.name", "=", user.getUsername()).executeTakeFirst();
+
+        res.status(200).json({ message: `player sucessfully remove from the game ${gameId}` });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: err.message });
+    }
 };
