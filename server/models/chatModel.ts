@@ -38,6 +38,10 @@ export class Chat {
         this.members = newMembers;
     }
 
+    /**
+     * Ajoute un message dans le chat et l'envoie à tous les membres du chat
+     * @param {string} message Message envoyé
+     */
     public addMessage(message: Message): void {
         this.messages.push(message);
 

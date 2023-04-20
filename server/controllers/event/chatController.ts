@@ -4,6 +4,13 @@ import { User } from "../../models/userModel";
 import database from "../../util/database";
 import { Event } from "../eventController";
 
+/**
+ * Enregistre un nouveau message dans la base de données et envoie le message sur le chat
+ * @param {Game} game Partie dans laquelle le message est envoyée
+ * @param {User} user Auteur du message
+ * @param  {Record<string, any>} data Données relatives au message
+ * @returns {Promise<void>}
+ */
 const newMessage = async (game: Game, user: User, data: { date: number; chat_type: Chat_type; content: string }): Promise<void> => {
     const message: Message = {
         game: game.getGameId(),
@@ -37,6 +44,12 @@ const newMessage = async (game: Game, user: User, data: { date: number; chat_typ
     }
 };
 
+/**
+ * Met à jour les membres du chat du chaman
+ * @param {Game} game Partie dans laquelle le chat est à mettre à jour
+ * @param {User} user Utilisateur qui a le pouvoir du spiritisme
+ * @param {Require<string, any>} data Nom du joueur mort avec qui le chaman échange la nuit
+ */
 const updateChat = (game: Game, user: User, data: { dead_player: string }): void => {
     game.updateSpiritismChat(game.getPlayer(user.getUsername()), game.getPlayer(data.dead_player));
 };

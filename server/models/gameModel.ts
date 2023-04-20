@@ -25,15 +25,6 @@ export type GameParam = {
     probaSpiritisme: number;
 };
 
-/** class Game
- * represente a game
- * usefield
- *  currentNumberOfPlayer current number of player who have join the game
- * fonction
- *  getGameId()         return the id of this game
- *  getGameParam()      return the GameParam object of this game
- *  getStatus()         Return an number corresponding to the status of the game
- */
 export class Game {
 
     private static gamesList: Array<Game> = [];
@@ -55,6 +46,11 @@ export class Game {
         this.currentNumberOfPlayer = 0;
     }
 
+    /**
+     * Charge une partie depuis la base de données
+     * @param {number} gameId Id de la partie
+     * @returns {Game}
+     */
     static async load(gameId: number): Promise<Game> {
         const game: { id: number } & GameParam = await database
             .selectFrom("games")
@@ -88,10 +84,8 @@ export class Game {
     };
 
     public static removeGame = (gameId: number): void => {
-        for (let i = 0; i < Game.gamesList.length; i++) {
-            if (Game.gamesList[i].getGameId() === gameId) 
-                Game.gamesList.splice(i, 1);
-        }
+        for (let i = 0; i < Game.gamesList.length; i++) 
+            if (Game.gamesList[i].getGameId() === gameId) Game.gamesList.splice(i, 1);
     };
 
     public static addGameInList(game: Game): void {
@@ -114,6 +108,9 @@ export class Game {
         return this.chatslist[type];
     }
 
+    /**
+     * Initialisation des chats lors de la création d'une partie
+     */
     public initChats(): void {
         this.chatslist.push(new Chat(Chat_type.CHAT_VILLAGE, this.playersList));
         this.chatslist.push(
@@ -125,6 +122,12 @@ export class Game {
         this.chatslist.push(new Chat(Chat_type.CHAT_SPIRITISM, []));
     }
 
+    /**
+     * Mise à jour du chat du chaman
+     * @param {Player} chaman Joueur ayant le pouvoir de spiritisme
+     * @param {Player} deadPlayer Joueur mort qui échange avec lui la nuit
+     * @returns {void}
+     */
     public updateSpiritismChat(chaman: Player, deadPlayer: Player): void {
         if (this.chatslist.length !== 3) return;
         this.chatslist[2].resetChatMembers([chaman, deadPlayer]);
