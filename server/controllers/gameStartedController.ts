@@ -1,7 +1,7 @@
 import { Chat_type } from "../models/chatModel";
 import { Game } from "../models/gameModel";
 import { Player } from "../models/playerModel";
-import { Clairvoyant, Contamination, Spiritism } from "../models/powersModel";
+import { Clairvoyant, Contamination, Insomnia, Spiritism } from "../models/powersModel";
 import { Human, Werewolf } from "../models/villagerModel";
 import database from "../util/database";
 
@@ -32,7 +32,7 @@ function setupGame(game: Game): void {
     const powersHuman = [];
     // On choisi si on utilise les pouvoirs
     if (randint(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
-    if (randint(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Contamination());
+    if (randint(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Insomnia());
     if (randint(0, 1) <= gameParam.probaSpiritisme) {
         if (randint(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Spiritism());
         else powersHuman.push(new Spiritism());
