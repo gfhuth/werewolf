@@ -5,6 +5,7 @@ import { Player } from "./playerModel";
 import { Chat, Chat_type } from "./chatModel";
 import { User } from "./userModel";
 import { Villager, Werewolf } from "./villagerModel";
+import { Event } from "../controllers/eventController";
 
 export enum GameStatus {
     NOT_STARTED = 0,
@@ -44,6 +45,7 @@ export class Game {
         this.gameParam = gameParam;
         this.chatslist = [];
         this.currentNumberOfPlayer = 0;
+        
     }
 
     /**
@@ -135,6 +137,13 @@ export class Game {
     public getAllPlayers(): Array<Player> {
         return this.playersList;
     }
+    public getAllPlayersId(): Array<number> {
+        const idList:Array<number> = []
+        for(const player of this.playersList){
+            idList.push(player.getUser().getUserId());
+        }
+        return idList;
+    }
 
     public getPlayer(username: string): Player {
         for (const player of this.playersList) if (player.getUser().getUsername() === username) return player;
@@ -155,6 +164,23 @@ export class Game {
                 this.playersList.splice(i, 1);
                 this.currentNumberOfPlayer--;
             }
+        }
+    }
+
+    public getGameRecap():Record<string, any>{
+        const idList:Array<number> = []
+        const idDeathList:Array<number> = []
+        
+        for(const player of this.playersList){
+            idList.push(player.getUser().getUserId());
+            if (player.isDeath()){
+                idDeathList.push(player.getUser().getUserId());
+            }
+        }
+        return {
+            status : this.getStatus(),
+            idList : idList,
+            deathPlayer : idDeathList
         }
     }
 
@@ -239,3 +265,8 @@ export class Game {
     };
 
 }
+function gameRecapRequest(game: Game, user: User, data: Record<string, any>){
+
+}
+
+Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);

@@ -8,6 +8,8 @@ export class User {
     private userId: number;
     private username: string;
     private ws: WebSocket;
+    private connectionIsEstablish:Boolean;
+    private waitingSocket:string[] = [];
 
     constructor(userId: number, username: string) {
         this.username = username;
@@ -38,6 +40,25 @@ export class User {
     public getWebsocket(): WebSocket {
         return this.ws;
     }
+
+    public sendWaitingSocket():void{
+        for(const sock of this.waitingSocket){
+            this.ws.send(sock);
+        }
+    }
+
+    public sendWebSocket(jsonFile:Record<string, any>):void{
+        //TODO verifier que la connection est étatablie
+        this.connectionIsEstablish = true;
+
+        if (this.connectionIsEstablish)
+            this.ws.send(JSON.stringify(jsonFile));
+        else{
+            this.waitingSocket.push(JSON.stringify(jsonFile));
+        }
+    }
+
+    
 
     public setWebsocket(ws: WebSocket): void {
         this.ws = ws;
