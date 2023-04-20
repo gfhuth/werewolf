@@ -52,7 +52,7 @@ export class Game {
         this.gameId = gameId;
         this.gameParam = gameParam;
         this.chatslist = [];
-        this.currentNumberOfPlayer = 1;
+        this.currentNumberOfPlayer = 0;
     }
 
     static async load(gameId: number): Promise<Game> {
