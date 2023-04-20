@@ -53,10 +53,12 @@ export class Player {
         this.user.sendWebSocket({
             game_id:this.game.getGameId(),
             event: "GAME_RECAP",
-            gameData: this.game.getGameRecap(),
-            playerData:{
-                role : this.getRole().getRoleValue(),
-                power: powerNumber
+            data :{
+                game: this.game.getGameRecap(),
+                player : {
+                    role : this.getRole().getRoleValue(),
+                    power: powerNumber
+                }
             }
         });
     } 
