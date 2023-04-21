@@ -1,33 +1,34 @@
 import { NavigationContainer, NavigationProp } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import Home from "./screens/Home";
 import Connection from "./screens/Connection";
-import { createStackNavigator } from "@react-navigation/stack";
 import { UserProvider } from "./context/UserContext";
 import { SettingsProvider } from "./context/SettingsContext";
 import { useFonts } from "expo-font";
 import Settings from "./screens/Settings";
-import { View, Text } from "react-native";
+import { Text } from "react-native";
 import CreateGame from "./screens/CreateGame";
-import Jeux from "./screens/Game";
+import Game from "./screens/Game";
 import { NativeBaseProvider } from "native-base";
+import Background from "./components/Background";
 
 export type StackParamList = {
     Home: undefined;
     Connection: undefined;
     Settings: undefined;
     CreateGame: undefined;
-    Jeux: { gameId: number };
+    Game: { gameId: number };
 };
 export type StackNavigation = NavigationProp<StackParamList>;
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<StackParamList>();
 function MyStack(): React.ReactElement {
     return (
         <Stack.Navigator initialRouteName="Connection">
             <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
             <Stack.Screen name="Connection" component={Connection} options={{ headerShown: false, title: "Connection" }} />
             <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
-            <Stack.Screen name="Jeux" component={Jeux} options={{ headerShown: false }} />
+            <Stack.Screen name="Game" component={Game} options={{ headerShown: false }} initialParams={{ gameId: 0 }} />
             <Stack.Screen name="CreateGame" component={CreateGame} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
@@ -52,9 +53,9 @@ export default function App(): React.ReactElement {
         );
     } else {
         return (
-            <View>
+            <Background>
                 <Text>Loading font...</Text>
-            </View>
+            </Background>
         );
     }
 }

@@ -25,7 +25,7 @@ export default function Home(): React.ReactElement {
         navigation.navigate("CreateGame");
     };
     const goToGame = (gameId: number): void => {
-        navigation.navigate("Jeux", { gameId: gameId });
+        navigation.navigate("Game", { gameId: gameId });
     };
     const context = useContext(UserContext);
     const [listeParties, setListeParties] = useState<Array<Partie>>([]);
@@ -60,9 +60,9 @@ export default function Home(): React.ReactElement {
 
             <ScrollView>
                 <View>
-                    <Text fontSize="2xl" color={"light.100"}>
+                    <Heading color={"light.100"} mt={5}>
                         Liste des parties existantes:
-                    </Text>
+                    </Heading>
                     {listeParties &&
                         listeParties.map((informationPartie) => (
                             <View key={informationPartie.id}>
