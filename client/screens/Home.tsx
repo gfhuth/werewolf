@@ -106,7 +106,7 @@ export default function Home(): React.ReactElement {
                 </View>
 
                 <View>
-                    <Heading fontSize="2xl" color={"light.100"}>
+                    <Heading color={"light.100"}>
                         Liste de vos parties:
                     </Heading>
                     {listePartiesUser &&
