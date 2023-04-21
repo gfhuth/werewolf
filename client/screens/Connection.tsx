@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../App";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { API_BASE_URL } from "@env";
 import { Box, Button, Divider, Heading, Input, Text, useToast } from "native-base";
 import { UserContext } from "../context/UserContext";
@@ -48,6 +48,31 @@ export default function Login(): React.ReactElement {
             .catch((e) => setMessageErreur(e.message));
     };
 
+    // BYPASS START
+
+    const byPass = (): void => {
+        request(`${API_BASE_URL}/user/login`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: "bat",
+                password: "man"
+            })
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                context.setToken(res.token);
+                setTimeout(() => {
+                    navigation.navigate("Game", { gameId: 1 });
+                }, 100);
+            })
+            .catch((e) => setMessageErreur(e.message));
+    };
+    // BYPASS END
+
     const registerUser = (): void => {
         request(`${API_BASE_URL}/user/register`, {
             method: "POST",
@@ -70,6 +95,7 @@ export default function Login(): React.ReactElement {
 
     return (
         <Background>
+            <Button onPress={byPass}>Bypass</Button>
             <Box padding={10} bgColor={"light.100"} borderRadius={5}>
                 {isAchievingLogin ? (
                     <>
@@ -81,7 +107,9 @@ export default function Login(): React.ReactElement {
                             Connexion
                         </Button>
                         <Divider my={5} />
-                        <Text onPress={(): void => setIsAchievingLogin(false)}>Vous n'avez pas de compte, <Text color="info.500">Enregistez vous!</Text></Text>
+                        <Text onPress={(): void => setIsAchievingLogin(false)}>
+                            Vous n'avez pas de compte, <Text color="info.500">Enregistez vous!</Text>
+                        </Text>
                     </>
                 ) : (
                     <>
@@ -93,7 +121,9 @@ export default function Login(): React.ReactElement {
                             S'inscrire
                         </Button>
                         <Divider my={5} />
-                        <Text onPress={(): void => setIsAchievingLogin(true)}>Vous avez deja un compte, <Text color="info.500">Connectez vous!</Text></Text>
+                        <Text onPress={(): void => setIsAchievingLogin(true)}>
+                            Vous avez deja un compte, <Text color="info.500">Connectez vous!</Text>
+                        </Text>
                     </>
                 )}
             </Box>
