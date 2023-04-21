@@ -19,6 +19,13 @@ export class Player {
         this.isAlive = true;
     }
 
+    public isDeath():Boolean{
+        return !this.isAlive;
+    }
+    public kill():void{
+       this.isAlive = false;
+    }
+
     public getUser(): User {
         return this.user;
     }
@@ -32,12 +39,29 @@ export class Player {
             this.role = role;
     }
 
-    /** Send at all client of the game the new status of the game
-     * @param {boolean} isDay new status of the game (true : day, false : night)
+    /** Send at the client a recap of the game
      */
-    public sendNewGameStatus(isDay: boolean): void {
-        //TODO
-    }
+    public sendNewGameRecap(): void {
+        let powerNumber : number;
+        // because power can be null
+        if (this.getRole().getPower()){
+            powerNumber = this.getRole().getPower().getPowerValue()
+        }
+        else{
+            powerNumber = -1
+        }
+        this.user.sendWebSocket({
+            game_id:this.game.getGameId(),
+            event: "GAME_RECAP",
+            data :{
+                game: this.game.getGameRecap(),
+                player : {
+                    role : this.getRole().getRoleValue(),
+                    power: powerNumber
+                }
+            }
+        });
+    } 
 
     public static schema = async (): Promise<void> => {
         await database.schema

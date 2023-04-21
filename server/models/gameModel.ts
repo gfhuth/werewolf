@@ -5,6 +5,7 @@ import { Player } from "./playerModel";
 import { Chat, Chat_type } from "./chatModel";
 import { User } from "./userModel";
 import { Villager, Werewolf } from "./villagerModel";
+import { Event } from "../controllers/eventController";
 
 export enum GameStatus {
     NOT_STARTED = 0,
@@ -25,15 +26,6 @@ export type GameParam = {
     probaSpiritisme: number;
 };
 
-/** class Game
- * represente a game
- * usefield
- *  currentNumberOfPlayer current number of player who have join the game
- * fonction
- *  getGameId()         return the id of this game
- *  getGameParam()      return the GameParam object of this game
- *  getStatus()         Return an number corresponding to the status of the game
- */
 export class Game {
 
     private static gamesList: Array<Game> = [];
@@ -52,7 +44,8 @@ export class Game {
         this.gameId = gameId;
         this.gameParam = gameParam;
         this.chatslist = [];
-        this.currentNumberOfPlayer = 1;
+        this.currentNumberOfPlayer = 0;
+        
     }
 
     /**
@@ -93,10 +86,7 @@ export class Game {
     };
 
     public static removeGame = (gameId: number): void => {
-        for (let i = 0; i < Game.gamesList.length; i++) {
-            if (Game.gamesList[i].getGameId() === gameId) 
-                Game.gamesList.splice(i, 1);
-        }
+        for (let i = 0; i < Game.gamesList.length; i++) if (Game.gamesList[i].getGameId() === gameId) Game.gamesList.splice(i, 1);
     };
 
     public static addGameInList(game: Game): void {
@@ -147,6 +137,13 @@ export class Game {
     public getAllPlayers(): Array<Player> {
         return this.playersList;
     }
+    public getAllPlayersId(): Array<number> {
+        const idList:Array<number> = []
+        for(const player of this.playersList){
+            idList.push(player.getUser().getUserId());
+        }
+        return idList;
+    }
 
     public getPlayer(username: string): Player {
         for (const player of this.playersList) if (player.getUser().getUsername() === username) return player;
@@ -160,6 +157,31 @@ export class Game {
     public addPlayer(player: Player): void {
         this.playersList.push(player);
         this.currentNumberOfPlayer++;
+    }
+    public removePlayer(player: Player): void {
+        for (let i = 0; i < this.playersList.length; i++) {
+            if (this.playersList[i] == player) {
+                this.playersList.splice(i, 1);
+                this.currentNumberOfPlayer--;
+            }
+        }
+    }
+
+    public getGameRecap():Record<string, any>{
+        const idList:Array<number> = []
+        const idDeathList:Array<number> = []
+        
+        for(const player of this.playersList){
+            idList.push(player.getUser().getUserId());
+            if (player.isDeath()){
+                idDeathList.push(player.getUser().getUserId());
+            }
+        }
+        return {
+            status : this.getStatus(),
+            idList : idList,
+            deathPlayer : idDeathList
+        }
     }
 
     /** Compute the status of the game
@@ -178,8 +200,8 @@ export class Game {
             const numberOfCycle = Math.floor(timeSinceGameStart / timeOfOneCycle);
             const timeSinceCycleStart = timeSinceGameStart % timeOfOneCycle;
             // If we are day.
-            if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return { status: 2 * numberOfCycle, timePassed: timeSinceCycleStart };
-            else return { status: 2 * numberOfCycle + 1, timePassed: timeSinceCycleStart - this.gameParam.dayLength };
+            if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return { status: 1 + 2 * numberOfCycle, timePassed: timeSinceCycleStart };
+            else return { status: 2 * (numberOfCycle + 1), timePassed: timeSinceCycleStart - this.gameParam.nightLength };
         }
     }
 
@@ -243,3 +265,8 @@ export class Game {
     };
 
 }
+function gameRecapRequest(game: Game, user: User, data: Record<string, any>){
+
+}
+
+Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);

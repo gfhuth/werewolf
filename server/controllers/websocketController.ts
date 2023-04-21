@@ -61,6 +61,8 @@ export class WebsocketConnection {
 
                 this.user = User.getUser(username);
                 this.user.setWebsocket(this.ws);
+                // Envoie des sockettes en attentes
+                this.user.sendWaitingSocket();
                 this.ws.send(JSON.stringify({ status: 200, message: "User authenticated" }));
                 return;
             }
