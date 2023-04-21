@@ -95,7 +95,7 @@ export default function Home(): React.ReactElement {
                                     <Text>Nombre maximum de joueur :{informationPartie.nbPlayerMax}</Text>
                                     <Text>Date : {informationPartie.date}</Text>
                                     <Center>
-                                        <Button size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
+                                        <Button size="md" fontSize="lg" width={"130"} onPress={(): void => goToGame(informationPartie.id)}>
                                             Rejoindre la partie
                                         </Button>
                                     </Center>
