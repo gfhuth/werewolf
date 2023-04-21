@@ -29,6 +29,7 @@ export default function Home(): React.ReactElement {
     };
     const context = useContext(UserContext);
     const [listeParties, setListeParties] = useState<Array<Partie>>([]);
+    const [listePartiesUser, setListePartiesUser] = useState<Array<Partie>>([]);
 
     const requestListeDesParties = (): void => {
         request(`${API_BASE_URL}/game/search`, {
@@ -50,8 +51,29 @@ export default function Home(): React.ReactElement {
             .catch((e) => console.log(e));
     };
 
+    const requestListeDesPartiesUser = (): void => {
+        request(`${API_BASE_URL}/game/me`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "x-access-token": context.token
+            }
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res.games);
+                res.games.map((info: Partie) => {
+                    info.date = new Date(info.startDate).toString();
+                });
+                setListePartiesUser(res.games);
+            })
+            .catch((e) => console.log(e));
+    };
+
     useEffect(() => {
         requestListeDesParties();
+        requestListeDesPartiesUser();
     }, []);
 
     return (
@@ -65,6 +87,30 @@ export default function Home(): React.ReactElement {
                     </Text>
                     {listeParties &&
                         listeParties.map((informationPartie) => (
+                            <View key={informationPartie.id}>
+                                <Box padding={3} bgColor={"light.100"} borderRadius={5}>
+                                    <Text>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Text>
+                                    <Text>hostId :{informationPartie.hostId}</Text>
+                                    <Text>id :{informationPartie.id}</Text>
+                                    <Text>Nombre maximum de joueur :{informationPartie.nbPlayerMax}</Text>
+                                    <Text>Date : {informationPartie.date}</Text>
+                                    <Center>
+                                        <Button size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
+                                            Go to game
+                                        </Button>
+                                    </Center>
+                                </Box>
+                                <Divider my={5} thickness="0" />
+                            </View>
+                        ))}
+                </View>
+
+                <View>
+                    <Text fontSize="2xl" color={"light.100"}>
+                        Liste de vos parties:
+                    </Text>
+                    {listePartiesUser &&
+                        listePartiesUser.map((informationPartie) => (
                             <View key={informationPartie.id}>
                                 <Box padding={3} bgColor={"light.100"} borderRadius={5}>
                                     <Text>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Text>
