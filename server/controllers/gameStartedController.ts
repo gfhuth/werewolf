@@ -1,7 +1,7 @@
 import { Chat_type } from "../models/chatModel";
 import { Game } from "../models/gameModel";
 import { Player } from "../models/playerModel";
-import { Clairvoyant, Contamination, Spiritism } from "../models/powersModel";
+import { Clairvoyant, Contamination, Insomnia, Spiritism } from "../models/powersModel";
 import { Human, Werewolf } from "../models/villagerModel";
 import database from "../util/database";
 
@@ -32,7 +32,7 @@ function setupGame(game: Game): void {
     const powersHuman = [];
     // On choisi si on utilise les pouvoirs
     if (randint(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
-    if (randint(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Contamination());
+    if (randint(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Insomnia());
     if (randint(0, 1) <= gameParam.probaSpiritisme) {
         if (randint(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Spiritism());
         else powersHuman.push(new Spiritism());
@@ -66,12 +66,13 @@ function startDay(game: Game): void {
     // Réinitialisation du chat
     game.getChat(Chat_type.CHAT_VILLAGE).resetMessages();
     game.getChat(Chat_type.CHAT_SPIRITISM).resetChatMembers([]);
-    // update death player
-
+    
+    //Envoie a chaque joueur un nouveau game recap
+    for (const player of game.getAllPlayers()){
+        player.sendNewGameRecap();
+    }
     // TODO: Update table player
 
-    // TODO : Send a message at every connected client
-    for (let i = 0; i < game.getAllPlayers().length; i++) game.getAllPlayers()[i].sendNewGameStatus(true);
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     setTimeout(() => startNight(game), game.getGameParam().dayLength);
@@ -86,10 +87,12 @@ function startNight(game: Game): void {
     game.getChat(Chat_type.CHAT_WEREWOLF).resetMessages();
     game.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
 
-    // TODO: Update table player
+    //Envoie a chaque joueur un nouveau game recap
+    for (const player of game.getAllPlayers()){
+        player.sendNewGameRecap();
+    }
 
-    // TODO : Send a message at every client
-    for (let i = 0; i < game.getAllPlayers().length; i++) game.getAllPlayers()[i].sendNewGameStatus(false);
+    // TODO: Update table player
 
     // call startDay at the end of the day
     setTimeout(() => startDay(game), game.getGameParam().nightLength);
@@ -107,11 +110,13 @@ export async function initGame(gameId: number): Promise<void> {
     //     await database.deleteFrom("games").where("games.id", "=", game.getGameId()).executeTakeFirst();
     //     return;
     // }
-    // // Initialisation des chats
+    
+    // Initialisation des chats
     game.initChats();
     const gameStatus = game.getStatus();
     if (gameStatus.status == 0) setupGame(game);
 
+    // Lancement du jours ou de la nuit selon la date actuel
     console.log(`game ${gameId} successfuly initialized`);
     if (gameStatus.status % 2 == 0) startDay(game);
     else startNight(game);

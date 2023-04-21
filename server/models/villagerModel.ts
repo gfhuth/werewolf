@@ -6,7 +6,7 @@ export abstract class Villager {
 
     public abstract getRoleValue(): number;
     public abstract setPower(power: Power): void;
-
+    public abstract getPower(): Power;
     public static load(type: number): Villager {
         if (type == 0)
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -36,7 +36,9 @@ export class Human extends Villager {
         
         throw new Error("A werewolf power is given but a Human power is required.");
     }
-
+    public getPower():Power{
+        return this.power;
+    }
 }
 
 export class Werewolf extends Villager {
@@ -57,6 +59,9 @@ export class Werewolf extends Villager {
             this.power = power;
         
         throw new Error("A Human power is given but a Werewolf power is required.");
+    }
+    public getPower():Power{
+        return this.power;
     }
 
 }
