@@ -96,7 +96,7 @@ export default function Home(): React.ReactElement {
                                     <Text>Date : {informationPartie.date}</Text>
                                     <Center>
                                         <Button size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
-                                            Go to game
+                                            Rejoindre la partie
                                         </Button>
                                     </Center>
                                 </Box>
