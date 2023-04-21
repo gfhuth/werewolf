@@ -106,9 +106,9 @@ export default function Home(): React.ReactElement {
                 </View>
 
                 <View>
-                    <Text fontSize="2xl" color={"light.100"}>
+                    <Heading fontSize="2xl" color={"light.100"}>
                         Liste de vos parties:
-                    </Text>
+                    </Heading>
                     {listePartiesUser &&
                         listePartiesUser.map((informationPartie) => (
                             <View key={informationPartie.id}>
