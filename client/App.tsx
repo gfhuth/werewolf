@@ -53,9 +53,11 @@ export default function App(): React.ReactElement {
         );
     } else {
         return (
-            <Background>
-                <Text>Loading font...</Text>
-            </Background>
+            <NativeBaseProvider>
+                <Background>
+                    <Text>Loading font...</Text>
+                </Background>
+            </NativeBaseProvider>
         );
     }
 }
