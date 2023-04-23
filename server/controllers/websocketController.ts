@@ -34,28 +34,28 @@ export class WebsocketConnection {
             const data: { game_id?: number; event: string; data: Record<string, any> } = JSON.parse(message);
 
             if (!data || typeof data !== "object" || !data.event || !data.data || typeof data.data !== "object") {
-                this.ws.send(JSON.stringify({ status: 400, message: "Bad Request" }));
+                this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 400, message: "Bad Request" }));
                 return;
             }
             if (data.event === "AUTHENTICATION") {
                 const token: string = data.data.token;
                 try {
                     if (!jwt.verify(token, JWT_SECRET)) {
-                        this.ws.send(JSON.stringify({ status: 403, message: "Bad Authentication" }));
+                        this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 403, message: "Bad Authentication" }));
                         return;
                     }
                 } catch (e) {
-                    this.ws.send(JSON.stringify({ status: 403, message: "Bad Authentication" }));
+                    this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 403, message: "Bad Authentication" }));
                     return;
                 }
                 const username: string = (jwt.decode(token) as { username: string }).username;
 
                 if (this.isAuthenticated()) {
                     if (this.user.getUsername() !== username) {
-                        this.ws.send(JSON.stringify({ status: 403, message: "Bad Authentication" }));
+                        this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 403, message: "Bad Authentication" }));
                         return;
                     }
-                    this.ws.send(JSON.stringify({ status: 200, message: "Already Authentified" }));
+                    this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 200, message: "Already Authentified" }));
                     return;
                 }
 
@@ -66,11 +66,11 @@ export class WebsocketConnection {
                 // Envoie des sockettes en attentes
                 this.user.sendWaitingMessages();
                 
-                this.ws.send(JSON.stringify({ status: 200, message: "User authenticated" }));
+                this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 200, message: "User authenticated" }));
                 return;
             }
             if (!this.isAuthenticated()) {
-                this.ws.send(JSON.stringify({ status: 403, message: "Not Authenticated" }));
+                this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 403, message: "Not Authenticated" }));
                 return;
             }
 

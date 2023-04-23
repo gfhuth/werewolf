@@ -96,7 +96,7 @@ describe("Test websockets", () => {
             })
         );
 
-        const res: Record<string, any> = await client.getNextMessage();
+        const res: Record<string, any> = await client.getNextEvent("AUTHENTICATION");
         expect(res.status).toEqual(403);
         expect(res.message).toEqual("Not Authenticated");
     });
@@ -110,7 +110,7 @@ describe("Test websockets", () => {
             })
         );
 
-        const res: Record<string, any> = await client.getNextMessage();
+        const res: Record<string, any> = await client.getNextEvent("AUTHENTICATION");
         expect(res.status).toEqual(400);
         expect(res.message).toEqual("Bad Request");
     });
@@ -123,7 +123,7 @@ describe("Test websockets", () => {
             })
         );
 
-        const res: Record<string, any> = await client.getNextMessage();
+        const res: Record<string, any> = await client.getNextEvent("AUTHENTICATION");
         expect(res.status).toEqual(200);
         expect(res.message).toEqual("User authenticated");
     });
@@ -136,7 +136,7 @@ describe("Test websockets", () => {
             })
         );
 
-        const res: Record<string, any> = await client.getNextMessage();
+        const res: Record<string, any> = await client.getNextEvent("AUTHENTICATION");
         expect(res.status).toEqual(200);
         expect(res.message).toEqual("Already Authentified");
     });
@@ -149,7 +149,7 @@ describe("Test websockets", () => {
             })
         );
 
-        const res: Record<string, any> = await client.getNextMessage();
+        const res: Record<string, any> = await client.getNextEvent("AUTHENTICATION");
         expect(res.status).toEqual(403);
         expect(res.message).toEqual("Bad Authentication");
     });
