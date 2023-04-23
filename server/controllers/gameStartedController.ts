@@ -66,13 +66,12 @@ function startDay(game: Game): void {
     // Réinitialisation du chat
     game.getChat(Chat_type.CHAT_VILLAGE).resetMessages();
     game.getChat(Chat_type.CHAT_SPIRITISM).resetChatMembers([]);
-    
-    //Envoie a chaque joueur un nouveau game recap
-    for (const player of game.getAllPlayers()){
-        player.sendNewGameRecap();
-    }
-    // TODO: Update table player
 
+    //Envoie a chaque joueur un nouveau game recap
+    for (const player of game.getAllPlayers()) 
+        player.sendNewGameRecap();
+    
+    // TODO: Update table player
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     setTimeout(() => startNight(game), game.getGameParam().dayLength);
@@ -88,9 +87,9 @@ function startNight(game: Game): void {
     game.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
 
     //Envoie a chaque joueur un nouveau game recap
-    for (const player of game.getAllPlayers()){
+    for (const player of game.getAllPlayers()) 
         player.sendNewGameRecap();
-    }
+    
 
     // TODO: Update table player
 
@@ -110,7 +109,7 @@ export async function initGame(gameId: number): Promise<void> {
     //     await database.deleteFrom("games").where("games.id", "=", game.getGameId()).executeTakeFirst();
     //     return;
     // }
-    
+
     // Initialisation des chats
     game.initChats();
     const gameStatus = game.getStatus();

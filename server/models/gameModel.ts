@@ -45,7 +45,6 @@ export class Game {
         this.gameParam = gameParam;
         this.chatslist = [];
         this.currentNumberOfPlayer = 0;
-        
     }
 
     /**
@@ -137,12 +136,9 @@ export class Game {
     public getAllPlayers(): Array<Player> {
         return this.playersList;
     }
+
     public getAllPlayersId(): Array<number> {
-        const idList:Array<number> = []
-        for(const player of this.playersList){
-            idList.push(player.getUser().getUserId());
-        }
-        return idList;
+        return this.playersList.map<number>((player) => player.getUser().getUserId());
     }
 
     public getPlayer(username: string): Player {
@@ -167,21 +163,19 @@ export class Game {
         }
     }
 
-    public getGameRecap():Record<string, any>{
-        const idList:Array<number> = []
-        const idDeathList:Array<number> = []
-        
-        for(const player of this.playersList){
+    public getGameRecap(): Record<string, any> {
+        const idList: Array<number> = [];
+        const idDeathList: Array<number> = [];
+
+        for (const player of this.playersList) {
             idList.push(player.getUser().getUserId());
-            if (player.isDeath()){
-                idDeathList.push(player.getUser().getUserId());
-            }
+            if (player.isDeath()) idDeathList.push(player.getUser().getUserId());
         }
         return {
-            status : this.getStatus(),
-            idList : idList,
-            deathPlayer : idDeathList
-        }
+            status: this.getStatus(),
+            idList: idList,
+            deathPlayer: idDeathList
+        };
     }
 
     /** Compute the status of the game
@@ -265,8 +259,7 @@ export class Game {
     };
 
 }
-function gameRecapRequest(game: Game, user: User, data: Record<string, any>){
 
-}
+// function gameRecapRequest(game: Game, user: User, data: Record<string, any>) {}
 
-Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);
+// Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);

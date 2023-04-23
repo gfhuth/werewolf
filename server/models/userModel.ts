@@ -8,13 +8,13 @@ export class User {
     private userId: number;
     private username: string;
     private ws: WebSocket;
-    private connectionIsEstablish:Boolean;
-    private waitingSocket:string[] = [];
+    private waitingMessages: Array<string>;
 
     constructor(userId: number, username: string) {
         this.username = username;
         this.userId = userId;
         this.ws = null;
+        this.waitingMessages = [];
     }
 
     static async load(username: string): Promise<User> {
@@ -41,24 +41,19 @@ export class User {
         return this.ws;
     }
 
-    public sendWaitingSocket():void{
-        for(const sock of this.waitingSocket){
-            this.ws.send(sock);
-        }
+    public isConnected(): boolean {
+        return this.ws != null;
     }
 
-    public sendWebSocket(jsonFile:Record<string, any>):void{
-        //TODO verifier que la connection est étatablie
-        this.connectionIsEstablish = true;
-
-        if (this.connectionIsEstablish)
-            this.ws.send(JSON.stringify(jsonFile));
-        else{
-            this.waitingSocket.push(JSON.stringify(jsonFile));
-        }
+    public sendWaitingMessages(): void {
+        for (const message of this.waitingMessages) this.ws.send(message);
+        this.waitingMessages.length = 0;
     }
 
-    
+    public sendMessage(jsonMessage: Record<string, any>): void {
+        if (this.isConnected()) this.ws.send(JSON.stringify(jsonMessage));
+        else this.waitingMessages.push(JSON.stringify(jsonMessage));
+    }
 
     public setWebsocket(ws: WebSocket): void {
         this.ws = ws;
@@ -72,10 +67,9 @@ export class User {
             .addColumn("username", "text", (col) => col.unique().notNull())
             .addColumn("password", "text", (col) => col.notNull())
             .execute();
-    
+
         const users: Array<{ username: string }> = await database.selectFrom("users").select("username").execute();
-        for (const elem of users) 
-            await User.load(elem.username);
+        for (const elem of users) await User.load(elem.username);
     };
 
 }

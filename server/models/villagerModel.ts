@@ -31,14 +31,14 @@ export class Human extends Villager {
     }
 
     public setPower(power: Power): void {
-        if (power.isHumanPower()) 
-            this.power = power;
-        
+        if (power.isHumanPower()) this.power = power;
+
         throw new Error("A werewolf power is given but a Human power is required.");
     }
-    public getPower():Power{
+    public getPower(): Power {
         return this.power;
     }
+
 }
 
 export class Werewolf extends Villager {
@@ -55,12 +55,11 @@ export class Werewolf extends Villager {
     }
 
     public setPower(power: Power): void {
-        if (power.isWerewolfPower()) 
-            this.power = power;
-        
+        if (power.isWerewolfPower()) this.power = power;
+
         throw new Error("A Human power is given but a Werewolf power is required.");
     }
-    public getPower():Power{
+    public getPower(): Power {
         return this.power;
     }
 

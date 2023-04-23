@@ -22,8 +22,8 @@ describe("Test games", () => {
                 JSON.stringify({
                     nbPlayerMin: 5,
                     nbPlayerMax: 20,
-                    dayLength: 13,
-                    nightLength: 12,
+                    dayLength: 10 * 1000,
+                    nightLength: 10 * 1000,
                     startDate: date.getTime(),
                     percentageWerewolf: 0.33,
                     probaContamination: 0.1,

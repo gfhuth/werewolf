@@ -4,17 +4,17 @@ export abstract class Power {
 
     public abstract showPower(): void;
     public abstract usePower(): void;
-    public getPowerValue():number{
+    public getPowerValue(): number {
         return -1;
-    };
+    }
     public abstract isHumanPower(): Boolean;
     public abstract isWerewolfPower(): Boolean;
 
 }
 
-export type HumanPower = Power
+export type HumanPower = Power;
 
-export type WerewolfPower = Power
+export type WerewolfPower = Power;
 
 export class Insomnia implements HumanPower {
 
@@ -64,6 +64,7 @@ export class Contamination implements WerewolfPower {
     getPowerValue(): number {
         return 1;
     }
+
 }
 
 export class Spiritism implements HumanPower, WerewolfPower {
@@ -92,6 +93,7 @@ export class Spiritism implements HumanPower, WerewolfPower {
     getPowerValue(): number {
         return 2;
     }
+
 }
 
 export class Clairvoyant implements HumanPower, WerewolfPower {
