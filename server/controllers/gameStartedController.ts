@@ -3,7 +3,6 @@ import { Game } from "../models/gameModel";
 import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "../models/powersModel";
 import { Human, Werewolf } from "../models/villagerModel";
-import database from "../util/database";
 
 function randint(a: number, b: number): number {
     return Math.floor(Math.random() * b) + a;
@@ -45,14 +44,14 @@ function setupGame(game: Game): void {
     let i;
     // attribution des roles loups garous et des pouvoirs loups garous
     for (i = 0; i < Math.floor(gameParam.percentageWerewolf * game.getAllPlayers().length); i++) {
-        players[i].setRole(new Werewolf(null));
+        players[i].setRole(new Werewolf());
         if (i < powersWerewolf.length) players[i].getRole().setPower(powersWerewolf[i]);
     }
     const startIndex = i;
 
     // attribution des roles humains et des pouvoir humains
     for (i = startIndex; i < game.getAllPlayers().length; i++) {
-        players[i].setRole(new Human(null));
+        players[i].setRole(new Human());
         if (i - startIndex < powersHuman.length) players[i].getRole().setPower(powersHuman[i]);
     }
     console.log("affectation Complete");
@@ -114,6 +113,9 @@ export async function initGame(gameId: number): Promise<void> {
     game.initChats();
     const gameStatus = game.getStatus();
     if (gameStatus.status == 0) setupGame(game);
+
+    // Initialisation des rôles
+    game.initRole();
 
     // Lancement du jours ou de la nuit selon la date actuel
     console.log(`game ${gameId} successfuly initialized`);

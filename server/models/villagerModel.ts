@@ -1,5 +1,3 @@
-import { throws } from "assert";
-import { Chat } from "./chatModel.js";
 import { HumanPower, Power, WerewolfPower } from "./powersModel.js";
 
 export abstract class Villager {
@@ -10,9 +8,9 @@ export abstract class Villager {
     public static load(type: number): Villager {
         if (type == 0)
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            return new Human(null);
+            return new Human();
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        else return new Werewolf(null);
+        else return new Werewolf();
     }
 
 }
@@ -21,9 +19,9 @@ export class Human extends Villager {
 
     protected power: HumanPower;
 
-    constructor(power: HumanPower) {
+    constructor() {
         super();
-        this.power = power;
+        this.power = null;
     }
 
     public getRoleValue(): number {
@@ -45,9 +43,9 @@ export class Werewolf extends Villager {
 
     protected power: WerewolfPower;
 
-    constructor(power: WerewolfPower) {
+    constructor() {
         super();
-        this.power = power;
+        this.power = null;
     }
 
     public getRoleValue(): number {

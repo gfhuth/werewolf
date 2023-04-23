@@ -4,7 +4,7 @@ import { initGame } from "../controllers/gameStartedController";
 import { Player } from "./playerModel";
 import { Chat, Chat_type } from "./chatModel";
 import { User } from "./userModel";
-import { Villager, Werewolf } from "./villagerModel";
+import { Human, Villager, Werewolf } from "./villagerModel";
 import { Event } from "../controllers/eventController";
 
 export enum GameStatus {
@@ -120,6 +120,17 @@ export class Game {
             )
         );
         this.chatslist.push(new Chat(Chat_type.CHAT_SPIRITISM, []));
+    }
+
+    public initRole(): void {
+        let nbWerewolf: number;
+        if (this.gameParam.percentageWerewolf === 0) nbWerewolf = 1;
+        else nbWerewolf = Math.ceil((this.playersList.length * this.gameParam.percentageWerewolf) / 100);
+        this.playersList
+            .sort(() => Math.random() - Math.random())
+            .slice(0, nbWerewolf - 1)
+            .forEach((player) => player.setRole(new Werewolf()));
+        this.playersList.filter((player) => player.getRole() === null).forEach((player) => player.setRole(new Human()));
     }
 
     /**
