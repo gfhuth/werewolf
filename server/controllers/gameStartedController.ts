@@ -3,6 +3,7 @@ import { Game } from "../models/gameModel";
 import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "../models/powersModel";
 import { Human, Werewolf } from "../models/villagerModel";
+import { Vote, Vote_type } from "../models/voteModel";
 
 function randint(a: number, b: number): number {
     return Math.floor(Math.random() * b) + a;
@@ -66,10 +67,12 @@ function startDay(game: Game): void {
     game.getChat(Chat_type.CHAT_VILLAGE).resetMessages();
     game.getChat(Chat_type.CHAT_SPIRITISM).resetChatMembers([]);
 
+    // Initialisation du vote
+    game.setVote(new Vote(Vote_type.VOTE_VILLAGE, game.getAllPlayers()));
+
     //Envoie a chaque joueur un nouveau game recap
-    for (const player of game.getAllPlayers()) 
-        player.sendNewGameRecap();
-    
+    for (const player of game.getAllPlayers()) player.sendNewGameRecap();
+
     // TODO: Update table player
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -85,10 +88,16 @@ function startNight(game: Game): void {
     game.getChat(Chat_type.CHAT_WEREWOLF).resetMessages();
     game.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
 
+    // Initialisation du vote
+    game.setVote(
+        new Vote(
+            Vote_type.VOTE_WEREWOLF,
+            game.getAllPlayers().filter((player) => player.getRole() instanceof Werewolf)
+        )
+    );
+
     //Envoie a chaque joueur un nouveau game recap
-    for (const player of game.getAllPlayers()) 
-        player.sendNewGameRecap();
-    
+    for (const player of game.getAllPlayers()) player.sendNewGameRecap();
 
     // TODO: Update table player
 

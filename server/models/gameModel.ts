@@ -6,6 +6,7 @@ import { Chat, Chat_type } from "./chatModel";
 import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
 import { Event } from "../controllers/eventController";
+import { Vote } from "./voteModel";
 
 export enum GameStatus {
     NOT_STARTED = 0,
@@ -34,6 +35,7 @@ export class Game {
     private gameParam: GameParam;
     private playersList: Player[] = [];
     private chatslist: Array<Chat>;
+    private vote: Vote;
     private currentNumberOfPlayer;
 
     /**
@@ -44,6 +46,7 @@ export class Game {
         this.gameId = gameId;
         this.gameParam = gameParam;
         this.chatslist = [];
+        this.vote = null;
         this.currentNumberOfPlayer = 0;
     }
 
@@ -101,6 +104,14 @@ export class Game {
 
     public getGameParam(): GameParam {
         return this.gameParam;
+    }
+
+    public getVote(): Vote {
+        return this.vote;
+    }
+
+    public setVote(vote: Vote): void {
+        this.vote = vote;
     }
 
     public getChat(type: Chat_type): Chat {
