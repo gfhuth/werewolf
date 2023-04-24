@@ -47,17 +47,23 @@ export class Player {
         if (this.role instanceof Human)
             this.role = new Werewolf;
     }
+    
+    public sendMessage(event: string, data: Record<string, any>): void {
+        this.user.sendMessage({ event: event, game_id: this.game.getGameId(), data: data });
+    }
+
+    public sendError(event: string, status: number, errorMessage: string): void {
+        this.user.sendMessage({ event: event, game_id: this.game.getGameId(), status: status, message: errorMessage });
+    }
 
     /** Send at the client a recap of the game
      */
     public sendNewGameRecap(): void {
         let powerNumber: number;
         // because power can be null
-        if (this.getRole().getPower()) 
-            powerNumber = this.getRole().getPower().getPowerValue();
-        else 
-            powerNumber = -1;
-        
+        if (this.getRole().getPower()) powerNumber = this.getRole().getPower().getPowerValue();
+        else powerNumber = -1;
+
         this.user.sendMessage({
             game_id: this.game.getGameId(),
             event: "GAME_RECAP",

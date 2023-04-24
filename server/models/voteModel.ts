@@ -12,10 +12,12 @@ export class Vote {
 
     private type: Vote_type;
     private votes: { [key: string]: Player };
+    private participants: Array<Player>;
     private result: Player;
 
     constructor(type: Vote_type, players: Array<Player>) {
         this.type = type;
+        this.participants = players;
         players.forEach((player) => (this.votes[player.getUser().getUsername()] = null));
         this.result = null;
     }
@@ -36,14 +38,7 @@ export class Vote {
         this.result = vote;
 
         // On annonce à tous les joueurs que le vote est validé
-        for (const playerName in this.votes) {
-            User.getUser(playerName).sendMessage({
-                event: "VOTE_VALID",
-                data: {
-                    result: this.result.getUser().getUsername()
-                }
-            });
-        }
+        for (const player of this.participants) player.sendMessage("VOTE_VALID", { result: this.result.getUser().getUsername() });
     }
 
 }
