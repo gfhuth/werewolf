@@ -18,6 +18,54 @@ export default function PlayersList(props: {}): React.ReactElement {
                     name: "Villageois"
                 }
             ]
+        },
+        {
+            id: 2,
+            username: "Robin",
+            roles: [
+                {
+                    name: "Loup"
+                },
+                {
+                    name: "Villageois"
+                }
+            ]
+        },
+        {
+            id: 3,
+            username: "Alfred",
+            roles: [
+                {
+                    name: "Loup"
+                },
+                {
+                    name: "Villageois"
+                }
+            ]
+        },
+        {
+            id: 4,
+            username: "Joker",
+            roles: [
+                {
+                    name: "Loup"
+                },
+                {
+                    name: "Villageois"
+                }
+            ]
+        },
+        {
+            id: 5,
+            username: "Wayne",
+            roles: [
+                {
+                    name: "Loup"
+                },
+                {
+                    name: "Villageois"
+                }
+            ]
         }
     ]);
 
@@ -30,7 +78,7 @@ export default function PlayersList(props: {}): React.ReactElement {
     }, []);
 
     return (
-        <Container>
+        <Container display={"flex"} flexDirection={"row"} flexWrap={"wrap"} style={{ gap: 10 }} width={"100%"} justifyContent={"space-around"} maxWidth={530}>
             {players.map((player) => (
                 <PlayerCard key={player.username} player={player} />
             ))}

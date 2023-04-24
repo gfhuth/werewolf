@@ -86,7 +86,7 @@ export default function Home(): React.ReactElement {
                         Liste des parties existantes:
                     </Heading>
                     {listeParties &&
-                        listeParties.map((informationPartie) => (
+                        listeParties.filter(partie => !listePartiesUser || !listePartiesUser.find(p => p.id === partie.id)).map((informationPartie) => (
                             <View key={informationPartie.id}>
                                 <Box padding={3} bgColor={"light.100"} borderRadius={5}>
                                     <Text>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Text>

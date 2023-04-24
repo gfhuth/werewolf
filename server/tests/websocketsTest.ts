@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import * as WebSocket from "ws";
-import { token } from "./usersTest";
+import { token1 } from "./usersTest";
 
 const { PORT, HOST } = process.env;
 
@@ -119,7 +119,7 @@ describe("Test websockets", () => {
         client.sendMessage(
             JSON.stringify({
                 event: "AUTHENTICATION",
-                data: { token: token }
+                data: { token: token1 }
             })
         );
 
@@ -132,7 +132,7 @@ describe("Test websockets", () => {
         client.sendMessage(
             JSON.stringify({
                 event: "AUTHENTICATION",
-                data: { token: token }
+                data: { token: token1 }
             })
         );
 
