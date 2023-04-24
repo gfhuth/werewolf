@@ -49,6 +49,10 @@ const newMessage = async (game: Game, user: User, data: { date: number; chat_typ
             player.sendError("CHAT_ERROR", 403, "There is no member in the chat");
             return;
         }
+        if (!chat.getMembers().includes(player)) {
+            player.sendError("CHAT_ERROR", 403, "This player is not a member of this chat");
+            return;
+        }
         chat.addMessage(message);
     } else {
         player.sendError("CHAT_ERROR", 500, "Chat null");
