@@ -1,7 +1,7 @@
 import { Player } from "./playerModel";
 
 export abstract class Power {
-
+    
     public abstract showPower(): void;
     public abstract usePower(): void;
     public getPowerValue(): number {
@@ -9,7 +9,8 @@ export abstract class Power {
     }
     public abstract isHumanPower(): Boolean;
     public abstract isWerewolfPower(): Boolean;
-
+    public abstract setVictim(player: Player): void;
+    
 }
 
 export type HumanPower = Power;
@@ -36,6 +37,10 @@ export class Insomnia implements HumanPower {
         return 0;
     }
 
+    setVictim(player: Player): void {
+        console.log("Insomnia doesn't have victim");
+    }
+
 }
 
 export class Contamination implements WerewolfPower {
@@ -47,7 +52,7 @@ export class Contamination implements WerewolfPower {
     }
 
     usePower(): void {
-        console.log("Contamine victim");
+        this.victim.contaminated();
     }
 
     setVictim(player: Player): void {

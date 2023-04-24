@@ -1,7 +1,8 @@
 import database from "../util/database";
 import { Game } from "./gameModel";
+import { Contamination } from "./powersModel";
 import { User } from "./userModel";
-import { Villager } from "./villagerModel";
+import { Human, Villager, Werewolf } from "./villagerModel";
 
 export class Player {
 
@@ -40,6 +41,11 @@ export class Player {
 
     public setRole(role: Villager): void {
         if (this.role == null) this.role = role;
+    }
+
+    public contaminated(): void {
+        if (this.role instanceof Human)
+            this.role = new Werewolf;
     }
 
     /** Send at the client a recap of the game
