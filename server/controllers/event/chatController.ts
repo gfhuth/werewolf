@@ -32,6 +32,14 @@ const newMessage = async (game: Game, user: User, data: { date: number; chat_typ
         player.sendError("CHAT_ERROR", 403, "Game is not started");
         return;
     }
+    if (game.getStatus().status % 2 === 0 && data.chat_type !== Chat_type.CHAT_VILLAGE) {
+        player.sendError("CHAT_ERROR", 403, "Wrong chat type");
+        return;
+    }
+    if (game.getStatus().status % 2 === 1 && data.chat_type !== Chat_type.CHAT_WEREWOLF && data.chat_type !== Chat_type.CHAT_SPIRITISM) {
+        player.sendError("CHAT_ERROR", 403, "Wrong chat type");
+        return;
+    }
 
     await database.insertInto("messages").values(message).execute();
 
