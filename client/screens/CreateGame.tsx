@@ -52,8 +52,8 @@ export default function CreateGame(): React.ReactElement {
             body: JSON.stringify({
                 nbPlayerMin: fieldsValue.nbPlayerMin,
                 nbPlayerMax: fieldsValue.nbPlayerMax,
-                dayLength: fieldsValue.dayLength,
-                nightLength: fieldsValue.nightLength,
+                dayLength: fieldsValue.dayLength * 1000 * 60,
+                nightLength: fieldsValue.nightLength * 1000 * 60,
                 startDate: fieldsValue.startDate.getTime(),
                 percentageWerewolf: fieldsValue.percentageWerewolf / 100,
                 probaContamination: fieldsValue.probaContamination / 100,

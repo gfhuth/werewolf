@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Pressable, View, Text } from "react-native";
+import { Pressable, View, Text } from "native-base";
 
-export default function Collapsible(props: { name: string, isDefaultOpen?: boolean; children: React.ReactNode }): React.ReactElement {
+export default function Collapsible(props: { name: string; isDefaultOpen?: boolean; children: React.ReactNode }): React.ReactElement {
     const [isOpen, setIsOpen] = useState(props.isDefaultOpen);
 
     return (
@@ -11,7 +11,7 @@ export default function Collapsible(props: { name: string, isDefaultOpen?: boole
                     <Text>{props.name}</Text>
                 </View>
             </Pressable>
-            {isOpen && <View>{props.children}</View>}
+            {isOpen ? <View>{props.children}</View> : <View display={"none"}>{props.children}</View>}
         </View>
     );
 }
