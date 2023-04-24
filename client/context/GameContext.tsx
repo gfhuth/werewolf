@@ -24,7 +24,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
 
     const onMessage = (event: MessageEvent<any>): void => {
-        LOGGER.log(`Message received : ${event}`);
+        LOGGER.log(`Message received : ${JSON.stringify(event)}`);
         try {
             const data = JSON.parse(event.data);
             const eventName = data.event as string;
