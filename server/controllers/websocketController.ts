@@ -3,8 +3,10 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/userModel";
 import { Game } from "../models/gameModel";
 import { Event } from "./eventController";
+import Logger from "../util/Logger";
 
 const { JWT_SECRET } = process.env;
+const LOGGER = new Logger("WEBSOCKET");
 
 export class WebsocketConnection {
 
@@ -16,6 +18,7 @@ export class WebsocketConnection {
     constructor(ws: WebSocket) {
         this.ws = ws;
         this.user = null;
+        ws.on("message", (message: string) => this.readMessage(message));
     }
 
     isAuthenticated(): boolean {
@@ -26,7 +29,8 @@ export class WebsocketConnection {
         // créer un connexion et le mettre dans une liste contenant toutes les connexions
         const connect: WebsocketConnection = new WebsocketConnection(ws);
         WebsocketConnection.connections.push(connect);
-        ws.on("message", (message: string) => connect.readMessage(message));
+
+        LOGGER.log(`New connection`);
     };
 
     async readMessage(message: string): Promise<void> {
@@ -42,17 +46,20 @@ export class WebsocketConnection {
                 try {
                     if (!jwt.verify(token, JWT_SECRET)) {
                         this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 403, message: "Bad Authentication" }));
+                        LOGGER.log(`Authentication failed`);
                         return;
                     }
                 } catch (e) {
                     this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 403, message: "Bad Authentication" }));
-                    return;
+                        LOGGER.log(`Authentication failed`);
+                        return;
                 }
                 const username: string = (jwt.decode(token) as { username: string }).username;
 
                 if (this.isAuthenticated()) {
                     if (this.user.getUsername() !== username) {
                         this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 403, message: "Bad Authentication" }));
+                        LOGGER.log(`Authentication failed`);
                         return;
                     }
                     this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 200, message: "Already Authentified" }));
@@ -67,6 +74,7 @@ export class WebsocketConnection {
                 this.user.sendWaitingMessages();
                 
                 this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 200, message: "User authenticated" }));
+                LOGGER.log(`Authentication succeeded : user ${this.user.getUsername()} logged in`);
                 return;
             }
             if (!this.isAuthenticated()) {
@@ -88,6 +96,8 @@ export class WebsocketConnection {
                 this.ws.send(JSON.stringify({ status: 500, message: "Event doesn't exist" }));
                 return;
             }
+
+            LOGGER.log(`Received event ${data.event} for game ${game.getGameId()} from user ${this.user.getUsername()}`);
             // Exécute les méthodes relatives à un événement
             for (const func of Event.getEventActions(data.event)) func(game, this.user, data.data);
         } catch (e) {
