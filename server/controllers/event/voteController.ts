@@ -1,23 +1,27 @@
 import { Game } from "../../models/gameModel";
+import { Player } from "../../models/playerModel";
 import { User } from "../../models/userModel";
 import { jsonVote } from "../../models/voteModel";
 import { Event } from "../eventController";
 
 const newVote = async (game: Game, user: User, data: jsonVote): Promise<void> => {
+    // On récupère le joueur qui a envoyé le message
+    const player: Player = game.getPlayer(user.getUsername());
+
     if (game.getVote().getType() !== data.vote_type) {
-        user.sendMessage({ event: "VOTE_SENT", status: 403, message: "Wrong vote type" });
+        player.sendError("VOTE_SENT", 403, "Wrong vote type");
         return;
     }
     if (!game.getPlayer(data.vote)) {
-        user.sendMessage({ event: "VOTE_SENT", status: 403, message: "Player is not valid" });
+        player.sendError("VOTE_SENT", 403, "Player is not valid");
         return;
     }
     if (game.getVote().isClosed()) {
-        user.sendMessage({ event: "VOTE_SENT", status: 403, message: "Vote is closed" });
+        player.sendError("VOTE_SENT", 403, "Vote is closed");
         return;
     }
 
-    game.getVote().addVote(game.getPlayer(user.getUsername()), game.getPlayer(data.vote));
+    game.getVote().addVote(player, game.getPlayer(data.vote));
 };
 
 // Liste des événements relatifs aux votes
