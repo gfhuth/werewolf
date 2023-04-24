@@ -1,5 +1,4 @@
 import { Player } from "./playerModel";
-import { User } from "./userModel";
 
 export enum Vote_type {
     VOTE_VILLAGE,
@@ -11,7 +10,7 @@ export type jsonVote = { vote_type: Vote_type; vote: string };
 export class Vote {
 
     private type: Vote_type;
-    private votes: { [key: string]: Player };
+    private votes: { [key: string]: Player } = {};
     private participants: Array<Player>;
     private result: Player;
 
@@ -26,6 +25,10 @@ export class Vote {
         return this.type;
     }
 
+    public getParticipants(): Array<Player> {
+        return this.participants;
+    }
+
     public isClosed(): boolean {
         return this.result !== null;
     }
@@ -33,12 +36,15 @@ export class Vote {
     public addVote(playerWhoVote: Player, vote: Player): void {
         this.votes[playerWhoVote.getUser().getUsername()] = vote;
 
+        playerWhoVote.sendMessage("VOTE_RECEIVED", { vote_type: this.type });
+
         // On vérifie si on peut valider le vote
         for (const player in this.votes) if (this.votes[player] !== vote) return;
+
         this.result = vote;
 
         // On annonce à tous les joueurs que le vote est validé
-        for (const player of this.participants) player.sendMessage("VOTE_VALID", { result: this.result.getUser().getUsername() });
+        for (const player of this.participants) player.sendMessage("VOTE_VALID", { vote_type: this.type, result: this.result.getUser().getUsername() });
     }
 
 }
