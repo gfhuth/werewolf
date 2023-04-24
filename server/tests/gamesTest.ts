@@ -8,12 +8,7 @@ const { PORT, HOST } = process.env;
 
 const url = `http://${HOST}:${PORT}`;
 
-const testTiming = 1;
-
-afterAll(async () => {
-    // On attend 1 secondes pour que la partie créée commence
-    await new Promise((resolve) => setTimeout(resolve, testTiming * 1000));
-});
+const testTiming = 2;
 
 describe("Test games", () => {
     test("Create game", async () => {
@@ -46,5 +41,8 @@ describe("Test games", () => {
     test("Join game", async () => {
         const res = await request(url).post("/game/1/join").set("x-access-token", token2);
         expect(res.status).toEqual(200);
+
+        // On attend testTiming secondes pour que la partie créée commence
+        await new Promise((resolve) => setTimeout(resolve, testTiming * 1000));
     });
 });

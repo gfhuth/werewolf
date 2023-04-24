@@ -126,7 +126,7 @@ export class Game {
         this.chatslist.push(new Chat(Chat_type.CHAT_VILLAGE, this.playersList));
         this.chatslist.push(
             new Chat(
-                Chat_type.CHAT_VILLAGE,
+                Chat_type.CHAT_WEREWOLF,
                 this.playersList.filter((player) => player.getRole() instanceof Werewolf)
             )
         );
@@ -139,7 +139,7 @@ export class Game {
         else nbWerewolf = Math.ceil((this.playersList.length * this.gameParam.percentageWerewolf) / 100);
         this.playersList
             .sort(() => Math.random() - Math.random())
-            .slice(0, nbWerewolf - 1)
+            .slice(0, nbWerewolf)
             .forEach((player) => player.setRole(new Werewolf()));
         this.playersList.filter((player) => player.getRole() === null).forEach((player) => player.setRole(new Human()));
     }
