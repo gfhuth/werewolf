@@ -118,13 +118,13 @@ export async function initGame(gameId: number): Promise<void> {
     //     return;
     // }
 
+    // Initialisation des rôles
+    game.initRole();
+
     // Initialisation des chats
     game.initChats();
     const gameStatus = game.getStatus();
     if (gameStatus.status == 0) setupGame(game);
-
-    // Initialisation des rôles
-    game.initRole();
 
     // Lancement du jours ou de la nuit selon la date actuel
     console.log(`game ${gameId} successfuly initialized`);
