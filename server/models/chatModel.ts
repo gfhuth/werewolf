@@ -46,14 +46,11 @@ export class Chat {
         this.messages.push(message);
 
         this.members.forEach((player) =>
-            player.getUser().sendMessage({
-                event: "CHAT_RECEIVED",
-                data: {
-                    author: message.user,
-                    date: message.date,
-                    chat_type: message.type,
-                    content: message.content
-                }
+            player.sendMessage("CHAT_RECEIVED", {
+                author: message.user,
+                date: message.date,
+                chat_type: message.type,
+                content: message.content
             })
         );
     }

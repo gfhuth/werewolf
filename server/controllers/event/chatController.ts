@@ -21,26 +21,29 @@ const newMessage = async (game: Game, user: User, data: { date: number; chat_typ
         date: data.date
     };
     // TODO: vérifier que le message est sans erreurs
-
-    await database.insertInto("messages").values(message).execute();
-
+    
     // On récupère le chat concerné
     const chat: Chat = game.getChat(data.chat_type);
 
+    // On récupère le joueur qui envoie le message
+    const player: Player = game.getPlayer(user.getUsername());
+    
     if (data.date < game.getGameParam().startDate) {
-        user.sendMessage({ status: 500, message: "Game is not started" });
+        player.sendError("CHAT_ERROR", 403, "Game is not started");
         return;
     }
+
+    await database.insertInto("messages").values(message).execute();
 
     // On envoie le message sur ce chat
     if (chat) {
         if (chat.getMembers().length === 0) {
-            user.sendMessage({ status: 500, message: "There is no member in the chat" });
+            player.sendError("CHAT_ERROR", 403, "There is no member in the chat");
             return;
         }
         chat.addMessage(message);
     } else {
-        user.sendMessage({ status: 500, message: "Chat null" });
+        player.sendError("CHAT_ERROR", 500, "Chat null");
         return;
     }
 };
