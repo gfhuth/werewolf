@@ -1,6 +1,6 @@
 import { Box, Button, Center, Container, Hidden, Image, Pressable, Text, Tooltip } from "native-base";
-import { images } from "./image.tsx";
-import { useContext, useEffect, useState } from "react";
+import { images } from "./image";
+import { useState } from "react";
 
 export type Role = {
     name: string;
