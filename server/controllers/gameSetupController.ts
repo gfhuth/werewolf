@@ -183,7 +183,7 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
 
         const game: Game = Game.getGame(gameId);
         if (!game) throw new Error("Game doesn't exist");
-        if (game.getStatus().status > 0) throw new Error("Game aleary started");
+        if (game.getStatus().status > 0) throw new Error("Game already started");
 
         // Check if player already in game
         if (game.getPlayer(user.getUsername())) throw new Error("User is already in the game.");
@@ -224,7 +224,7 @@ export const leaveGame = async (req: Request, res: Response): Promise<void> => {
 
         const game: Game = Game.getGame(gameId);
         if (!game) throw new Error("Game doesn't exist");
-        if (game.getStatus().status > 0) throw new Error("Game aleary started");
+        if (game.getStatus().status > 0) throw new Error("Game already started");
 
         // Check if player already in game
         if (!game.getPlayer(user.getUsername())) throw new Error("User haven't join this game.");
