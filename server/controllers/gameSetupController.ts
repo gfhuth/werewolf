@@ -159,16 +159,12 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
             })
             .execute();
 
-        // On ajoute la partie à la liste des parties
-        Game.addGameInList(newHostGame);
-
         // On ajoute l'utilisateur aux joueurs de la partie
         // TODO: ajuster les valeurs de role et power
         const player: Player = new Player(user, null, null, newHostGame);
         newHostGame.addPlayer(player);
 
         // On ajoute un evenement
-        setTimeout(newHostGame.initGame, game.startDate - Date.now());
         res.status(200).json({ message: `New game created and start in ${(game.startDate - Date.now()) / 60000} min` });
     } catch (e) {
         res.sendStatus(500);

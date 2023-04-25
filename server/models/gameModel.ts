@@ -56,6 +56,12 @@ export class Game {
         this.chatslist = [];
         this.vote = null;
         this.currentNumberOfPlayer = 0;
+
+        Game.addGameInList(this);
+
+        // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
+        if (this.getStatus().status === GameStatus.NOT_STARTED) setTimeout(this.initGame.bind(this), this.gameParam.startDate - Date.now());
+        else this.initGame();
     }
 
     /* ------------------ fonction logique de la partie ------------------ */
@@ -357,10 +363,6 @@ export class Game {
                 probaSpiritisme: elem.probaSpiritisme
             };
             const game: Game = new Game(elem.id, gameParams);
-            Game.addGameInList(game);
-            // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
-            if (game.getStatus().status === GameStatus.NOT_STARTED) setTimeout(game.initGame, elem.startDate - Date.now());
-            else game.initGame();
         }
 
         // Initialisation des joueurs de chaque partie
