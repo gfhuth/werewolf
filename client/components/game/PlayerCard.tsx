@@ -1,7 +1,7 @@
-import { Actionsheet, Box, Button, Center, Container, Hidden, Image, Pressable, Text, Tooltip, useDisclose } from "native-base";
+import { Actionsheet, Box, Button, Center, Container, Hidden, Image, Pressable, Text, Tooltip, useDisclose, useToast } from "native-base";
 import { images } from "./image";
 import { GameContext } from "../../context/GameContext";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export type Role = {
     name: string;
@@ -16,9 +16,30 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
     const [isOpenVote, setIsOpen] = useState(false);
     const gameContext = useContext(GameContext);
 
+    const toast = useToast();
+
+    const setMessageToast = (message: string): void => {
+        toast.show({
+            title: "Erreur",
+            description: message,
+            variant: "subtle",
+            borderColor: "red.700",
+            borderLeftWidth: 3
+        });
+    };
+
     const vote = (): void => {
         gameContext.sendJsonMessage("VOTE_SENT", { vote_type: "village", vote: "username de la personne" });
     };
+
+    const receivedVote = (): void => {
+        setMessageToast("Le vote a bien était pris en compte");
+    };
+
+    useEffect(() => {
+        gameContext.registerEventHandler("VOTE_RECEIVED", receivedVote);
+    }, []);
+
     const { isOpen, onOpen, onClose } = useDisclose();
     return (
         <Box bg="light.100" borderRadius={5} p={2}>
