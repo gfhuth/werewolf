@@ -108,5 +108,17 @@ export class Player {
             .addColumn("game", "integer", (col) => col.references("games.id").onDelete("cascade"))
             .execute();
     };
+    /** Create a new permutation of players
+     * @param {Player[]} players players to shuffle
+     */
+    public static shuffle(players: Player[]): void {
+        for (let i = 0; i < players.length; i++) {
+            const playerTemp = players[i];
+            //Bettween i and players.length
+            const j = Math.floor(Math.random() * players.length) + i;
+            players[i] = players[j];
+            players[j] = playerTemp;
+        }
+    }
 
 }

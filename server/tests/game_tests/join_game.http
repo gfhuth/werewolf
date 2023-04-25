@@ -28,11 +28,11 @@ x-access-token: {{token1}}
 Content-Type: {{contentType}}
 
 {
-    "nbPlayerMin": 5,
+    "nbPlayerMin": 2,
     "nbPlayerMax": 20,
     "dayLength": 2000,
     "nightLength": 2000,
-    "startDate": 1681915913629,
+    "startDate": 1682427776723,
     "percentageWerewolf": 0.33,
     "probaContamination": 0.1,
     "probaInsomnie": 0.1,
@@ -41,9 +41,9 @@ Content-Type: {{contentType}}
 }
 
 ### join game1
-POST http://{{baseUrl}}/game/1/join HTTP/1.1
+POST http://{{baseUrl}}/game/6/join HTTP/1.1
 x-access-token: {{token2}}
 
 ### check update
-GET http://{{baseUrl}}/game/1/details/ HTTP/1.1
+GET http://{{baseUrl}}/game/4/details/ HTTP/1.1
 x-access-token: {{token1}}

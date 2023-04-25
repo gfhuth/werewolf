@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { getTokenContent } from "./userController";
 import { Game, GameParam } from "../models/gameModel";
 import database from "../util/database";
-import { initGame } from "./gameStartedController";
 
 import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
@@ -169,7 +168,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         newHostGame.addPlayer(player);
 
         // On ajoute un evenement
-        setTimeout(() => initGame(gameId.id), game.startDate - Date.now());
+        setTimeout(newHostGame.initGame, game.startDate - Date.now());
         res.status(200).json({ message: `New game created and start in ${(game.startDate - Date.now()) / 60000} min` });
     } catch (e) {
         res.sendStatus(500);
@@ -179,6 +178,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 export const joinGame = async (req: Request, res: Response): Promise<void> => {
     try {
         const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
+        if (!user) throw new Error("No user provided.");
         const gameId: number = parseInt(req.params.id);
         if (!gameId) throw new Error("No game ID provided.");
 
