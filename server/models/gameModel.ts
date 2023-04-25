@@ -29,7 +29,7 @@ export type GameParam = {
 
 export class Game {
 
-    private static gamesList: Array<Game> = [];
+    private static games: Map<number, Game> = new Map();
 
     private gameId: number;
     private gameParam: GameParam;
@@ -77,22 +77,21 @@ export class Game {
         return new Game(gameId, gameParams);
     }
 
-    public static getAllGames(): Array<Game> {
-        return Game.gamesList;
+    public static getAllGames(): IterableIterator<Game> {
+        return Game.games.values();
     }
 
     public static getGame = (gameId: number): Game => {
-        const filter: Array<Game> = Game.gamesList.filter((game) => game.getGameId() === gameId);
-        if (filter.length === 0) return null;
-        return filter[0];
+        const game = Game.games.get(gameId);
+        return game;
     };
 
     public static removeGame = (gameId: number): void => {
-        for (let i = 0; i < Game.gamesList.length; i++) if (Game.gamesList[i].getGameId() === gameId) Game.gamesList.splice(i, 1);
+        Game.games.delete(gameId);
     };
 
     public static addGameInList(game: Game): void {
-        Game.gamesList.push(game);
+        Game.games.set(game.getGameId(), game);
     }
 
     /** Return Id of the game
