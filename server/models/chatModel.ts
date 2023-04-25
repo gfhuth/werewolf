@@ -2,27 +2,27 @@ import { sql } from "kysely";
 import database from "../util/database";
 import { Player } from "./playerModel";
 
-export enum Chat_type {
+export enum ChatType {
     CHAT_VILLAGE,
     CHAT_WEREWOLF,
     CHAT_SPIRITISM,
 }
 
-export type Message = { game: number; type: number; user: number; content: string; date: number };
+export type Message = { game: number; type: number; user: string; content: string; date: number };
 
 export class Chat {
 
-    private type: Chat_type;
+    private type: ChatType;
     private messages: Array<Message>;
     private members: Array<Player>;
 
-    constructor(type: Chat_type, members: Array<Player>) {
+    constructor(type: ChatType, members: Array<Player>) {
         this.type = type;
         this.members = members;
         this.messages = [];
     }
 
-    public getType(): Chat_type {
+    public getType(): ChatType {
         return this.type;
     }
 
@@ -66,7 +66,7 @@ export class Chat {
             .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
             .addColumn("game", "integer", (col) => col.notNull())
             .addColumn("type", "integer", (col) => col.notNull())
-            .addColumn("user", "integer", (col) => col.notNull())
+            .addColumn("user", "text", (col) => col.notNull())
             .addColumn("content", "text", (col) => col.notNull())
             .addColumn("date", "integer", (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
             .execute();

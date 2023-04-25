@@ -1,11 +1,11 @@
 import { sql } from "kysely";
 import database from "../util/database";
 import { Player } from "./playerModel";
-import { Chat, Chat_type } from "./chatModel";
+import { Chat, ChatType } from "./chatModel";
 import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
 import { Event } from "../controllers/eventController";
-import { Vote, Vote_type } from "./voteModel";
+import { Vote, VoteType } from "./voteModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "./powersModel";
 
 export enum GameStatus {
@@ -64,14 +64,14 @@ export class Game {
      * Initialisation des chats lors de la création d'une partie
      */
     public initChats(): void {
-        this.chatslist.push(new Chat(Chat_type.CHAT_VILLAGE, Array.from(this.playersList.values())));
+        this.chatslist.push(new Chat(ChatType.CHAT_VILLAGE, Array.from(this.playersList.values())));
         this.chatslist.push(
             new Chat(
-                Chat_type.CHAT_WEREWOLF,
+                ChatType.CHAT_WEREWOLF,
                 Array.from(this.playersList.values()).filter((player) => player.getRole() instanceof Werewolf)
             )
         );
-        this.chatslist.push(new Chat(Chat_type.CHAT_SPIRITISM, []));
+        this.chatslist.push(new Chat(ChatType.CHAT_SPIRITISM, []));
     }
     /**
      * Mise à jour du chat du chaman
@@ -133,10 +133,10 @@ export class Game {
     startDay(): void {
         console.log(`The sun is rising, status : ${this.getStatus().status} for game :${this.getGameId()}`);
         // Réinitialisation du chat
-        this.getChat(Chat_type.CHAT_VILLAGE).resetMessages();
-        this.getChat(Chat_type.CHAT_SPIRITISM).resetChatMembers([]);
+        this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
+        this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
         // Initialisation du vote
-        this.setVote(new Vote(Vote_type.VOTE_VILLAGE, this.getAllPlayers()));
+        this.setVote(new Vote(VoteType.VOTE_VILLAGE, this.getAllPlayers()));
         //Envoie a chaque joueur un nouveau game recap
         for (const player of this.getAllPlayers()) player.sendNewGameRecap();
         // TODO: Update table player
@@ -147,12 +147,12 @@ export class Game {
     startNight(): void {
         console.log(`The night is falling, status : ${this.getStatus().status} for game :${this.getGameId()}`);
         // Réinitialisation des chats
-        this.getChat(Chat_type.CHAT_WEREWOLF).resetMessages();
-        this.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
+        this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
+        this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
         // Initialisation du vote
         this.setVote(
             new Vote(
-                Vote_type.VOTE_WEREWOLF,
+                VoteType.VOTE_WEREWOLF,
                 this.getAllPlayers().filter((player) => player.getRole() instanceof Werewolf)
             )
         );
@@ -215,7 +215,7 @@ export class Game {
         this.vote = vote;
     }
 
-    public getChat(type: Chat_type): Chat {
+    public getChat(type: ChatType): Chat {
         if (this.chatslist.length !== 3) return null;
         return this.chatslist[type];
     }
@@ -380,11 +380,8 @@ export class Game {
  * @param {User} user UserObject not null
  * @param {Json} data Data given by the message (unused here)
  */
-function gameRecapRequest(game: Game, player: Player, data: Record<string, any>): void {
-    // user send a request for game
-    if (!player) throw new Error("this user isn't in the game");
-    // 3. Use sendMessage of user to send the json
-    player.sendNewGameRecap();
+function getInfoGame(game: Game, player: Player, data: {}): void {
+    player.sendMessage("GET_ALL_INFO_GAME", { status: game.getStatus().status });
 }
 
-Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);
+Event.registerHandlers("GET_ALL_INFO", getInfoGame);
