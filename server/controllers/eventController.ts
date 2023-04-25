@@ -1,7 +1,7 @@
 import { Game } from "../models/gameModel";
-import { User } from "../models/userModel";
+import { Player } from "../models/playerModel";
 
-type functionHandler = (game: Game, user: User, data: Record<string, any>) => void;
+type functionHandler = (game: Game, player: Player, data: Record<string, any>) => void;
 
 export class Event {
 

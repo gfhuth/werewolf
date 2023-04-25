@@ -30,6 +30,10 @@ export class Chat {
         return this.members;
     }
 
+    public getMessages(): Array<Message> {
+        return this.messages;
+    }
+
     public resetMessages(): void {
         this.messages.length = 0;
     }

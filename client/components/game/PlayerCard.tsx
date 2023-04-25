@@ -1,6 +1,7 @@
-import { Actionsheet, Box, Button, Center, Container, Hidden, Image, Pressable, Text, Tooltip, useDisclose } from "native-base";
+import { Actionsheet, Box, Button, Center, Container, Hidden, Image, Pressable, Text, Tooltip, useDisclose, useToast } from "native-base";
 import { images } from "./image";
-import { useState } from "react";
+import { GameContext } from "../../context/GameContext";
+import { useContext, useEffect, useState } from "react";
 
 export type Role = {
     name: string;
@@ -13,10 +14,32 @@ export type Player = {
 
 export default function PlayerCard(props: { player: Player }): React.ReactElement {
     const [isOpenVote, setIsOpen] = useState(false);
+    const gameContext = useContext(GameContext);
+
+    const toast = useToast();
+
+    const setMessageToast = (message: string): void => {
+        toast.show({
+            title: "Erreur",
+            description: message,
+            variant: "subtle",
+            borderColor: "red.700",
+            borderLeftWidth: 3
+        });
+    };
 
     const vote = (): void => {
-        console.log("A VOTE");
+        gameContext.sendJsonMessage("VOTE_SENT", { vote_type: "village", vote: "username de la personne" });
     };
+
+    const receivedVote = (): void => {
+        setMessageToast("Le vote a bien était pris en compte");
+    };
+
+    useEffect(() => {
+        gameContext.registerEventHandler("VOTE_RECEIVED", receivedVote);
+    }, []);
+
     const { isOpen, onOpen, onClose } = useDisclose();
     return (
         <Box bg="light.100" borderRadius={5} p={2}>
@@ -33,7 +56,6 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                         </Container>
                         <Text>{props.player.username}</Text>
                     </Container>
-                    {/* {isOpen ? <Button onPress={vote}> Voter </Button> : <Hidden children={null}></Hidden>} */}
                 </Pressable>
 
                 <Actionsheet isOpen={isOpen} onClose={onClose}>
@@ -50,11 +72,11 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                                 Actions possibles :
                             </Text>
                         </Box>
-                        <Actionsheet.Item>VOTE</Actionsheet.Item>
+                        <Actionsheet.Item onPress={vote}>VOTE</Actionsheet.Item>
                         <Actionsheet.Item isDisabled>Share</Actionsheet.Item>
                         <Actionsheet.Item>Play</Actionsheet.Item>
                         <Actionsheet.Item>Favourite</Actionsheet.Item>
-                        <Actionsheet.Item>Cancel</Actionsheet.Item>
+                        <Actionsheet.Item onPress={onClose}>Close</Actionsheet.Item>
                     </Actionsheet.Content>
                 </Actionsheet>
             </Center>

@@ -78,7 +78,8 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
         const games: Array<{ id: number; startDate: number; hostId: number; nbPlayerMax: number; currentNumberOfPlayer: number }> = await database
             .selectFrom("games")
             .select(["id", "startDate", "hostId", "nbPlayerMax", "currentNumberOfPlayer"])
-            .where("games.hostId", "=", user.getUserId())
+            .innerJoin("players", "players.game", "games.id")
+            .where("players.user", "=", user.getUserId())
             .execute();
 
         res.status(200).json({ games: games });
