@@ -78,7 +78,7 @@ const getAllChats = async (game: Game, player: Player, data: {}): Promise<void> 
     res.chat_werewolf = game.getChat(Chat_type.CHAT_WEREWOLF).getMessages();
     res.chat_spiritism = game.getChat(Chat_type.CHAT_SPIRITISM).getMessages();
 
-    player.sendMessage("GET_ALL_INFO_RETURN", res);
+    player.sendMessage("GET_ALL_INFO_CHAT", res);
 };
 
 // Liste des événements relatifs aux messages
