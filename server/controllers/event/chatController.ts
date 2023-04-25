@@ -15,7 +15,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
     const message: Message = {
         game: game.getGameId(),
         type: data.chat_type,
-        user: player.getUser().getUserId(),
+        user: player.getUser().getUsername(),
         content: data.content,
         date: data.date
     };

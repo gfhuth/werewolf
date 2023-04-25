@@ -8,7 +8,7 @@ export enum ChatType {
     CHAT_SPIRITISM,
 }
 
-export type Message = { game: number; type: number; user: number; content: string; date: number };
+export type Message = { game: number; type: number; user: string; content: string; date: number };
 
 export class Chat {
 
@@ -66,7 +66,7 @@ export class Chat {
             .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
             .addColumn("game", "integer", (col) => col.notNull())
             .addColumn("type", "integer", (col) => col.notNull())
-            .addColumn("user", "integer", (col) => col.notNull())
+            .addColumn("user", "text", (col) => col.notNull())
             .addColumn("content", "text", (col) => col.notNull())
             .addColumn("date", "integer", (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
             .execute();

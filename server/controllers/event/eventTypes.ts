@@ -26,7 +26,7 @@ export type ClientToServerEvents = {
 
 export type ServerToClientEvents = {
     CHAT_RECEIVED: {
-        author: number;
+        author: string;
         date: number;
         chat_type: ChatType;
         content: string;
