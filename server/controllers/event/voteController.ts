@@ -13,7 +13,7 @@ const newVote = async (game: Game, user: User, data: jsonVote): Promise<void> =>
         return;
     }
     if (game.getVote().getType() !== data.vote_type) {
-        player.sendError("VOTE_ERROR", 403, "Wrong vote type");
+        player.sendError("VOTE_ERROR", 403, `Vote type is ${game.getVote().getType()} but vote type ${data.vote_type}is expected`);
         return;
     }
     if (!game.getPlayer(data.vote)) {
