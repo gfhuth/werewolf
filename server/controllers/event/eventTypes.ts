@@ -13,6 +13,9 @@ export type EventType = {
         chat_type: Chat_type;
         content: string;
     };
+    GAME_DELETED: {
+        message: string
+    }
     GET_ALL_INFO: {}
     GET_ALL_INFO_CHAT: {
         [key in Chat_type]: Array<Message>
