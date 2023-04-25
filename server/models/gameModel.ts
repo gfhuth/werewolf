@@ -1,12 +1,12 @@
 import { sql } from "kysely";
 import database from "../util/database";
-import { initGame } from "../controllers/gameStartedController";
 import { Player } from "./playerModel";
 import { Chat, Chat_type } from "./chatModel";
 import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
 import { Event } from "../controllers/eventController";
-import { Vote } from "./voteModel";
+import { Vote, Vote_type } from "./voteModel";
+import { Clairvoyant, Contamination, Insomnia, Spiritism } from "./powersModel";
 
 export enum GameStatus {
     NOT_STARTED = -1,
@@ -32,10 +32,13 @@ export type GameParam = {
     probaSpiritisme: number;
 };
 
+function randfloat(a: number, b: number): number {
+    return Math.random() * b + a;
+}
+
 export class Game {
 
     private static games: Map<number, Game> = new Map();
-
     private gameId: number;
     private gameParam: GameParam;
     private playersList: Map<string, Player> = new Map();
@@ -55,73 +58,7 @@ export class Game {
         this.currentNumberOfPlayer = 0;
     }
 
-    /**
-     * Charge une partie depuis la base de données
-     * @param {number} gameId Id de la partie
-     * @returns {Game}
-     */
-    static async load(gameId: number): Promise<Game> {
-        const game: { id: number } & GameParam = await database
-            .selectFrom("games")
-            .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
-            .where("id", "=", gameId)
-            .executeTakeFirstOrThrow();
-        const gameParams: GameParam = {
-            nbPlayerMin: game.nbPlayerMin,
-            nbPlayerMax: game.nbPlayerMax,
-            dayLength: game.dayLength,
-            nightLength: game.nightLength,
-            startDate: game.startDate,
-            percentageWerewolf: game.percentageWerewolf,
-            probaContamination: game.probaContamination,
-            probaInsomnie: game.probaInsomnie,
-            probaVoyance: game.probaVoyance,
-            probaSpiritisme: game.probaSpiritisme
-        };
-
-        return new Game(gameId, gameParams);
-    }
-
-    public static getAllGames(): IterableIterator<Game> {
-        return Game.games.values();
-    }
-
-    public static getGame = (gameId: number): Game => {
-        const game = Game.games.get(gameId);
-        return game;
-    };
-
-    public static removeGame = (gameId: number): void => {
-        Game.games.delete(gameId);
-    };
-
-    public static addGameInList(game: Game): void {
-        Game.games.set(game.getGameId(), game);
-    }
-
-    /** Return Id of the game
-     * @returns {number} Id of the game
-     */
-    public getGameId(): number {
-        return this.gameId;
-    }
-
-    public getGameParam(): GameParam {
-        return this.gameParam;
-    }
-
-    public getVote(): Vote {
-        return this.vote;
-    }
-
-    public setVote(vote: Vote): void {
-        this.vote = vote;
-    }
-
-    public getChat(type: Chat_type): Chat {
-        if (this.chatslist.length !== 3) return null;
-        return this.chatslist[type];
-    }
+    /* ------------------ fonction logique de la partie ------------------ */
 
     /**
      * Initialisation des chats lors de la création d'une partie
@@ -147,6 +84,141 @@ export class Game {
         this.chatslist[2].resetChatMembers([chaman, deadPlayer]);
     }
 
+    public addPlayer(player: Player): void {
+        this.playersList.set(player.getUser().getUsername(), player);
+        this.currentNumberOfPlayer++;
+    }
+    public removePlayer(username: string): void {
+        this.playersList.delete(username);
+    }
+
+    /** Set all role in the game
+     * @param {Game} game Game with all player added
+     */
+    setupGamePowerAndRole(): void {
+        const gameParam = this.getGameParam();
+        const players = this.getAllPlayers();
+
+        const powersWerewolf = [];
+        const powersHuman = [];
+        // On choisi si on utilise les pouvoirs
+        if (randfloat(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
+        if (randfloat(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Insomnia());
+        if (randfloat(0, 1) <= gameParam.probaSpiritisme) {
+            if (randfloat(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Spiritism());
+            else powersHuman.push(new Spiritism());
+        }
+        if (randfloat(0, 1) <= gameParam.probaVoyance) {
+            if (randfloat(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Clairvoyant());
+            else powersHuman.push(new Clairvoyant());
+        }
+        Player.shuffle(players);
+        let i;
+        // attribution des roles loups garous et des pouvoirs loups garous
+        for (i = 0; i < Math.floor(gameParam.percentageWerewolf * this.getAllPlayers().length); i++) {
+            players[i].setRole(new Werewolf());
+            if (i < powersWerewolf.length) players[i].getRole().setPower(powersWerewolf[i]);
+        }
+        const startIndex = i;
+
+        // attribution des roles humains et des pouvoir humains
+        for (i = startIndex; i < this.getAllPlayers().length; i++) {
+            players[i].setRole(new Human());
+            if (i - startIndex < powersHuman.length) players[i].getRole().setPower(powersHuman[i]);
+        }
+    }
+
+    /** Apply all action happend during the night and lunch a day
+     */
+    startDay(): void {
+        console.log(`The sun is rising, status : ${this.getStatus().status} for game :${this.getGameId()}`);
+        // Réinitialisation du chat
+        this.getChat(Chat_type.CHAT_VILLAGE).resetMessages();
+        this.getChat(Chat_type.CHAT_SPIRITISM).resetChatMembers([]);
+        // Initialisation du vote
+        this.setVote(new Vote(Vote_type.VOTE_VILLAGE, this.getAllPlayers()));
+        //Envoie a chaque joueur un nouveau game recap
+        for (const player of this.getAllPlayers()) player.sendNewGameRecap();
+        // TODO: Update table player
+        this.lunchNextGameMoment();
+    }
+    /** lunch a night
+     */
+    startNight(): void {
+        console.log(`The night is falling, status : ${this.getStatus().status} for game :${this.getGameId()}`);
+        // Réinitialisation des chats
+        this.getChat(Chat_type.CHAT_WEREWOLF).resetMessages();
+        this.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
+        // Initialisation du vote
+        this.setVote(
+            new Vote(
+                Vote_type.VOTE_WEREWOLF,
+                this.getAllPlayers().filter((player) => player.getRole() instanceof Werewolf)
+            )
+        );
+        //Envoie a chaque joueur un nouveau game recap
+        for (const player of this.getAllPlayers()) player.sendNewGameRecap();
+        // TODO: Update table player
+        // call startDay at the end of the day
+        this.lunchNextGameMoment();
+    }
+
+    lunchNextGameMoment(): void {
+        let func;
+        if (this.getStatus().status % 2 === GameStatus.JOUR) func = this.startDay;
+        else func = this.startNight;
+        setTimeout(func, this.gameParam.dayLength);
+    }
+
+    /** Function to add when a game is restored or start
+     * Setup the game (probability, role, ...)
+     * Add event call at each end of days (use interval or timeout), ...
+     * @param {number} gameId id of the starting game
+     * */
+    public async initGame(): Promise<void> {
+        console.log(`Initialisation de la partie : ${this.gameId}`);
+        // if (this.getGameParam().nbPlayerMin > this.getNbOfPlayers()) {
+        //     Game.removeGame(this.getGameId());
+        //     await database.deleteFrom("games").where("games.id", "=", this.getGameId()).executeTakeFirst();
+        //     this.getAllPlayers().forEach((player) => player.sendMessage("GAME_DELETED", { message: "game deleted" }));
+        //     console.log("Suppresions de la partie");
+        //     return;
+        // }
+        console.log(`Initialisation des chats : ${this.gameId}`);
+        // Initialisation des chats
+        this.initChats();
+        //Initialisation des roles et des pouvoirs
+        const gameStatus = this.getStatus();
+        if (gameStatus.status === GameStatus.JOUR) this.setupGamePowerAndRole();
+        // Lancement du jours ou de la nuit selon la date actuel
+        this.lunchNextGameMoment();
+        console.log(`game ${this.gameId} successfuly initialized`);
+    }
+    /* ------------------ Getter et Setter ------------------ */
+
+    /** Return Id of the game
+     * @returns {number} Id of the game
+     */
+    public getGameId(): number {
+        return this.gameId;
+    }
+
+    public getGameParam(): GameParam {
+        return this.gameParam;
+    }
+
+    public getVote(): Vote {
+        return this.vote;
+    }
+
+    public setVote(vote: Vote): void {
+        this.vote = vote;
+    }
+
+    public getChat(type: Chat_type): Chat {
+        if (this.chatslist.length !== 3) return null;
+        return this.chatslist[type];
+    }
     public getAllPlayers(): Array<Player> {
         return Array.from(this.playersList.values());
     }
@@ -158,15 +230,6 @@ export class Game {
     public getNbOfPlayers(): number {
         return this.currentNumberOfPlayer;
     }
-
-    public addPlayer(player: Player): void {
-        this.playersList.set(player.getUser().getUsername(), player);
-        this.currentNumberOfPlayer++;
-    }
-    public removePlayer(username: string): void {
-        this.playersList.delete(username);
-    }
-
     public getGameRecap(): Record<string, any> {
         const usernameList: Array<string> = [];
         const usernameDeathList: Array<string> = [];
@@ -203,6 +266,51 @@ export class Game {
         }
     }
 
+    /* ------------------ Static Function ------------------ */
+    /**
+     * Charge une partie depuis la base de données
+     * @param {number} gameId Id de la partie
+     * @returns {Game}
+     */
+    static async load(gameId: number): Promise<Game> {
+        const game: { id: number } & GameParam = await database
+            .selectFrom("games")
+            .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
+            .where("id", "=", gameId)
+            .executeTakeFirstOrThrow();
+        const gameParams: GameParam = {
+            nbPlayerMin: game.nbPlayerMin,
+            nbPlayerMax: game.nbPlayerMax,
+            dayLength: game.dayLength,
+            nightLength: game.nightLength,
+            startDate: game.startDate,
+            percentageWerewolf: game.percentageWerewolf,
+            probaContamination: game.probaContamination,
+            probaInsomnie: game.probaInsomnie,
+            probaVoyance: game.probaVoyance,
+            probaSpiritisme: game.probaSpiritisme
+        };
+
+        return new Game(gameId, gameParams);
+    }
+
+    public static getAllGames(): IterableIterator<Game> {
+        return Game.games.values();
+    }
+
+    public static removeGame = (gameId: number): void => {
+        Game.games.delete(gameId);
+    };
+
+    public static addGameInList(game: Game): void {
+        Game.games.set(game.getGameId(), game);
+    }
+
+    public static getGame = (gameId: number): Game => {
+        const game = Game.games.get(gameId);
+        return game;
+    };
+
     /**
      * Function use to create a game table in the database if it is necessary
      * Next, load all game in the database and create an event to start a game at the starting date
@@ -227,7 +335,9 @@ export class Game {
             .addColumn("probaVoyance", "real", (col) => col.defaultTo(0).notNull())
             .addColumn("probaSpiritisme", "real", (col) => col.defaultTo(0).notNull())
             .execute();
+    };
 
+    public static async loadAllGame(): Promise<void> {
         // On charge chaque parties en cours
         const gamelist: Array<{ id: number } & GameParam> = await database
             .selectFrom("games")
@@ -249,8 +359,8 @@ export class Game {
             const game: Game = new Game(elem.id, gameParams);
             Game.addGameInList(game);
             // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
-            if (game.getStatus().status === GameStatus.NOT_STARTED) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
-            else initGame(game.getGameId());
+            if (game.getStatus().status === GameStatus.NOT_STARTED) setTimeout(game.initGame, elem.startDate - Date.now());
+            else game.initGame();
         }
 
         // Initialisation des joueurs de chaque partie
@@ -260,7 +370,8 @@ export class Game {
             const player: Player = new Player(User.getUser(elem.name), Villager.load(elem.role), elem.power, game);
             game.addPlayer(player);
         }
-    };
+        console.log("Chargment des parties deja créer terminé");
+    }
 
 }
 
@@ -270,9 +381,10 @@ export class Game {
  * @param {Json} data Data given by the message (unused here)
  */
 function gameRecapRequest(game: Game, player: Player, data: Record<string, any>): void {
+    // user send a request for game
     if (!player) throw new Error("this user isn't in the game");
     // 3. Use sendMessage of user to send the json
     player.sendNewGameRecap();
 }
 
-Event.registerHandlers("GET_ALL_INFO", gameRecapRequest);
+Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);

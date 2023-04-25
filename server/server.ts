@@ -3,6 +3,7 @@ dotenv.config();
 import express, { Application } from "express";
 import { createSchema } from "./util/database";
 import gameRouter from "./routers/game";
+import { Game } from "./models/gameModel";
 import cors from "cors";
 import * as WebSocket from "ws";
 
@@ -21,6 +22,7 @@ const { PORT, HOST } = process.env;
 
 createSchema();
 console.log("database created");
+Game.loadAllGame();
 
 app.use(
     cors({
