@@ -47,7 +47,11 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
             LOGGER.log(`ERREUR Message received : ${data.event}`);
             const eventName = data.event as string;
             const handler = eventHandlers[eventName];
-            if (handler) handler(data.data);
+            try {
+                if (handler) handler(data.data);
+            } catch (e) {
+                LOGGER.log(`Handle threw an error on event ${data.event} : ${e}`);
+            }
         } catch (e) {
             LOGGER.log(`Failed to handle message : ${event.data} (${e})`);
         }
@@ -80,8 +84,8 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     };
 
     const registerEventHandler = (event: string, callback: EventHandlerCallback): void => {
-        eventHandlers[event] = callback;
-        setEventHandlers({ ...eventHandlers });
+        setEventHandlers(eh => ({ ...eh, [event]: callback }));
+        console.log("here");
     };
 
     const sendMessage = (event: string, data: any): void => {
