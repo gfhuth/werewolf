@@ -1,13 +1,16 @@
-import { Chat_type } from "../models/chatModel";
+import { ChatType } from "../models/chatModel";
 import { Game, GameStatus } from "../models/gameModel";
 import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "../models/powersModel";
 import { Human, Werewolf } from "../models/villagerModel";
-import { Vote, Vote_type } from "../models/voteModel";
+import { Vote, VoteType } from "../models/voteModel";
 import database from "../util/database";
 
 function randint(a: number, b: number): number {
     return Math.floor(Math.random() * b) + a;
+}
+function randfloat(a: number, b: number): number {
+    return Math.random() * b + a;
 }
 /** Create a new permutation of players
  * @param {Player[]} players players to shuffle
@@ -32,14 +35,14 @@ function setupGame(game: Game): void {
     const powersWerewolf = [];
     const powersHuman = [];
     // On choisi si on utilise les pouvoirs
-    if (randint(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
-    if (randint(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Insomnia());
-    if (randint(0, 1) <= gameParam.probaSpiritisme) {
-        if (randint(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Spiritism());
+    if (randfloat(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
+    if (randfloat(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Insomnia());
+    if (randfloat(0, 1) <= gameParam.probaSpiritisme) {
+        if (randfloat(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Spiritism());
         else powersHuman.push(new Spiritism());
     }
-    if (randint(0, 1) <= gameParam.probaVoyance) {
-        if (randint(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Clairvoyant());
+    if (randfloat(0, 1) <= gameParam.probaVoyance) {
+        if (randfloat(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Clairvoyant());
         else powersHuman.push(new Clairvoyant());
     }
     shuffle(players);
@@ -64,11 +67,11 @@ function setupGame(game: Game): void {
 function startDay(game: Game): void {
     console.log(`The sun is rising, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Réinitialisation du chat
-    game.getChat(Chat_type.CHAT_VILLAGE).resetMessages();
-    game.getChat(Chat_type.CHAT_SPIRITISM).resetChatMembers([]);
+    game.getChat(ChatType.CHAT_VILLAGE).resetMessages();
+    game.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
     // Initialisation du vote
-    game.setVote(new Vote(Vote_type.VOTE_VILLAGE, game.getAllPlayers()));
+    game.setVote(new Vote(VoteType.VOTE_VILLAGE, game.getAllPlayers()));
 
     //Envoie a chaque joueur un nouveau game recap
     for (const player of game.getAllPlayers()) player.sendNewGameRecap();
@@ -85,13 +88,13 @@ function startDay(game: Game): void {
 function startNight(game: Game): void {
     console.log(`The night is falling, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Réinitialisation des chats
-    game.getChat(Chat_type.CHAT_WEREWOLF).resetMessages();
-    game.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
+    game.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
+    game.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
 
     // Initialisation du vote
     game.setVote(
         new Vote(
-            Vote_type.VOTE_WEREWOLF,
+            VoteType.VOTE_WEREWOLF,
             game.getAllPlayers().filter((player) => player.getRole() instanceof Werewolf)
         )
     );

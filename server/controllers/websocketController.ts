@@ -4,6 +4,7 @@ import { User } from "../models/userModel";
 import { Game } from "../models/gameModel";
 import { Event } from "./eventController";
 import Logger from "../util/Logger";
+import { Player } from "../models/playerModel";
 
 const { JWT_SECRET } = process.env;
 const LOGGER = new Logger("WEBSOCKET");
@@ -91,6 +92,7 @@ export class WebsocketConnection {
                 this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
                 return;
             }
+            const player: Player = game.getPlayer(this.user.getUsername());
 
             if (!Event.getEventActions(data.event)) {
                 this.ws.send(JSON.stringify({ status: 500, message: "Event doesn't exist" }));
@@ -99,7 +101,7 @@ export class WebsocketConnection {
 
             LOGGER.log(`Received event ${data.event} for game ${game.getGameId()} from user ${this.user.getUsername()}`);
             // Exécute les méthodes relatives à un événement
-            for (const func of Event.getEventActions(data.event)) func(game, this.user, data.data);
+            for (const func of Event.getEventActions(data.event)) func(game, player, data.data);
         } catch (e) {
             console.log(e);
             this.ws.send(JSON.stringify({ status: 500, message: "Server Internal Error" }));

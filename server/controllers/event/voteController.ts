@@ -1,13 +1,9 @@
 import { Game } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
-import { User } from "../../models/userModel";
-import { jsonVote } from "../../models/voteModel";
+import { VoteType} from "../../models/voteModel";
 import { Event } from "../eventController";
 
-const newVote = async (game: Game, user: User, data: jsonVote): Promise<void> => {
-    // On récupère le joueur qui a envoyé le message
-    const player: Player = game.getPlayer(user.getUsername());
-
+const newVote = async (game: Game, player: Player, data: { vote_type: VoteType; vote: string }): Promise<void> => {
     if (!game.getVote()) {
         player.sendError("VOTE_ERROR", 403, "Game hasn't started");
         return;
