@@ -65,7 +65,7 @@ export class Client {
                 data: { token: clientToken }
             })
         );
-        const res: Record<string, any> = await this.getNextMessage();
+        const res: Record<string, any> = await this.getNextEvent("AUTHENTICATION");
         return res.status === 200;
     }
 

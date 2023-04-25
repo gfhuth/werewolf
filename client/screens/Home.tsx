@@ -71,6 +71,22 @@ export default function Home(): React.ReactElement {
             .catch((e) => console.log(e));
     };
 
+    const joinGame = (gameId: number): void => {
+        request(`${API_BASE_URL}/game/${gameId}/join`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "x-access-token": context.token
+            }
+        })
+            .then((res) => {
+                requestListeDesParties();
+                requestListeDesPartiesUser();
+            })
+            .catch(console.error);
+    };
+
     useEffect(() => {
         requestListeDesParties();
         requestListeDesPartiesUser();
@@ -86,31 +102,31 @@ export default function Home(): React.ReactElement {
                         Liste des parties existantes:
                     </Heading>
                     {listeParties &&
-                        listeParties.filter(partie => !listePartiesUser || !listePartiesUser.find(p => p.id === partie.id)).map((informationPartie) => (
-                            <View key={informationPartie.id}>
-                                <Box padding={3} bgColor={"light.100"} borderRadius={5}>
-                                    <Text>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Text>
-                                    <Text>hostId :{informationPartie.hostId}</Text>
-                                    <Text>id :{informationPartie.id}</Text>
-                                    <Text>Nombre maximum de joueur :{informationPartie.nbPlayerMax}</Text>
-                                    <Text>Date : {informationPartie.date}</Text>
-                                    <Center>
-                                        <Button size="md" fontSize="lg" width={"130"} onPress={(): void => goToGame(informationPartie.id)}>
-                                            Rejoindre la partie
-                                        </Button>
-                                    </Center>
-                                </Box>
-                                <Divider my={5} thickness="0" />
-                            </View>
-                        ))}
+                        listeParties
+                            .filter((partie) => !listePartiesUser || !listePartiesUser.find((p) => p.id === partie.id))
+                            .map((informationPartie) => (
+                                <View key={informationPartie.id}>
+                                    <Box padding={3} bgColor={"light.100"} borderRadius={5}>
+                                        <Text>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Text>
+                                        <Text>hostId :{informationPartie.hostId}</Text>
+                                        <Text>id :{informationPartie.id}</Text>
+                                        <Text>Nombre maximum de joueur :{informationPartie.nbPlayerMax}</Text>
+                                        <Text>Date : {informationPartie.date}</Text>
+                                        <Center>
+                                            <Button size="md" fontSize="lg" width={"130"} onPress={(): void => joinGame(informationPartie.id)}>
+                                                Rejoindre la partie
+                                            </Button>
+                                        </Center>
+                                    </Box>
+                                    <Divider my={5} thickness="0" />
+                                </View>
+                            ))}
                 </View>
 
                 <View>
-                    <Heading color={"light.100"}>
-                        Liste de vos parties:
-                    </Heading>
-                    {listePartiesUser &&
-                        listePartiesUser.map((informationPartie) => (
+                    <Heading color={"light.100"}>Liste de vos parties:</Heading>
+                    {listeParties &&
+                        listeParties.map((informationPartie) => (
                             <View key={informationPartie.id}>
                                 <Box padding={3} bgColor={"light.100"} borderRadius={5}>
                                     <Text>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Text>

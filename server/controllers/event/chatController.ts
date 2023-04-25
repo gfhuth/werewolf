@@ -33,11 +33,11 @@ const newMessage = async (game: Game, user: User, data: { date: number; chat_typ
         return;
     }
     if (game.getStatus().status % 2 === 0 && data.chat_type !== Chat_type.CHAT_VILLAGE) {
-        player.sendError("CHAT_ERROR", 403, "Wrong chat type");
+        player.sendError("CHAT_ERROR", 403, "Chat Werewolf and Chat Spiritism unavailable during the day");
         return;
     }
     if (game.getStatus().status % 2 === 1 && data.chat_type !== Chat_type.CHAT_WEREWOLF && data.chat_type !== Chat_type.CHAT_SPIRITISM) {
-        player.sendError("CHAT_ERROR", 403, "Wrong chat type");
+        player.sendError("CHAT_ERROR", 403, "Chat Village unavailable during the night");
         return;
     }
 

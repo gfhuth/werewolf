@@ -2,8 +2,12 @@ import { WS } from "@env";
 import React, { useState } from "react";
 import useWebSocket, { SendMessage } from "react-use-websocket";
 import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
+import Logger from "../utils/Logger";
+import { useToast } from "native-base";
 
 export type EventHandlerCallback = (data: any) => void;
+
+const LOGGER = new Logger("WEBSOCKET");
 
 export const GameContext = React.createContext<{
     eventHandlers: { [key: string]: EventHandlerCallback };
@@ -19,23 +23,46 @@ export const GameContext = React.createContext<{
 
 export function GameProvider(props: { children: React.ReactNode; gameId: number }): React.ReactElement {
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
+    const toast = useToast();
+
+    const setMessageErreur = (messageErreur: string): void => {
+        toast.show({
+            title: "Erreur",
+            description: messageErreur,
+            variant: "subtle",
+            borderColor: "red.700",
+            borderLeftWidth: 3
+        });
+    };
 
     const onMessage = (event: MessageEvent<any>): void => {
+        LOGGER.log(`Message received : ${JSON.stringify(event)}`);
         try {
             const data = JSON.parse(event.data);
+            LOGGER.log(`Message received data : ${data.event}`);
+
+            if (data.event === "CHAT_ERROR") 
+                setMessageErreur(data.message);
+            
+
             const eventName = data.event as string;
             const handler = eventHandlers[eventName];
             if (handler) handler(data.data);
         } catch (e) {
-            console.error("Failed to handle message : ", event.data, e);
+            LOGGER.log(`Failed to handle message : ${event.data} (${e})`);
         }
+    };
+
+    const onError = (event: Event): void => {
+        LOGGER.log(`Error : ${event}`);
     };
 
     const { sendJsonMessage } = useWebSocket(WS, {
         onOpen: () => {
-            console.log("Connection opened");
+            LOGGER.log("Connection opened");
         },
         onMessage: onMessage,
+        onError: onError,
         //Will attempt to reconnect on all close events, such as server shutting down
         shouldReconnect: () => true
     });
