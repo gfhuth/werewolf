@@ -21,13 +21,13 @@ const newMessage = async (game: Game, user: User, data: { date: number; chat_typ
         date: data.date
     };
     // TODO: vérifier que le message est sans erreurs
-    
+
     // On récupère le chat concerné
     const chat: Chat = game.getChat(data.chat_type);
 
     // On récupère le joueur qui envoie le message
     const player: Player = game.getPlayer(user.getUsername());
-    
+
     if (data.date < game.getGameParam().startDate) {
         player.sendError("CHAT_ERROR", 403, "Game is not started");
         return;
@@ -69,10 +69,10 @@ const newMessage = async (game: Game, user: User, data: { date: number; chat_typ
 const updateChat = (game: Game, user: User, data: { dead_player: string }): void => {
     const chaman: Player = game.getPlayer(user.getUsername());
     if (chaman.getPower() != 2) {
-        user.sendMessage({ status: 403, message: "User hasn't spiritism power" });
+        chaman.sendError("CHAT_ERROR", 403, "User hasn't spiritism power");
         return;
     }
-    game.updateSpiritismChat(game.getPlayer(user.getUsername()), game.getPlayer(data.dead_player));
+    game.updateSpiritismChat(chaman, game.getPlayer(data.dead_player));
 };
 
 // Liste des événements relatifs aux messages
