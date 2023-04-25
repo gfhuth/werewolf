@@ -16,6 +16,7 @@ export default function ChatComponent(): React.ReactElement {
     const [message, setMessage] = useState("");
 
     const sendMessage = (): void => {
+        console.log(gameContext.jourNuit);
         gameContext.sendJsonMessage("CHAT_SENT", { date: new Date().getTime(), content: message, chat_type: 0 });
     };
 
