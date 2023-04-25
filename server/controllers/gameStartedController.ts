@@ -99,7 +99,7 @@ function startNight(game: Game): void {
     //Envoie a chaque joueur un nouveau game recap
     for (const player of game.getAllPlayers()) player.sendNewGameRecap();
 
-    // TODO: Update table player 
+    // TODO: Update table player
 
     // call startDay at the end of the day
     setTimeout(() => startDay(game), game.getGameParam().nightLength);
@@ -115,6 +115,7 @@ export async function initGame(gameId: number): Promise<void> {
     if (game.getGameParam().nbPlayerMin > game.getNbOfPlayers()) {
         Game.removeGame(game.getGameId());
         await database.deleteFrom("games").where("games.id", "=", game.getGameId()).executeTakeFirst();
+        game.getAllPlayers().forEach((player) => player.sendMessage("GAME_DELETED", { message: "game deleted" }));
         return;
     }
 
