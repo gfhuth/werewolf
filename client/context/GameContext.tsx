@@ -60,6 +60,9 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     const { sendJsonMessage } = useWebSocket(WS, {
         onOpen: () => {
             LOGGER.log("Connection opened");
+            //TODO: AJOUTER UNE REQUTE POUR RECUPERER LES INFORMATIONS DES PARTIES
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            sendMessage("GET_ALL_INFO", {});
         },
         onMessage: onMessage,
         onError: onError,
@@ -70,6 +73,11 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     const errorHandler = (data: { status: number; message: string }): void => {
         LOGGER.log(`Websocket error : ${data.message}`);
         setMessageErreur(data.message);
+    };
+
+    const infoParties = (data: { status: number; message: string }): void => {
+        LOGGER.log(`Websocket information partie : ${JSON.stringify(data)}`);
+        //setJourNuit
     };
 
     const registerEventHandler = (event: string, callback: EventHandlerCallback): void => {
@@ -90,6 +98,8 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     useEffect(() => {
         registerEventHandler("CHAT_ERROR", errorHandler);
         registerEventHandler("VOTE_ERROR", errorHandler);
+        registerEventHandler("GAME_DELETED", errorHandler);
+        registerEventHandler("GET_ALL_INFO_RETURN", infoParties);
     }, []);
 
     return <GameContext.Provider value={{ jourNuit, setJourNuit, eventHandlers, registerEventHandler, onMessage, sendJsonMessage: sendMessage }}>{props.children}</GameContext.Provider>;

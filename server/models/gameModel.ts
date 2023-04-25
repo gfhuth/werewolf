@@ -269,13 +269,10 @@ export class Game {
  * @param {User} user UserObject not null
  * @param {Json} data Data given by the message (unused here)
  */
-function gameRecapRequest(game: Game, user: User, data: Record<string, any>): void {
-    // user send a request for game
-    // 1. found player
-    const player = game.getPlayer(user.getUsername());
+function gameRecapRequest(game: Game, player: Player, data: Record<string, any>): void {
     if (!player) throw new Error("this user isn't in the game");
     // 3. Use sendMessage of user to send the json
     player.sendNewGameRecap();
 }
 
-Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);
+Event.registerHandlers("GET_ALL_INFO", gameRecapRequest);

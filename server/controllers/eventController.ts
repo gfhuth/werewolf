@@ -1,8 +1,8 @@
 import { Game } from "../models/gameModel";
-import { User } from "../models/userModel";
 import { EventType } from "./event/eventTypes";
+import { Player } from "../models/playerModel";
 
-type functionHandler = (game: Game, user: User, data: Record<string, any>) => void;
+type functionHandler = (game: Game, player: Player, data: Record<string, any>) => void;
 
 export class Event {
 
@@ -25,7 +25,7 @@ export class Event {
      * @param {string} event nom de l'événement
      * @param {functionHandler} func méthode à exécuter lors de l'arrivée de l'événement
      */
-    public static registerHandlers<T extends keyof EventType>(event: T, func: (game: Game, user: User, data: EventType[T]) => void): void {
+    public static registerHandlers<T extends keyof EventType>(event: T, func: (game: Game, user: Player, data: EventType[T]) => void): void {
         if (Event.eventHandlers[event]) Event.eventHandlers[event].push(func);
         else Event.eventHandlers[event] = [func];
     }
