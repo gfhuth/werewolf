@@ -9,7 +9,7 @@ const newVote = async (game: Game, user: User, data: jsonVote): Promise<void> =>
     const player: Player = game.getPlayer(user.getUsername());
 
     if (!game.getVote()) {
-        player.sendError("VOTE_ERROR", 403, "Vote not init");
+        player.sendError("VOTE_ERROR", 403, "Game hasn't started");
         return;
     }
     if (game.getVote().getType() !== data.vote_type) {
