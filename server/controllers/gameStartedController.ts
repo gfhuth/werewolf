@@ -4,6 +4,7 @@ import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "../models/powersModel";
 import { Human, Werewolf } from "../models/villagerModel";
 import { Vote, Vote_type } from "../models/voteModel";
+import database from "../util/database";
 
 function randint(a: number, b: number): number {
     return Math.floor(Math.random() * b) + a;
@@ -112,11 +113,11 @@ function startNight(game: Game): void {
  * */
 export async function initGame(gameId: number): Promise<void> {
     const game: Game = Game.getGame(gameId);
-    // if (game.getGameParam().nbPlayerMin > game.getNbOfPlayers()) {
-    //     Game.removeGame(game.getGameId());
-    //     await database.deleteFrom("games").where("games.id", "=", game.getGameId()).executeTakeFirst();
-    //     return;
-    // }
+    if (game.getGameParam().nbPlayerMin > game.getNbOfPlayers()) {
+        Game.removeGame(game.getGameId());
+        await database.deleteFrom("games").where("games.id", "=", game.getGameId()).executeTakeFirst();
+        return;
+    }
 
     // Initialisation des chats
     game.initChats();

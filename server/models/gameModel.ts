@@ -282,6 +282,8 @@ export class Game {
 
 }
 
-// function gameRecapRequest(game: Game, user: User, data: Record<string, any>) {}
+function gameRecapRequest(game: Game, user: User, data: Record<string, any>): void {
+    console.log("TODO");
+}
 
-// Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);
+Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);
