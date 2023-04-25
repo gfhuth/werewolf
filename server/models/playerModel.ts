@@ -43,8 +43,26 @@ export class Player {
         if (this.role === null) this.role = role;
     }
 
-    public contaminated(): void {
-        if (this.role instanceof Human) this.role = new Werewolf();
+    // Maybe we need to wait to contamine, and notify game.
+    public contaminated(): boolean {
+        if (this.role instanceof Human) {
+            this.role = new Werewolf();
+            return true;
+        }
+        return false;
+    }
+
+    public usePower(): void {
+        if (this.role.getPower() != null) {
+            if (!this.role.getPower().getPowerAlreadyUsed()) {
+                const data: Record<string, any> = this.role.getPower().usePower();
+                this.sendMessage("USE_POWER_VALID", data);
+                return;
+            } else {
+                this.sendError("USE_POWER", 403, "Problem was already used");
+            }
+        }
+        this.sendError("USE_POWER", 403, "You don't have");
     }
 
     public sendMessage(event: string, data: Record<string, any>): void {

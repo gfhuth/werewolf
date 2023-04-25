@@ -1,30 +1,33 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 import { Player } from "./playerModel";
 
 export abstract class Power {
-    
-    public abstract showPower(): void;
-    public abstract usePower(): void;
+
+    private powerAlreadyUsed: boolean;
+
+    public getPowerAlreadyUsed(): boolean {
+        return this.powerAlreadyUsed;
+    }
+
+    public abstract usePower(): Record<string, any>;
     public getPowerValue(): number {
         return -1;
     }
     public abstract isHumanPower(): Boolean;
     public abstract isWerewolfPower(): Boolean;
     public abstract setVictim(player: Player): void;
-    
+
 }
 
-export type HumanPower = Power;
+export interface HumanPower extends Power{}
 
-export type WerewolfPower = Power;
+export interface WerewolfPower extends Power{}
 
-export class Insomnia implements HumanPower {
+export class Insomnia extends Power implements HumanPower {
 
-    showPower(): void {
-        console.log("Insomnia options:");
-    }
-
-    usePower(): void {
+    usePower(): Record<string, any> {
         console.log("Observe Werewolf chat");
+        return {};
     }
 
     isHumanPower(): Boolean {
@@ -43,16 +46,13 @@ export class Insomnia implements HumanPower {
 
 }
 
-export class Contamination implements WerewolfPower {
+export class Contamination extends Power implements WerewolfPower {
 
     private victim: Player;
 
-    showPower(): void {
-        console.log("Contamination options:");
-    }
-
-    usePower(): void {
+    usePower(): Record<string, any> {
         this.victim.contaminated();
+        return {};
     }
 
     setVictim(player: Player): void {
@@ -72,16 +72,13 @@ export class Contamination implements WerewolfPower {
 
 }
 
-export class Spiritism implements HumanPower, WerewolfPower {
+export class Spiritism extends Power implements HumanPower, WerewolfPower {
 
     private victim: Player;
 
-    showPower(): void {
-        console.log("Spiritism options:");
-    }
-
-    usePower(): void {
+    usePower(): Record<string, any> {
         console.log("Contamine victim");
+        return {};
     }
 
     setVictim(player: Player): void {
@@ -101,16 +98,15 @@ export class Spiritism implements HumanPower, WerewolfPower {
 
 }
 
-export class Clairvoyant implements HumanPower, WerewolfPower {
+export class Clairvoyant extends Power implements HumanPower, WerewolfPower {
 
     private victim: Player;
 
-    showPower(): void {
-        console.log("clairvoyant options:");
-    }
+    usePower(): Record<string, any> {
+        const victimRole = this.victim.getRole();
+        const victimPower = victimRole.getPower();
 
-    usePower(): void {
-        console.log("See victim's power");
+        return { Player: this.victim.getUser().getUsername(), Villager: victimRole.getRoleValue(), Power: victimPower.getPowerValue() };
     }
 
     setVictim(player: Player): void {

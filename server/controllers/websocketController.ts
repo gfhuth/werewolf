@@ -51,8 +51,8 @@ export class WebsocketConnection {
                     }
                 } catch (e) {
                     this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 403, message: "Bad Authentication" }));
-                        LOGGER.log(`Authentication failed`);
-                        return;
+                    LOGGER.log(`Authentication failed`);
+                    return;
                 }
                 const username: string = (jwt.decode(token) as { username: string }).username;
 
@@ -69,10 +69,10 @@ export class WebsocketConnection {
                 // Set user
                 this.user = User.getUser(username);
                 this.user.setWebsocket(this.ws);
-                
+
                 // Envoie des sockettes en attentes
                 this.user.sendWaitingMessages();
-                
+
                 this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 200, message: "User authenticated" }));
                 LOGGER.log(`Authentication succeeded : user ${this.user.getUsername()} logged in`);
                 return;

@@ -14,6 +14,11 @@ export enum GameStatus {
     NUIT = 1,
 }
 
+export enum Role {
+    VILLAGER,
+    WEREWOLF,
+}
+
 export type GameParam = {
     nbPlayerMin: number;
     nbPlayerMax: number;
@@ -139,8 +144,16 @@ export class Game {
         this.playersList
             .sort(() => Math.random() - Math.random())
             .slice(0, nbWerewolf)
-            .forEach((player) => player.setRole(new Werewolf()));
-        this.playersList.filter((player) => player.getRole() === null).forEach((player) => player.setRole(new Human()));
+            .forEach((player) => {
+                player.setRole(new Werewolf());
+                player.sendMessage("SET_ROLE", { role: Role.WEREWOLF });
+            });
+        this.playersList
+            .filter((player) => player.getRole() === null)
+            .forEach((player) => {
+                player.setRole(new Human());
+                player.sendMessage("SET_ROLE", { role: Role.VILLAGER });
+            });
     }
 
     /**
