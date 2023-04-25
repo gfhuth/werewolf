@@ -1,27 +1,25 @@
 import { Player } from "./playerModel";
 
-export enum Vote_type {
+export enum VoteType {
     VOTE_VILLAGE,
     VOTE_WEREWOLF,
 }
 
-export type jsonVote = { vote_type: Vote_type; vote: string };
-
 export class Vote {
 
-    private type: Vote_type;
+    private type: VoteType;
     private votes: { [key: string]: Player } = {};
     private participants: Array<Player>;
     private result: Player;
 
-    constructor(type: Vote_type, players: Array<Player>) {
+    constructor(type: VoteType, players: Array<Player>) {
         this.type = type;
         this.participants = players;
         players.forEach((player) => (this.votes[player.getUser().getUsername()] = null));
         this.result = null;
     }
 
-    public getType(): Vote_type {
+    public getType(): VoteType {
         return this.type;
     }
 

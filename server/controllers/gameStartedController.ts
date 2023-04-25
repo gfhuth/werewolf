@@ -3,7 +3,7 @@ import { Game, GameStatus } from "../models/gameModel";
 import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "../models/powersModel";
 import { Human, Werewolf } from "../models/villagerModel";
-import { Vote, Vote_type } from "../models/voteModel";
+import { Vote, VoteType } from "../models/voteModel";
 import database from "../util/database";
 
 function randint(a: number, b: number): number {
@@ -71,7 +71,7 @@ function startDay(game: Game): void {
     game.getChat(Chat_type.CHAT_SPIRITISM).resetChatMembers([]);
 
     // Initialisation du vote
-    game.setVote(new Vote(Vote_type.VOTE_VILLAGE, game.getAllPlayers()));
+    game.setVote(new Vote(VoteType.VOTE_VILLAGE, game.getAllPlayers()));
 
     //Envoie a chaque joueur un nouveau game recap
     for (const player of game.getAllPlayers()) player.sendNewGameRecap();
@@ -94,7 +94,7 @@ function startNight(game: Game): void {
     // Initialisation du vote
     game.setVote(
         new Vote(
-            Vote_type.VOTE_WEREWOLF,
+            VoteType.VOTE_WEREWOLF,
             game.getAllPlayers().filter((player) => player.getRole() instanceof Werewolf)
         )
     );

@@ -1,4 +1,4 @@
-import { Vote_type } from "../models/voteModel";
+import { VoteType } from "../models/voteModel";
 import { Client } from "./websocketsTest";
 import { token1, token2, username1 } from "./usersTest";
 
@@ -33,7 +33,7 @@ describe("Test votes", () => {
                 game_id: 1,
                 event: "VOTE_SENT",
                 data: {
-                    vote_type: Vote_type.VOTE_WEREWOLF,
+                    vote_type: VoteType.VOTE_WEREWOLF,
                     vote: username1
                 }
             })
@@ -44,7 +44,7 @@ describe("Test votes", () => {
                 game_id: 1,
                 event: "VOTE_SENT",
                 data: {
-                    vote_type: Vote_type.VOTE_WEREWOLF,
+                    vote_type: VoteType.VOTE_WEREWOLF,
                     vote: username1
                 }
             })
@@ -54,11 +54,11 @@ describe("Test votes", () => {
         const res2: Record<string, any> = await client2.getNextMessage();
 
         if (res1.event === "VOTE_RECEIVED") {
-            expect(res1.data.vote_type).toEqual(Vote_type.VOTE_WEREWOLF);
+            expect(res1.data.vote_type).toEqual(VoteType.VOTE_WEREWOLF);
             expect(res2.event).toEqual("VOTE_ERROR");
         } else {
             expect(res2.event).toEqual("VOTE_RECEIVED");
-            expect(res1.data.vote_type).toEqual(Vote_type.VOTE_WEREWOLF);
+            expect(res1.data.vote_type).toEqual(VoteType.VOTE_WEREWOLF);
         }
     });
 });

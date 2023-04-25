@@ -1,5 +1,5 @@
 import { Chat_type, Message } from "../../models/chatModel";
-import { Vote_type } from "../../models/voteModel";
+import { VoteType } from "../../models/voteModel";
 
 export type EventType = {
     CHAT_RECEIVED: {
@@ -34,14 +34,14 @@ export type EventType = {
         // Empty
     };
     VOTE_SENT: {
-        vote_type: Vote_type;
+        vote_type: VoteType;
         vote: string;
     };
     VOTE_RECEIVED: {
-        vote_type: Vote_type;
+        vote_type: VoteType;
     };
     VOTE_VALID: {
-        vote_type: Vote_type;
+        vote_type: VoteType;
         result: string;
     };
 };
