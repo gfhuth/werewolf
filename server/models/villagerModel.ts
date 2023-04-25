@@ -6,7 +6,7 @@ export abstract class Villager {
     public abstract setPower(power: Power): void;
     public abstract getPower(): Power;
     public static load(type: number): Villager {
-        if (type == 0)
+        if (type === 0)
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
             return new Human();
         // eslint-disable-next-line @typescript-eslint/no-use-before-define

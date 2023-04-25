@@ -11,10 +11,10 @@ const usePower = async (game: Game, user: User, data: {victimId: string}): Promi
     const player: Player = game.getPlayer(user.getUsername());
     const power = player.getRole().getPower();
     const victim = game.getPlayer(data.victimId);
-    if (power == null) {
+    if (power === null) {
         player.sendError("USE_POWER", 403, "You don't have power");
         return;
-    } else if (victim == null) {
+    } else if (victim === null) {
         player.sendError("USE_POWER", 403, "The victim isn't in the game");
         return;
     } else if ( power instanceof Contamination || 

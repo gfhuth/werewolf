@@ -1,5 +1,5 @@
 import { Chat_type } from "../models/chatModel";
-import { Game } from "../models/gameModel";
+import { Game, GameStatus } from "../models/gameModel";
 import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "../models/powersModel";
 import { Human, Werewolf } from "../models/villagerModel";
@@ -56,7 +56,6 @@ function setupGame(game: Game): void {
         players[i].setRole(new Human());
         if (i - startIndex < powersHuman.length) players[i].getRole().setPower(powersHuman[i]);
     }
-    console.log("affectation Complete");
 }
 
 /** Apply all action happend during the night and lunch a day
@@ -84,7 +83,7 @@ function startDay(game: Game): void {
  * @param {Game} game Game to apply change
  */
 function startNight(game: Game): void {
-    console.log(`The night falling, status : ${game.getStatus().status} for game :${game.getGameId()}`);
+    console.log(`The night is falling, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Réinitialisation des chats
     game.getChat(Chat_type.CHAT_WEREWOLF).resetMessages();
     game.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
@@ -100,7 +99,7 @@ function startNight(game: Game): void {
     //Envoie a chaque joueur un nouveau game recap
     for (const player of game.getAllPlayers()) player.sendNewGameRecap();
 
-    // TODO: Update table player
+    // TODO: Update table player 
 
     // call startDay at the end of the day
     setTimeout(() => startDay(game), game.getGameParam().nightLength);
@@ -125,10 +124,10 @@ export async function initGame(gameId: number): Promise<void> {
     // Initialisation des chats
     game.initChats();
     const gameStatus = game.getStatus();
-    if (gameStatus.status == 0) setupGame(game);
+    if (gameStatus.status === GameStatus.JOUR) setupGame(game);
 
     // Lancement du jours ou de la nuit selon la date actuel
     console.log(`game ${gameId} successfuly initialized`);
-    if (gameStatus.status % 2 == 0) startDay(game);
+    if (gameStatus.status % 2 === GameStatus.JOUR) startDay(game);
     else startNight(game);
 }

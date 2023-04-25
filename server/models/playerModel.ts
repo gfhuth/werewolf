@@ -40,14 +40,13 @@ export class Player {
     }
 
     public setRole(role: Villager): void {
-        if (this.role == null) this.role = role;
+        if (this.role === null) this.role = role;
     }
 
     public contaminated(): void {
-        if (this.role instanceof Human)
-            this.role = new Werewolf;
+        if (this.role instanceof Human) this.role = new Werewolf();
     }
-    
+
     public sendMessage(event: string, data: Record<string, any>): void {
         this.user.sendMessage({ event: event, game_id: this.game.getGameId(), data: data });
     }
@@ -61,6 +60,7 @@ export class Player {
     public sendNewGameRecap(): void {
         let powerNumber: number;
         // because power can be null
+        if (!this.getRole()) throw new Error(`player ${this.getUser().getUsername()} don't have role set on game ${this.game.getGameId()}.`);
         if (this.getRole().getPower()) powerNumber = this.getRole().getPower().getPowerValue();
         else powerNumber = -1;
 
