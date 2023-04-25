@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../App";
 import Background from "../components/Background";
 import NavigationUI from "../components/NavigationUI";
@@ -20,6 +20,7 @@ type Partie = {
 
 export default function Home(): React.ReactElement {
     const navigation = useNavigation<StackNavigation>();
+    const isFocused = useIsFocused();
 
     const createGame = (): void => {
         navigation.navigate("CreateGame");
@@ -88,9 +89,11 @@ export default function Home(): React.ReactElement {
     };
 
     useEffect(() => {
-        requestListeDesParties();
-        requestListeDesPartiesUser();
-    }, []);
+        if (isFocused) {
+            requestListeDesParties();
+            requestListeDesPartiesUser();
+        }
+    }, [isFocused]);
 
     return (
         <Background>
@@ -125,8 +128,8 @@ export default function Home(): React.ReactElement {
 
                 <View>
                     <Heading color={"light.100"}>Liste de vos parties:</Heading>
-                    {listeParties &&
-                        listeParties.map((informationPartie) => (
+                    {listePartiesUser &&
+                        listePartiesUser.map((informationPartie) => (
                             <View key={informationPartie.id}>
                                 <Box padding={3} bgColor={"light.100"} borderRadius={5}>
                                     <Text>Nombre de joueur présent :{informationPartie.currentNumberOfPlayer}</Text>
