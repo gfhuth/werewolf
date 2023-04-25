@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import useWebSocket, { SendMessage } from "react-use-websocket";
 import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
 import Logger from "../utils/Logger";
+import { useToast } from "native-base";
 
 export type EventHandlerCallback = (data: any) => void;
 
@@ -22,11 +23,28 @@ export const GameContext = React.createContext<{
 
 export function GameProvider(props: { children: React.ReactNode; gameId: number }): React.ReactElement {
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
+    const toast = useToast();
+
+    const setMessageErreur = (messageErreur: string): void => {
+        toast.show({
+            title: "Erreur",
+            description: messageErreur,
+            variant: "subtle",
+            borderColor: "red.700",
+            borderLeftWidth: 3
+        });
+    };
 
     const onMessage = (event: MessageEvent<any>): void => {
         LOGGER.log(`Message received : ${JSON.stringify(event)}`);
         try {
             const data = JSON.parse(event.data);
+            LOGGER.log(`Message received data : ${data.event}`);
+
+            if (data.event === "CHAT_ERROR") 
+                setMessageErreur(data.message);
+            
+
             const eventName = data.event as string;
             const handler = eventHandlers[eventName];
             if (handler) handler(data.data);

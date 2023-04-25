@@ -40,14 +40,31 @@ export class Player {
     }
 
     public setRole(role: Villager): void {
-        if (this.role == null) this.role = role;
+        if (this.role === null) this.role = role;
     }
 
-    public contaminated(): void {
-        if (this.role instanceof Human)
-            this.role = new Werewolf;
+    // Maybe we need to wait to contamine, and notify game.
+    public contaminated(): boolean {
+        if (this.role instanceof Human) {
+            this.role = new Werewolf();
+            return true;
+        }
+        return false;
     }
-    
+
+    public usePower(): void {
+        if (this.role.getPower() != null) {
+            if (!this.role.getPower().getPowerAlreadyUsed()) {
+                const data: Record<string, any> = this.role.getPower().usePower();
+                this.sendMessage("USE_POWER_VALID", data);
+                return;
+            } else {
+                this.sendError("USE_POWER", 403, "Problem was already used");
+            }
+        }
+        this.sendError("USE_POWER", 403, "You don't have");
+    }
+
     public sendMessage(event: string, data: Record<string, any>): void {
         this.user.sendMessage({ event: event, game_id: this.game.getGameId(), data: data });
     }
@@ -61,6 +78,7 @@ export class Player {
     public sendNewGameRecap(): void {
         let powerNumber: number;
         // because power can be null
+        if (!this.getRole()) throw new Error(`player ${this.getUser().getUsername()} don't have role set on game ${this.game.getGameId()}.`);
         if (this.getRole().getPower()) powerNumber = this.getRole().getPower().getPowerValue();
         else powerNumber = -1;
 
