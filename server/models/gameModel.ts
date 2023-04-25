@@ -266,13 +266,11 @@ export class Game {
 
 /** Envoie une websocket a un user contenant le récapitulatif de la partie
  * @param {Game} game GameObject not null
- * @param {User} user UserObject not null
+ * @param {Player} player UserObject not null
  * @param {Json} data Data given by the message (unused here)
  */
-function gameRecapRequest(game: Game, player: Player, data: Record<string, any>): void {
-    if (!player) throw new Error("this user isn't in the game");
-    // 3. Use sendMessage of user to send the json
-    player.sendNewGameRecap();
+function getInfoGame(game: Game, player: Player, data: {}): void {
+    player.sendMessage("GET_ALL_MESSAGE", { status: game.getStatus().status });
 }
 
-Event.registerHandlers("GET_ALL_INFO", gameRecapRequest);
+Event.registerHandlers("GET_ALL_INFO", getInfoGame);

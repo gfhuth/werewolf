@@ -85,7 +85,7 @@ export class Player {
 
         this.user.sendMessage({
             game_id: this.game.getGameId(),
-            event: "GAME_RECAP",
+            event: "GET_ALL_INFO_GAME",
             data: {
                 game: this.game.getGameRecap(),
                 player: {
