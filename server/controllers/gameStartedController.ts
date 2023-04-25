@@ -115,6 +115,7 @@ export async function initGame(gameId: number): Promise<void> {
     if (game.getGameParam().nbPlayerMin > game.getNbOfPlayers()) {
         Game.removeGame(game.getGameId());
         await database.deleteFrom("games").where("games.id", "=", game.getGameId()).executeTakeFirst();
+        game.getAllPlayers().forEach((player) => player.sendMessage("GAME_DELETED", {}));
         return;
     }
 
