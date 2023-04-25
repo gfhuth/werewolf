@@ -270,7 +270,7 @@ export class Game {
  * @param {Json} data Data given by the message (unused here)
  */
 function getInfoGame(game: Game, player: Player, data: {}): void {
-    player.sendMessage("GET_ALL_MESSAGE", { status: game.getStatus().status });
+    player.sendMessage("GET_ALL_INFO_GAME", { status: game.getStatus().status });
 }
 
 Event.registerHandlers("GET_ALL_INFO", getInfoGame);

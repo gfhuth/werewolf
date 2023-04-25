@@ -13,8 +13,12 @@ export type EventType = {
         chat_type: Chat_type;
         content: string;
     };
+    GET_ALL_INFO: {}
     GET_ALL_INFO_CHAT: {
         [key in Chat_type]: Array<Message>
+    }
+    GET_ALL_INFO_GAME: {
+        status: number
     }
     UPDATE_CHAT_SPIRITSM: {
         dead_player: string;
