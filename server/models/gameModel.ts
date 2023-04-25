@@ -9,9 +9,9 @@ import { Event } from "../controllers/eventController";
 import { Vote } from "./voteModel";
 
 export enum GameStatus {
-    NOT_STARTED = 0,
-    JOUR = 1,
-    NUIT = 2,
+    NOT_STARTED = -1,
+    JOUR = 0,
+    NUIT = 1,
 }
 
 export type GameParam = {
@@ -178,7 +178,7 @@ export class Game {
     }
     public removePlayer(player: Player): void {
         for (let i = 0; i < this.playersList.length; i++) {
-            if (this.playersList[i] == player) {
+            if (this.playersList[i] === player) {
                 this.playersList.splice(i, 1);
                 this.currentNumberOfPlayer--;
             }
@@ -186,17 +186,17 @@ export class Game {
     }
 
     public getGameRecap(): Record<string, any> {
-        const idList: Array<number> = [];
-        const idDeathList: Array<number> = [];
+        const usernameList: Array<string> = [];
+        const usernameDeathList: Array<string> = [];
 
         for (const player of this.playersList) {
-            idList.push(player.getUser().getUserId());
-            if (player.isDeath()) idDeathList.push(player.getUser().getUserId());
+            usernameList.push(player.getUser().getUsername());
+            if (player.isDeath()) usernameDeathList.push(player.getUser().getUsername());
         }
         return {
             status: this.getStatus(),
-            idList: idList,
-            deathPlayer: idDeathList
+            playerInGame: usernameList,
+            deathPlayer: usernameDeathList
         };
     }
 
@@ -267,7 +267,7 @@ export class Game {
             const game: Game = new Game(elem.id, gameParams);
             Game.addGameInList(game);
             // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
-            if (game.getStatus().status == -1) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
+            if (game.getStatus().status === GameStatus.NOT_STARTED) setTimeout(() => initGame(game.getGameId()), elem.startDate - Date.now());
             else initGame(game.getGameId());
         }
 
@@ -282,6 +282,18 @@ export class Game {
 
 }
 
-// function gameRecapRequest(game: Game, user: User, data: Record<string, any>) {}
+/** Envoie une websocket a un user contenant le récapitulatif de la partie
+ * @param {Game} game GameObject not null
+ * @param {User} user UserObject not null
+ * @param {Json} data Data given by the message (unused here)
+ */
+function gameRecapRequest(game: Game, user: User, data: Record<string, any>): void {
+    // user send a request for game
+    // 1. found player
+    const player = game.getPlayer(user.getUsername());
+    if (!player) throw new Error("this user isn't in the game");
+    // 3. Use sendMessage of user to send the json
+    player.sendNewGameRecap();
+}
 
-// Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);
+Event.registerHandlers("GAME_RECAP_REQUEST", gameRecapRequest);

@@ -9,11 +9,11 @@ const usePower = async (game: Game, user: User, data: { victimId: string }): Pro
     const player = game.getPlayer(user.getUsername());
     const power = player.getRole().getPower();
     const victim = game.getPlayer(data.victimId);
-    if (power == null) {
-        player.sendError("USE_POWER_ERROR", 403, "You don't have power");
+    if (power === null) {
+        player.sendError("USE_POWER", 403, "You don't have power");
         return;
     } else if (victim === null) {
-        player.sendError("USE_POWER_ERROR", 403, "The victim isn't in the game");
+        player.sendError("USE_POWER", 403, "The victim isn't in the game");
         return;
     } else if (power instanceof Contamination || power instanceof Spiritism || power instanceof Clairvoyant) {
         if (!data.victimId) {
