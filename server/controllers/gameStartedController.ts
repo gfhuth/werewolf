@@ -118,11 +118,10 @@ export async function initGame(gameId: number): Promise<void> {
         return;
     }
 
-    // Initialisation des rôles
-    game.initRole();
-
     // Initialisation des chats
     game.initChats();
+
+    //Initialisation des roles et des pouvoirs
     const gameStatus = game.getStatus();
     if (gameStatus.status === GameStatus.JOUR) setupGame(game);
 

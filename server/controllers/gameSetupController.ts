@@ -231,7 +231,7 @@ export const leaveGame = async (req: Request, res: Response): Promise<void> => {
 
         // Supressions du joueur dans la liste des joueurs de la partie
         const player: Player = game.getPlayer(user.getUsername());
-        game.removePlayer(player);
+        game.removePlayer(player.getUser().getUsername());
 
         // Insert a new record in the user_games table
         await database.deleteFrom("players").where("players.game", "=", gameId).where("players.name", "=", user.getUsername()).executeTakeFirst();
