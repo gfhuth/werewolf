@@ -10,11 +10,15 @@ export type EventHandlerCallback = (data: any) => void;
 const LOGGER = new Logger("WEBSOCKET");
 
 export const GameContext = React.createContext<{
+    jourNuit : string;
+    setJourNuit:(token: string) => void;
     eventHandlers: { [key: string]: EventHandlerCallback };
     registerEventHandler:(event: string, callback: EventHandlerCallback) => void;
     sendJsonMessage: (event: string, data: any) => void;
     onMessage: (event: MessageEvent<any>) => void;
         }>({
+            jourNuit: "",
+            setJourNuit: () => null,
             eventHandlers: {},
             registerEventHandler: () => null,
             onMessage: () => null,
@@ -23,27 +27,37 @@ export const GameContext = React.createContext<{
 
 export function GameProvider(props: { children: React.ReactNode; gameId: number }): React.ReactElement {
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
+    const [jourNuit, setJourNuit] = useState("");
     const toast = useToast();
 
     const setMessageErreur = (messageErreur: string): void => {
         toast.show({
             title: "Erreur",
             description: messageErreur,
+            placement: "top",
             variant: "subtle",
             borderColor: "red.700",
             borderLeftWidth: 3
         });
     };
 
+    const traitementMessage = (data: any): void => {
+        if (data.event === "CHAT_ERROR" || data.event === "VOTE_ERROR") setMessageErreur(data.message);
+        if (data.event === "GAME_RECAP") {
+            LOGGER.log(`/////////: GAME_RECAP: ${JSON.stringify(data)}`);
+
+            setJourNuit(data.data.game.status.etat);
+        } 
+    };
+
     const onMessage = (event: MessageEvent<any>): void => {
         LOGGER.log(`Message received : ${JSON.stringify(event)}`);
         try {
             const data = JSON.parse(event.data);
-            LOGGER.log(`Message received data : ${data.event}`);
+            LOGGER.log(`ERREUR Message received : ${data.event}`);
 
-            if (data.event === "CHAT_ERROR") 
-                setMessageErreur(data.message);
-            
+            //TODO: A voir si le placement est bon
+            traitementMessage(data);
 
             const eventName = data.event as string;
             const handler = eventHandlers[eventName];
