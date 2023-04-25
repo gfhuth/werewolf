@@ -1,12 +1,10 @@
 import { Game } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
 import { Clairvoyant, Contamination, Spiritism } from "../../models/powersModel";
-import { User } from "../../models/userModel";
 import { Human, Werewolf } from "../../models/villagerModel";
 import { Event } from "../eventController";
 
-const usePower = async (game: Game, user: User, data: { victimId: string }): Promise<void> => {
-    const player = game.getPlayer(user.getUsername());
+const usePower = async (game: Game, player: Player, data: { victimId: string }): Promise<void> => {
     const power = player.getRole().getPower();
     const victim = game.getPlayer(data.victimId);
     if (power === null) {
