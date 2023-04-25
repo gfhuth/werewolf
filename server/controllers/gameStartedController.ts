@@ -1,4 +1,4 @@
-import { Chat_type } from "../models/chatModel";
+import { ChatType } from "../models/chatModel";
 import { Game, GameStatus } from "../models/gameModel";
 import { Player } from "../models/playerModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "../models/powersModel";
@@ -67,8 +67,8 @@ function setupGame(game: Game): void {
 function startDay(game: Game): void {
     console.log(`The sun is rising, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Réinitialisation du chat
-    game.getChat(Chat_type.CHAT_VILLAGE).resetMessages();
-    game.getChat(Chat_type.CHAT_SPIRITISM).resetChatMembers([]);
+    game.getChat(ChatType.CHAT_VILLAGE).resetMessages();
+    game.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
     // Initialisation du vote
     game.setVote(new Vote(VoteType.VOTE_VILLAGE, game.getAllPlayers()));
@@ -88,8 +88,8 @@ function startDay(game: Game): void {
 function startNight(game: Game): void {
     console.log(`The night is falling, status : ${game.getStatus().status} for game :${game.getGameId()}`);
     // Réinitialisation des chats
-    game.getChat(Chat_type.CHAT_WEREWOLF).resetMessages();
-    game.getChat(Chat_type.CHAT_SPIRITISM).resetMessages();
+    game.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
+    game.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
 
     // Initialisation du vote
     game.setVote(

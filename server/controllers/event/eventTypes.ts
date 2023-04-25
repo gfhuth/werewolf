@@ -1,16 +1,16 @@
-import { Chat_type, Message } from "../../models/chatModel";
+import { ChatType, Message } from "../../models/chatModel";
 import { VoteType } from "../../models/voteModel";
 
 export type EventType = {
     CHAT_RECEIVED: {
         author: number;
         date: number;
-        chat_type: Chat_type;
+        chat_type: ChatType;
         content: string;
     };
     CHAT_SENT: {
         date: number;
-        chat_type: Chat_type;
+        chat_type: ChatType;
         content: string;
     };
     GAME_DELETED: {
@@ -18,7 +18,7 @@ export type EventType = {
     }
     GET_ALL_INFO: {}
     GET_ALL_INFO_CHAT: {
-        [key in Chat_type]: Array<Message>
+        [key in ChatType]: Array<Message>
     }
     GET_ALL_INFO_GAME: {
         status: number

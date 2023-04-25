@@ -1,4 +1,4 @@
-import { Chat, Chat_type, Message } from "../../models/chatModel";
+import { Chat, ChatType, Message } from "../../models/chatModel";
 import { Game } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
 import database from "../../util/database";
@@ -11,7 +11,7 @@ import { Event } from "../eventController";
  * @param  {Record<string, any>} data Données relatives au message
  * @returns {Promise<void>}
  */
-const newMessage = async (game: Game, player: Player, data: { date: number; chat_type: Chat_type; content: string }): Promise<void> => {
+const newMessage = async (game: Game, player: Player, data: { date: number; chat_type: ChatType; content: string }): Promise<void> => {
     const message: Message = {
         game: game.getGameId(),
         type: data.chat_type,
@@ -28,11 +28,11 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
         player.sendError("CHAT_ERROR", 403, "Game is not started");
         return;
     }
-    if (game.getStatus().status % 2 === 0 && data.chat_type !== Chat_type.CHAT_VILLAGE) {
+    if (game.getStatus().status % 2 === 0 && data.chat_type !== ChatType.CHAT_VILLAGE) {
         player.sendError("CHAT_ERROR", 403, "Chat Werewolf and Chat Spiritism unavailable during the day");
         return;
     }
-    if (game.getStatus().status % 2 === 1 && data.chat_type !== Chat_type.CHAT_WEREWOLF && data.chat_type !== Chat_type.CHAT_SPIRITISM) {
+    if (game.getStatus().status % 2 === 1 && data.chat_type !== ChatType.CHAT_WEREWOLF && data.chat_type !== ChatType.CHAT_SPIRITISM) {
         player.sendError("CHAT_ERROR", 403, "Chat Village unavailable during the night");
         return;
     }
@@ -74,9 +74,9 @@ const updateChat = (game: Game, player: Player, data: { dead_player: string }): 
 const getAllChats = async (game: Game, player: Player, data: {}): Promise<void> => {
     let res: { chat_village: Array<Message>; chat_werewolf: Array<Message>; chat_spiritism: Array<Message> };
 
-    res.chat_village = game.getChat(Chat_type.CHAT_VILLAGE).getMessages();
-    res.chat_werewolf = game.getChat(Chat_type.CHAT_WEREWOLF).getMessages();
-    res.chat_spiritism = game.getChat(Chat_type.CHAT_SPIRITISM).getMessages();
+    res.chat_village = game.getChat(ChatType.CHAT_VILLAGE).getMessages();
+    res.chat_werewolf = game.getChat(ChatType.CHAT_WEREWOLF).getMessages();
+    res.chat_spiritism = game.getChat(ChatType.CHAT_SPIRITISM).getMessages();
 
     player.sendMessage("GET_ALL_INFO_CHAT", res);
 };
