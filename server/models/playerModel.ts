@@ -1,4 +1,4 @@
-import { EventType } from "../controllers/event/eventTypes";
+import { ServerToClientEvents } from "../controllers/event/eventTypes";
 import database from "../util/database";
 import { Game } from "./gameModel";
 import { Contamination } from "./powersModel";
@@ -66,7 +66,7 @@ export class Player {
         this.sendError("USE_POWER", 403, "You don't have");
     }
 
-    public sendMessage<T extends keyof EventType>(event: T, data: EventType[T]): void {
+    public sendMessage<T extends keyof ServerToClientEvents>(event: T, data: ServerToClientEvents[T]): void {
         this.user.sendMessage({ event: event, game_id: this.game.getGameId(), data: data });
     }
 

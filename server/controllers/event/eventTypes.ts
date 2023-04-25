@@ -1,28 +1,13 @@
 import { Chat_type, Message } from "../../models/chatModel";
 import { VoteType } from "../../models/voteModel";
 
-export type EventType = {
-    CHAT_RECEIVED: {
-        author: number;
-        date: number;
-        chat_type: Chat_type;
-        content: string;
-    };
+export type ClientToServerEvents = {
     CHAT_SENT: {
         date: number;
         chat_type: Chat_type;
         content: string;
     };
-    GAME_DELETED: {
-        message: string
-    }
-    GET_ALL_INFO: {}
-    GET_ALL_INFO_CHAT: {
-        [key in Chat_type]: Array<Message>
-    }
-    GET_ALL_INFO_GAME: {
-        status: number
-    }
+    GET_ALL_INFO: {};
     UPDATE_CHAT_SPIRITSM: {
         dead_player: string;
     };
@@ -33,12 +18,27 @@ export type EventType = {
         // FIXME ça n'a aucun sens
         victimId: string;
     };
-    USE_POWER_VALID: {
-        // Empty
-    };
     VOTE_SENT: {
         vote_type: VoteType;
         vote: string;
+    };
+};
+
+export type ServerToClientEvents = {
+    CHAT_RECEIVED: {
+        author: number;
+        date: number;
+        chat_type: Chat_type;
+        content: string;
+    };
+    GAME_DELETED: {
+        message: string;
+    };
+    GET_ALL_INFO_CHAT: {
+        [key in Chat_type]: Array<Message>;
+    };
+    GET_ALL_INFO_GAME: {
+        status: number;
     };
     VOTE_RECEIVED: {
         vote_type: VoteType;
@@ -47,5 +47,7 @@ export type EventType = {
         vote_type: VoteType;
         result: string;
     };
+    USE_POWER_VALID: {
+        // Empty
+    };
 };
-export type EventName = keyof EventType;
