@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import database from "../util/database";
 import { initGame } from "../controllers/gameStartedController";
 import { Player } from "./playerModel";
-import { Chat, Chat_type } from "./chatModel";
+import { Chat, ChatType } from "./chatModel";
 import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
 import { Event } from "../controllers/eventController";
@@ -118,7 +118,7 @@ export class Game {
         this.vote = vote;
     }
 
-    public getChat(type: Chat_type): Chat {
+    public getChat(type: ChatType): Chat {
         if (this.chatslist.length !== 3) return null;
         return this.chatslist[type];
     }
@@ -127,14 +127,14 @@ export class Game {
      * Initialisation des chats lors de la création d'une partie
      */
     public initChats(): void {
-        this.chatslist.push(new Chat(Chat_type.CHAT_VILLAGE, Array.from(this.playersList.values())));
+        this.chatslist.push(new Chat(ChatType.CHAT_VILLAGE, Array.from(this.playersList.values())));
         this.chatslist.push(
             new Chat(
-                Chat_type.CHAT_WEREWOLF,
+                ChatType.CHAT_WEREWOLF,
                 Array.from(this.playersList.values()).filter((player) => player.getRole() instanceof Werewolf)
             )
         );
-        this.chatslist.push(new Chat(Chat_type.CHAT_SPIRITISM, []));
+        this.chatslist.push(new Chat(ChatType.CHAT_SPIRITISM, []));
     }
     /**
      * Mise à jour du chat du chaman

@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import database from "../util/database";
 import { Player } from "./playerModel";
 
-export enum Chat_type {
+export enum ChatType {
     CHAT_VILLAGE,
     CHAT_WEREWOLF,
     CHAT_SPIRITISM,
@@ -12,17 +12,17 @@ export type Message = { game: number; type: number; user: number; content: strin
 
 export class Chat {
 
-    private type: Chat_type;
+    private type: ChatType;
     private messages: Array<Message>;
     private members: Array<Player>;
 
-    constructor(type: Chat_type, members: Array<Player>) {
+    constructor(type: ChatType, members: Array<Player>) {
         this.type = type;
         this.members = members;
         this.messages = [];
     }
 
-    public getType(): Chat_type {
+    public getType(): ChatType {
         return this.type;
     }
 

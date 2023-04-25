@@ -1,4 +1,4 @@
-import { Chat_type } from "../models/chatModel";
+import { ChatType } from "../models/chatModel";
 import { Client } from "./websocketsTest";
 import { token1, token2 } from "./usersTest";
 
@@ -35,7 +35,7 @@ describe("Test chats", () => {
                 event: "CHAT_SENT",
                 data: {
                     date: now,
-                    chat_type: Chat_type.CHAT_WEREWOLF,
+                    chat_type: ChatType.CHAT_WEREWOLF,
                     content: "Premier message"
                 }
             })
@@ -47,7 +47,7 @@ describe("Test chats", () => {
                 event: "CHAT_SENT",
                 data: {
                     date: now,
-                    chat_type: Chat_type.CHAT_WEREWOLF,
+                    chat_type: ChatType.CHAT_WEREWOLF,
                     content: "Premier message"
                 }
             })
@@ -57,7 +57,7 @@ describe("Test chats", () => {
         const res2: Record<string, any> = await client2.getNextMessage();
 
         if (res1.event === "CHAT_RECEIVED") {
-            expect(res1.data.chat_type).toEqual(Chat_type.CHAT_WEREWOLF);
+            expect(res1.data.chat_type).toEqual(ChatType.CHAT_WEREWOLF);
             expect(res1.data.date).toEqual(now);
             expect(res1.data.content).toEqual("Premier message");
             expect(res2.event).toEqual("CHAT_ERROR");
@@ -65,7 +65,7 @@ describe("Test chats", () => {
             expect(res2.message).toEqual("This player is not a member of this chat");
         } else {
             expect(res2.event).toEqual("CHAT_RECEIVED");
-            expect(res2.data.chat_type).toEqual(Chat_type.CHAT_WEREWOLF);
+            expect(res2.data.chat_type).toEqual(ChatType.CHAT_WEREWOLF);
             expect(res2.data.date).toEqual(now);
             expect(res2.data.content).toEqual("Premier message");
             expect(res1.event).toEqual("CHAT_ERROR");
