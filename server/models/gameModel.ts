@@ -38,7 +38,7 @@ export class Game {
 
     private gameId: number;
     private gameParam: GameParam;
-    private playersList: Player[] = [];
+    private playersList: Map<string, Player> = new Map();
     private chatslist: Array<Chat>;
     private vote: Vote;
     private currentNumberOfPlayer;
@@ -127,35 +127,15 @@ export class Game {
      * Initialisation des chats lors de la création d'une partie
      */
     public initChats(): void {
-        this.chatslist.push(new Chat(Chat_type.CHAT_VILLAGE, this.playersList));
+        this.chatslist.push(new Chat(Chat_type.CHAT_VILLAGE, Array.from(this.playersList.values())));
         this.chatslist.push(
             new Chat(
                 Chat_type.CHAT_WEREWOLF,
-                this.playersList.filter((player) => player.getRole() instanceof Werewolf)
+                Array.from(this.playersList.values()).filter((player) => player.getRole() instanceof Werewolf)
             )
         );
         this.chatslist.push(new Chat(Chat_type.CHAT_SPIRITISM, []));
     }
-
-    public initRole(): void {
-        let nbWerewolf: number;
-        if (this.gameParam.percentageWerewolf === 0) nbWerewolf = 1;
-        else nbWerewolf = Math.ceil((this.playersList.length * this.gameParam.percentageWerewolf) / 100);
-        this.playersList
-            .sort(() => Math.random() - Math.random())
-            .slice(0, nbWerewolf)
-            .forEach((player) => {
-                player.setRole(new Werewolf());
-                player.sendMessage("SET_ROLE", { role: Role.WEREWOLF });
-            });
-        this.playersList
-            .filter((player) => player.getRole() === null)
-            .forEach((player) => {
-                player.setRole(new Human());
-                player.sendMessage("SET_ROLE", { role: Role.VILLAGER });
-            });
-    }
-
     /**
      * Mise à jour du chat du chaman
      * @param {Player} chaman Joueur ayant le pouvoir de spiritisme
@@ -168,16 +148,11 @@ export class Game {
     }
 
     public getAllPlayers(): Array<Player> {
-        return this.playersList;
-    }
-
-    public getAllPlayersId(): Array<number> {
-        return this.playersList.map<number>((player) => player.getUser().getUserId());
+        return Array.from(this.playersList.values());
     }
 
     public getPlayer(username: string): Player {
-        for (const player of this.playersList) if (player.getUser().getUsername() === username) return player;
-        return null;
+        return this.playersList.get(username);
     }
 
     public getNbOfPlayers(): number {
@@ -185,25 +160,20 @@ export class Game {
     }
 
     public addPlayer(player: Player): void {
-        this.playersList.push(player);
+        this.playersList.set(player.getUser().getUsername(), player);
         this.currentNumberOfPlayer++;
     }
-    public removePlayer(player: Player): void {
-        for (let i = 0; i < this.playersList.length; i++) {
-            if (this.playersList[i] === player) {
-                this.playersList.splice(i, 1);
-                this.currentNumberOfPlayer--;
-            }
-        }
+    public removePlayer(username: string): void {
+        this.playersList.delete(username);
     }
 
     public getGameRecap(): Record<string, any> {
         const usernameList: Array<string> = [];
         const usernameDeathList: Array<string> = [];
-
-        for (const player of this.playersList) {
-            usernameList.push(player.getUser().getUsername());
-            if (player.isDeath()) usernameDeathList.push(player.getUser().getUsername());
+        const iterator = this.playersList.values();
+        for (let player = iterator.next(); !player.done; player = iterator.next()) {
+            usernameList.push(player.value.getUser().getUsername());
+            if (player.value.isDeath()) usernameDeathList.push(player.value.getUser().getUsername());
         }
         return {
             status: this.getStatus(),
