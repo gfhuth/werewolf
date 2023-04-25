@@ -72,11 +72,11 @@ const updateChat = (game: Game, player: Player, data: { dead_player: string }): 
 };
 
 const getAllChats = async (game: Game, player: Player, data: {}): Promise<void> => {
-    let res: { chat_village: Array<Message>; chat_werewolf: Array<Message>; chat_spiritism: Array<Message> };
+    let res: { [key in ChatType]: Array<Message> };
 
-    res.chat_village = game.getChat(ChatType.CHAT_VILLAGE).getMessages();
-    res.chat_werewolf = game.getChat(ChatType.CHAT_WEREWOLF).getMessages();
-    res.chat_spiritism = game.getChat(ChatType.CHAT_SPIRITISM).getMessages();
+    res[ChatType.CHAT_VILLAGE] = game.getChat(ChatType.CHAT_VILLAGE).getMessages();
+    res[ChatType.CHAT_WEREWOLF] = game.getChat(ChatType.CHAT_WEREWOLF).getMessages();
+    res[ChatType.CHAT_SPIRITISM] = game.getChat(ChatType.CHAT_SPIRITISM).getMessages();
 
     player.sendMessage("GET_ALL_INFO_CHAT", res);
 };
