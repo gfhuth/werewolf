@@ -9,6 +9,9 @@ import database from "../util/database";
 function randint(a: number, b: number): number {
     return Math.floor(Math.random() * b) + a;
 }
+function randfloat(a: number, b: number): number {
+    return Math.random() * b + a;
+}
 /** Create a new permutation of players
  * @param {Player[]} players players to shuffle
  */
@@ -32,14 +35,14 @@ function setupGame(game: Game): void {
     const powersWerewolf = [];
     const powersHuman = [];
     // On choisi si on utilise les pouvoirs
-    if (randint(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
-    if (randint(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Insomnia());
-    if (randint(0, 1) <= gameParam.probaSpiritisme) {
-        if (randint(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Spiritism());
+    if (randfloat(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
+    if (randfloat(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Insomnia());
+    if (randfloat(0, 1) <= gameParam.probaSpiritisme) {
+        if (randfloat(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Spiritism());
         else powersHuman.push(new Spiritism());
     }
-    if (randint(0, 1) <= gameParam.probaVoyance) {
-        if (randint(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Clairvoyant());
+    if (randfloat(0, 1) <= gameParam.probaVoyance) {
+        if (randfloat(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Clairvoyant());
         else powersHuman.push(new Clairvoyant());
     }
     shuffle(players);
