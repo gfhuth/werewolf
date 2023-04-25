@@ -77,7 +77,7 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
         // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
         const games: Array<{ id: number; startDate: number; hostId: number; nbPlayerMax: number; currentNumberOfPlayer: number }> = await database
             .selectFrom("games")
-            .select(["id", "startDate", "hostId", "nbPlayerMax", "currentNumberOfPlayer"])
+            .select(["games.id", "startDate", "hostId", "nbPlayerMax", "currentNumberOfPlayer"])
             .innerJoin("players", "players.game", "games.id")
             .where("players.user", "=", user.getUserId())
             .execute();
