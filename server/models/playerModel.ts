@@ -71,7 +71,7 @@ export class Player {
     }
 
     public sendError(event: string, status: number, errorMessage: string): void {
-        this.user.sendMessage({ event: event, game_id: this.game.getGameId(), status: status, message: errorMessage });
+        this.user.sendMessage({ event: event, game_id: this.game.getGameId(), data: { status: status, message: errorMessage } });
     }
 
     /** Send at the client a recap of the game
