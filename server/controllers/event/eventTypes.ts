@@ -40,6 +40,9 @@ export type ServerToClientEvents = {
         power: string;
     };
     DAY_STARTS: {};
+    END_GAME: {
+        message: string;
+    };
     GAME_DELETED: {
         message: string;
     };
