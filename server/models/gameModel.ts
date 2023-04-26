@@ -141,38 +141,60 @@ export class Game {
     /** Apply all action happend during the night and lunch a day
      */
     startDay(): void {
-        LOGGER.log(`The sun is rising, status : ${this.getStatus()} for game : ${this.getGameId()}`);
+        LOGGER.log(`game ${this.getGameId()} changed to day`);
+
         // Réinitialisation du chat
         this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
+
         // Initialisation du vote
         this.setVote(new Vote(VoteType.VOTE_VILLAGE, this.getAllPlayers()));
-        //Envoie a chaque joueur un nouveau game recap
-        // TODO : Envoyer l'info de passage au jour au joueur
-        // for (const player of this.getAllPlayers()) player.sendNewGameRecap();
-        // TODO: Update table player
-        this.lunchNextGameMoment();
+
+        const infoPlayers = this.getAllPlayers().map(
+            (player) => ({
+                user: player.getUser().getUsername(),
+                werewolf: player.isWerewolf(),
+                power: player.getPower().getName(),
+                alive: !player.isDead()
+            })
+        );
+
+        // Envoie à chaque joueur un recap de la nuit
+        this.getAllPlayers().forEach((player) => {
+            player.sendMessage("DAY_STARTS", {});
+            player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
+        });
+
+        setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
     }
     /** lunch a night
      */
     startNight(): void {
-        LOGGER.log(`The night is falling, status : ${this.getStatus()} for game : ${this.getGameId()}`);
+        LOGGER.log(`game ${this.getGameId()} changed to night`);
+
         // Réinitialisation des chats
         this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
+
         // Initialisation du vote
         this.setVote(new Vote(VoteType.VOTE_WEREWOLF, this.getWerewolfs()));
-        //Envoie a chaque joueur un nouveau game recap
-        // TODO : Envoyer l'info de passage à la nuit au joueur
-        // for (const player of this.getAllPlayers()) player.sendNewGameRecap();
-        // TODO: Update table player
-        // call startDay at the end of the day
-        this.lunchNextGameMoment();
-    }
 
-    private lunchNextGameMoment(): void {
-        if (this.getStatus() === GameStatus.DAY) setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
-        else setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
+        const infoPlayers = this.getAllPlayers().map(
+            (player) => ({
+                user: player.getUser().getUsername(),
+                werewolf: player.isWerewolf(),
+                power: player.getPower().getName(),
+                alive: !player.isDead()
+            })
+        );
+
+        // Envoie à chaque joueur un recap du jour
+        this.getAllPlayers().forEach((player) => {
+            player.sendMessage("NIGHT_STARTS", {});
+            player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
+        });
+
+        setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
     }
 
     /** Function to add when a game is restored or start
