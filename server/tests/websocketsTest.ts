@@ -3,10 +3,13 @@ dotenv.config();
 
 import * as WebSocket from "ws";
 import { token1 } from "./usersTest";
+import Logger from "../util/Logger";
 
 const { PORT, HOST } = process.env;
 
 const url = `ws://${HOST}:${PORT}`;
+
+const LOGGER = new Logger("WEBSOCKETS_TEST");
 
 export class Client {
 
@@ -33,7 +36,8 @@ export class Client {
 
     public async getNextEvent(event: string): Promise<Record<string, any>> {
         let message: Record<string, any>;
-        while ((message = await this.getNextMessage()).event !== event) {}
+        while ((message = await this.getNextMessage()).event !== event) 
+            LOGGER.log(JSON.stringify(message));
         return message;
     }
 
