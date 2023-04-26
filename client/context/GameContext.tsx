@@ -100,6 +100,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         registerEventHandler("CHAT_ERROR", errorHandler);
         registerEventHandler("VOTE_ERROR", errorHandler);
         registerEventHandler("GAME_DELETED", errorHandler);
+        //TODO Récuperer les joueurs mort
     }, []);
 
     return <GameContext.Provider value={{ jourNuit, setJourNuit, eventHandlers, registerEventHandler, onMessage, sendJsonMessage: sendMessage }}>{props.children}</GameContext.Provider>;
