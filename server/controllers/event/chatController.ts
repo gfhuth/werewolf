@@ -1,6 +1,7 @@
 import { Chat, ChatType, Message } from "../../models/chatModel";
-import { Game } from "../../models/gameModel";
+import { Game, GameStatus } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
+import SpiritismPower from "../../models/powers/SpiritismPower";
 import database from "../../util/database";
 import { Event } from "../eventController";
 import Logger from "../../util/Logger";
@@ -33,12 +34,16 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
         player.sendError("CHAT_ERROR", 403, "Game is not started");
         return;
     }
-    if (game.getStatus().status % 2 === 0 && data.chat_type !== ChatType.CHAT_VILLAGE) {
-        player.sendError("CHAT_ERROR", 403, "Chat Werewolf and Chat Spiritism unavailable during the day");
+    if (data.chat_type !== ChatType.CHAT_VILLAGE && game.getStatus() !== GameStatus.DAY) {
+        player.sendError("CHAT_ERROR", 403, "Chat Viallage unavailable during the night");
         return;
     }
-    if (game.getStatus().status % 2 === 1 && data.chat_type !== ChatType.CHAT_WEREWOLF && data.chat_type !== ChatType.CHAT_SPIRITISM) {
-        player.sendError("CHAT_ERROR", 403, "Chat Village unavailable during the night");
+    if (data.chat_type !== ChatType.CHAT_WEREWOLF && game.getStatus() !== GameStatus.NIGHT) {
+        player.sendError("CHAT_ERROR", 403, "Chat Werewolf unavailable during the day");
+        return;
+    }
+    if (data.chat_type !== ChatType.CHAT_SPIRITISM && game.getStatus() !== GameStatus.NIGHT) {
+        player.sendError("CHAT_ERROR", 403, "Chat Spiritism unavailable during the day");
         return;
     }
 
@@ -69,7 +74,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
  */
 const updateChat = (game: Game, player: Player, data: { dead_player: string }): void => {
     const chaman: Player = game.getPlayer(player.getUser().getUsername());
-    if (chaman.getPower() != 2) {
+    if (chaman.hasPower(SpiritismPower.POWERNAME)) {
         chaman.sendError("CHAT_ERROR", 403, "User hasn't spiritism power");
         return;
     }

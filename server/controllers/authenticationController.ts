@@ -10,7 +10,7 @@ export async function verifyToken(req: Request, res: Response, next: NextFunctio
             return;
         }
         const username = getTokenContent(req.headers["x-access-token"] as string).username;
-        const row = await database.selectFrom("users").select(["users.id"]).where("username", "=", username).execute();
+        const row = await database.selectFrom("users").select(["users.username"]).where("username", "=", username).execute();
         
         if (row.length === 0) {
             res.status(404).send("Player not found");

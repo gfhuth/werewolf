@@ -14,6 +14,9 @@ export type ClientToServerEvents = {
     USE_POWER_VOYANCE: {
         target: number;
     };
+    USE_POWER_CONTAMINATION: {
+        target: number;
+    };
     USE_POWER: {
         // FIXME ça n'a aucun sens
         victimId: string;
@@ -39,6 +42,16 @@ export type ServerToClientEvents = {
     };
     GET_ALL_INFO_GAME: {
         status: number;
+    };
+    LIST_PLAYERS: {
+        players: Array<string>
+    };
+    SET_POWER: {
+        power: string
+    };
+    SET_ROLE: {
+        role: number,
+        nbWerewolfs: number
     };
     VOTE_RECEIVED: {
         vote_type: VoteType;

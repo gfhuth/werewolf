@@ -1,24 +1,22 @@
 import { Generated } from "kysely";
 
 export interface UserTable {
-    id: Generated<number>;
     username: string;
     password: string;
 }
 
 export interface PlayerTable {
     id: Generated<number>;
-    name: string;
-    role: number;
-    power: number;
-    user: number;
+    power: string;
+    user: string;
     game: number;
+    alive: boolean;
+    werewolf: boolean;
 }
 
 export interface GameTable {
     id: Generated<number>;
-    hostId: number;
-    currentNumberOfPlayer: number;
+    host: string;
     nbPlayerMin: number;
     nbPlayerMax: number;
     dayLength: number;

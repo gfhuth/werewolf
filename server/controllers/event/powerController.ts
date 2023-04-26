@@ -1,32 +1,16 @@
 import { Game } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
-import { Clairvoyant, Contamination, Spiritism } from "../../models/powersModel";
-import { Human, Werewolf } from "../../models/villagerModel";
 import { Event } from "../eventController";
 
-const usePower = async (game: Game, player: Player, data: { victimId: string }): Promise<void> => {
-    const power = player.getRole().getPower();
-    const victim = game.getPlayer(data.victimId);
-    if (power === null) {
+export const usePower = async (game: Game, player: Player, data: Record<string, any>): Promise<void> => {
+    const power = player.getPower();
+
+    if (!power) {
         player.sendError("USE_POWER", 403, "You don't have power");
         return;
-    } else if (victim === null) {
-        player.sendError("USE_POWER", 403, "The victim isn't in the game");
-        return;
-    } else if (power instanceof Contamination || power instanceof Spiritism || power instanceof Clairvoyant) {
-        if (!data.victimId) {
-            player.sendError("USE_POWER_ERROR", 403, "You need to set a victim");
-            return;
-        } else if (power instanceof Contamination && victim.getRole() instanceof Human) {
-            player.sendError("USE_POWER_ERROR", 403, "Your victim must to be an Human");
-            return;
-        } else {
-            power.setVictim(victim);
-        }
-    }
-    // TODO: else if the power was already used in the day/night
-    player.usePower();
-    return;
+    } 
+    
+    power.usePower(game, player, data);
 };
 
 // Liste des événements relatifs aux messages
