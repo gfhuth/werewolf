@@ -153,12 +153,23 @@ export class Game {
         }
     }
 
+    public verifyEndGame(): boolean {
+        let endMessage: string;
+        if (this.getWerewolfs().length === 0) endMessage = "Victoire des villageois !!!";
+        else if (this.getAllPlayers().filter((player) => !player.isWerewolf()).length === 0) endMessage = "Victoire des loup-garous !!!";
+
+        if (endMessage) {
+            this.getAllPlayers().forEach((player) => player.sendMessage("END_GAME", { message: endMessage }));
+            return true;
+        }
+
+        return false;
+    }
+
     applyPower(): void {
         throw new Error("Not Implemented yet");
     }
 
-    /** Apply all action happend during the night and lunch a day
-     */
     startDay(): void {
         LOGGER.log(`game ${this.getGameId()} changed to day`);
 
@@ -169,28 +180,32 @@ export class Game {
             LOGGER.log(`player ${resultWerewolfVote.getUser().getUsername()} is dead`);
         }
 
-        // Réinitialisation du chat
-        this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
-        this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
+        // Vérification si fin de partie
+        const isEndGame: boolean = this.verifyEndGame();
 
-        // Initialisation du vote
-        this.setVote(new Vote(VoteType.VOTE_VILLAGE, this.getAllPlayers()));
+        if (!isEndGame) {
+            // Réinitialisation du chat
+            this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
+            this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
-        const infoPlayers = this.getAllPlayers().map((player) => ({
-            user: player.getUser().getUsername(),
-            alive: !player.isDead()
-        }));
+            // Initialisation du vote
+            this.setVote(new Vote(VoteType.VOTE_VILLAGE, this.getAllPlayers()));
 
-        // Envoie à chaque joueur un recap de la nuit
-        this.getAllPlayers().forEach((player) => {
-            player.sendMessage("DAY_STARTS", {});
-            player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
-        });
+            const infoPlayers = this.getAllPlayers().map((player) => ({
+                user: player.getUser().getUsername(),
+                alive: !player.isDead()
+            }));
 
-        setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
+            // Envoie à chaque joueur un recap de la nuit
+            this.getAllPlayers().forEach((player) => {
+                player.sendMessage("DAY_STARTS", {});
+                player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
+            });
+
+            setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
+        }
     }
-    /** lunch a night
-     */
+
     startNight(): void {
         LOGGER.log(`game ${this.getGameId()} changed to night`);
 
@@ -203,25 +218,30 @@ export class Game {
             }
         }
 
-        // Réinitialisation des chats
-        this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
-        this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
+        // Vérification si fin de partie
+        const isEndGame: boolean = this.verifyEndGame();
 
-        // Initialisation du vote
-        this.setVote(new Vote(VoteType.VOTE_WEREWOLF, this.getWerewolfs()));
+        if (!isEndGame) {
+            // Réinitialisation des chats
+            this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
+            this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
 
-        const infoPlayers = this.getAllPlayers().map((player) => ({
-            user: player.getUser().getUsername(),
-            alive: !player.isDead()
-        }));
+            // Initialisation du vote
+            this.setVote(new Vote(VoteType.VOTE_WEREWOLF, this.getWerewolfs()));
 
-        // Envoie à chaque joueur un recap du jour
-        this.getAllPlayers().forEach((player) => {
-            player.sendMessage("NIGHT_STARTS", {});
-            player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
-        });
+            const infoPlayers = this.getAllPlayers().map((player) => ({
+                user: player.getUser().getUsername(),
+                alive: !player.isDead()
+            }));
 
-        setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
+            // Envoie à chaque joueur un recap du jour
+            this.getAllPlayers().forEach((player) => {
+                player.sendMessage("NIGHT_STARTS", {});
+                player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
+            });
+
+            setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
+        }
     }
 
     /** Function to add when a game is restored or start
@@ -276,7 +296,6 @@ export class Game {
     }
 
     public getChat(type: ChatType): Chat {
-        if (this.chats.length !== 3) return null;
         return this.chats[type];
     }
     public getAllPlayers(): Array<Player> {
