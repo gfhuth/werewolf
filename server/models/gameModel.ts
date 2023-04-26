@@ -9,6 +9,7 @@ import InsomniaPower from "./powers/InsomniaPower";
 import SpiritismPower from "./powers/SpiritismPower";
 import ClairvoyancePower from "./powers/ClairvoyancePower";
 import { toBoolean } from "../util/sql/schema";
+import { User } from "./userModel";
 
 const LOGGER = new Logger("GAME");
 
@@ -41,6 +42,7 @@ export class Game {
     private static games: Map<number, Game> = new Map();
 
     private gameId: number;
+    private host: User;
     private gameParam: GameParam;
     private players: Map<string, Player> = new Map();
     private chats: Array<Chat>;
@@ -50,8 +52,9 @@ export class Game {
      * @param {number} gameId is the id of the game
      * @param {GameParam} gameParam parameters of the game
      */
-    constructor(gameId: number, gameParam: GameParam) {
+    constructor(gameId: number, host: User, gameParam: GameParam) {
         this.gameId = gameId;
+        this.host = host;
         this.gameParam = gameParam;
         this.chats = [];
         this.currentVote = null;
@@ -89,6 +92,12 @@ export class Game {
     }
     public removePlayer(username: string): void {
         this.players.delete(username);
+    }
+    public isUserPlaying(user: User): boolean {
+        return this.players.has(user.getUsername());
+    }
+    public getHost(): User {
+        return this.host;
     }
 
     private setupRoles(): void {
@@ -298,9 +307,22 @@ export class Game {
      * @returns {Game}
      */
     static async load(gameId: number): Promise<Game> {
-        const game: { id: number } & GameParam = await database
+        const game: { id: number; host: string } & GameParam = await database
             .selectFrom("games")
-            .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
+            .select([
+                "id",
+                "nbPlayerMin",
+                "nbPlayerMax",
+                "dayLength",
+                "nightLength",
+                "startDate",
+                "percentageWerewolf",
+                "probaContamination",
+                "probaInsomnie",
+                "probaVoyance",
+                "probaSpiritisme",
+                "host"
+            ])
             .where("id", "=", gameId)
             .executeTakeFirstOrThrow();
         const gameParams: GameParam = {
@@ -316,11 +338,11 @@ export class Game {
             probaSpiritisme: game.probaSpiritisme
         };
 
-        return new Game(gameId, gameParams);
+        return new Game(gameId, await User.load(game.host), gameParams);
     }
 
-    public static getAllGames(): IterableIterator<Game> {
-        return Game.games.values();
+    public static getAllGames(): Array<Game> {
+        return Array.from(Game.games.values());
     }
 
     public static removeGame = (gameId: number): void => {
@@ -361,9 +383,22 @@ export class Game {
 
     public static async loadAllGame(): Promise<void> {
         // On charge chaque parties en cours
-        const gamelist: Array<{ id: number } & GameParam> = await database
+        const gamelist: Array<{ id: number; host: string } & GameParam> = await database
             .selectFrom("games")
-            .select(["id", "nbPlayerMin", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme"])
+            .select([
+                "id",
+                "host",
+                "nbPlayerMin",
+                "nbPlayerMax",
+                "dayLength",
+                "nightLength",
+                "startDate",
+                "percentageWerewolf",
+                "probaContamination",
+                "probaInsomnie",
+                "probaVoyance",
+                "probaSpiritisme"
+            ])
             .execute();
         for (const elem of gamelist) {
             const gameParams: GameParam = {
@@ -378,7 +413,7 @@ export class Game {
                 probaVoyance: elem.probaVoyance,
                 probaSpiritisme: elem.probaSpiritisme
             };
-            const game: Game = new Game(elem.id, gameParams);
+            const game: Game = new Game(elem.id, await User.load(elem.host), gameParams);
             game.load();
         }
 
