@@ -162,8 +162,8 @@ export class Game {
     }
 
     private lunchNextGameMoment(): void {
-        if (this.getStatus() === GameStatus.DAY) setTimeout(this.startDay.bind(this), this.gameParam.dayLength);
-        else setTimeout(this.startDay.bind(this), this.gameParam.dayLength);
+        if (this.getStatus() === GameStatus.DAY) setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
+        else setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
     }
 
     /** Function to add when a game is restored or start
@@ -189,9 +189,9 @@ export class Game {
         console.log(`Initialisation des chats : ${this.gameId}`);
         this.initChats();
 
-        // Lancement du jours ou de la nuit selon la date actuel
-        this.lunchNextGameMoment();
+        // Lancement du jeu avec la première nuit
         console.log(`game ${this.gameId} successfuly initialized`);
+        this.startNight();
     }
     /* ------------------ Getter et Setter ------------------ */
 
