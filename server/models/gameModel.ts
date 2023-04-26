@@ -5,7 +5,7 @@ import { Chat, ChatType } from "./chatModel";
 import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
 import { Vote, VoteType } from "./voteModel";
-import { Clairvoyant, Contamination, Insomnia, Spiritism } from "./powersModel";
+import { Clairvoyant, Contamination, Insomnia, Power, Spiritism } from "./powersModel";
 import { randomInt } from "crypto";
 
 export enum GameStatus {
@@ -100,7 +100,7 @@ export class Game {
         while (werewolfs.length < nbWerewolfs) {
             const werewolf: Player = players[randomInt(0, players.length)];
             werewolf.setRole(new Werewolf());
-            werewolf.sendMessage("SET_ROLE", { role: Role.WEREWOLF });
+            werewolf.sendMessage("SET_ROLE", { role: Role.WEREWOLF, nbWerewolfs: nbWerewolfs });
             werewolfs.push(werewolf);
             players.forEach((player, index) => {
                 if (player == werewolf) players.splice(index, 1);
@@ -108,45 +108,37 @@ export class Game {
         }
         players.forEach((player) => {
             player.setRole(new Human());
-            player.sendMessage("SET_ROLE", { role: Role.VILLAGER });
+            player.sendMessage("SET_ROLE", { role: Role.VILLAGER, nbWerewolfs: nbWerewolfs });
         });
     }
 
-    /** Set all role in the game
-     * @param {Game} game Game with all player added
-     */
-    private setupGamePowerAndRole(): void {
-        const gameParam = this.getGameParam();
-        const players = this.getAllPlayers();
+    private setupPower(): void {
+        const werewolfs: Array<Player> = this.getWerewolfs();
+        const humans: Array<Player> = this.getAllPlayers().filter((player) => player.getRole() instanceof Human);
 
-        const powersWerewolf = [];
-        const powersHuman = [];
-        // On choisi si on utilise les pouvoirs
-        if (randfloat(0, 1) <= gameParam.probaContamination) powersWerewolf.push(new Contamination());
-        if (randfloat(0, 1) <= gameParam.probaInsomnie) powersHuman.push(new Insomnia());
-        if (randfloat(0, 1) <= gameParam.probaSpiritisme) {
-            if (randfloat(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Spiritism());
-            else powersHuman.push(new Spiritism());
+        if (Math.random() <= this.gameParam.probaContamination) {
+            const contamination: Player = werewolfs[randomInt(0, werewolfs.length)];
+            contamination.getRole().setPower(new Contamination());
+            contamination.sendMessage("SET_POWER", { power: "Contamination" });
         }
-        if (randfloat(0, 1) <= gameParam.probaVoyance) {
-            if (randfloat(0, 1) <= gameParam.percentageWerewolf) powersWerewolf.push(new Clairvoyant());
-            else powersHuman.push(new Clairvoyant());
-        }
-        Player.shuffle(players);
-        const nbWerewolfs: number = gameParam.percentageWerewolf === 0 ? 1 : Math.ceil(gameParam.percentageWerewolf * this.getAllPlayers().length);
-
-        // attribution des roles loups garous et des pouvoirs loups garous
-        for (let i = 0; i < nbWerewolfs; i++) {
-            players[i].setRole(new Werewolf());
-            if (i < powersWerewolf.length) players[i].getRole().setPower(powersWerewolf[i]);
+        if (Math.random() <= this.gameParam.probaInsomnie) {
+            const insomnie: Player = humans[randomInt(0, humans.length)];
+            insomnie.getRole().setPower(new Insomnia());
+            insomnie.sendMessage("SET_POWER", { power: "Insomnie" });
         }
 
-        // attribution des roles humains et des pouvoir humains
-        for (let i = nbWerewolfs; i < this.getAllPlayers().length; i++) {
-            console.log(players[i]);
-            console.log(players);
-            players[i].setRole(new Human());
-            if (i - nbWerewolfs < powersHuman.length) players[i].getRole().setPower(powersHuman[i]);
+        let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getRole().getPower());
+        if (Math.random() <= this.gameParam.probaSpiritisme) {
+            const spiritisme: Player = playersWithoutPower[randomInt(0, playersWithoutPower.length)];
+            spiritisme.getRole().setPower(new Spiritism());
+            spiritisme.sendMessage("SET_POWER", { power: "Spiritisme" });
+        }
+
+        playersWithoutPower = playersWithoutPower.filter((player) => !player.getRole().getPower());
+        if (Math.random() <= this.gameParam.probaVoyance) {
+            const voyance: Player = playersWithoutPower[randomInt(0, playersWithoutPower.length)];
+            voyance.getRole().setPower(new Spiritism());
+            voyance.sendMessage("SET_POWER", { power: "Voyance" });
         }
     }
 
@@ -203,8 +195,8 @@ export class Game {
         //Initialisation des roles et des pouvoirs
         console.log(`Initialisation des rôles : ${this.gameId}`);
         this.setupRole();
-        // console.log(`Initialisation des pouvoirs : ${this.gameId}`);
-        // this.setupGamePowerAndRole();
+        console.log(`Initialisation des pouvoirs : ${this.gameId}`);
+        this.setupPower();
 
         // Initialisation des chats
         console.log(`Initialisation des chats : ${this.gameId}`);

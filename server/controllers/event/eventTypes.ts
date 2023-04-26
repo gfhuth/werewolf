@@ -40,8 +40,12 @@ export type ServerToClientEvents = {
     GET_ALL_INFO_GAME: {
         status: number;
     };
+    SET_POWER: {
+        power: string
+    };
     SET_ROLE: {
-        role: number
+        role: number,
+        nbWerewolfs: number
     };
     VOTE_RECEIVED: {
         vote_type: VoteType;
