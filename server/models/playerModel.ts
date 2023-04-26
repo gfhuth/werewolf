@@ -1,28 +1,30 @@
 import { ServerToClientEvents } from "../controllers/event/eventTypes";
 import database from "../util/database";
 import { Game } from "./gameModel";
+import Power from "./powerModelBetter";
 import { User } from "./userModel";
-import { Human, Villager, Werewolf } from "./villagerModel";
 
 export class Player {
 
     private user: User;
-    private role: Villager;
-    private power: number;
+    private werewolf: boolean;
+    private power: Power;
     private game: Game;
-    private isAlive: Boolean;
+    private isAlive: boolean;
 
-    constructor(user: User, role: Villager, power: number, game: Game) {
+    constructor(user: User, game: Game) {
         this.user = user;
-        this.role = role;
-        this.power = power;
         this.game = game;
         this.isAlive = true;
     }
 
-    public isDeath(): Boolean {
+    public isDead(): boolean {
         return !this.isAlive;
     }
+    public setAlive(alive: boolean): void {
+        this.isAlive = alive;
+    }
+
     public kill(): void {
         this.isAlive = false;
     }
@@ -31,38 +33,24 @@ export class Player {
         return this.user;
     }
 
-    public getRole(): Villager {
-        return this.role;
-    }
-
-    public getPower(): number {
+    public getPower(): Power {
         return this.power;
     }
 
-    public setRole(role: Villager): void {
-        if (this.role === null) this.role = role;
+    public setPower(power: Power): void {
+        this.power = power;
     }
 
-    // Maybe we need to wait to contamine, and notify game.
-    public contaminated(): boolean {
-        if (this.role instanceof Human) {
-            this.role = new Werewolf();
-            return true;
-        }
-        return false;
+    public hasPower(name: string): boolean {
+        return this.getPower() && this.getPower().getName() === name;
     }
 
-    public usePower(): void {
-        if (this.role.getPower() != null) {
-            if (!this.role.getPower().getPowerAlreadyUsed()) {
-                const data: Record<string, any> = this.role.getPower().usePower();
-                this.sendMessage("USE_POWER_VALID", data);
-                return;
-            } else {
-                this.sendError("USE_POWER", 403, "Problem was already used");
-            }
-        }
-        this.sendError("USE_POWER", 403, "You don't have");
+    public isWerewolf(): boolean {
+        return this.werewolf;
+    }
+
+    public setWerewolf(value: boolean): void {
+        this.werewolf = value;
     }
 
     public sendMessage<T extends keyof ServerToClientEvents>(event: T, data: ServerToClientEvents[T]): void {
@@ -73,47 +61,28 @@ export class Player {
         this.user.sendMessage({ event: event, game_id: this.game.getGameId(), data: { status: status, message: errorMessage } });
     }
 
-    /** Send at the client a recap of the game
-     */
-    public sendNewGameRecap(): void {
-        let powerNumber: number;
-        // because power can be null
-        if (!this.getRole()) throw new Error(`player ${this.getUser().getUsername()} don't have role set on game ${this.game.getGameId()}.`);
-        if (this.getRole().getPower()) powerNumber = this.getRole().getPower().getPowerValue();
-        else powerNumber = -1;
-
-        this.user.sendMessage({
-            game_id: this.game.getGameId(),
-            event: "GET_ALL_INFO_GAME",
-            data: {
-                game: this.game.getGameRecap(),
-                player: {
-                    role: this.getRole().getRoleValue(),
-                    power: powerNumber
-                }
-            }
-        });
-    }
-
     public static schema = async (): Promise<void> => {
         await database.schema
             .createTable("players")
             .ifNotExists()
             .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
-            .addColumn("name", "text", (col) => col.notNull())
-            .addColumn("role", "integer")
-            .addColumn("power", "integer")
-            .addColumn("user", "integer", (col) => col.references("users.id").onDelete("cascade"))
+            .addColumn("power", "text")
+            .addColumn("alive", "boolean")
+            .addColumn("werewolf", "boolean")
+            .addColumn("user", "text", (col) => col.references("users.username").onDelete("cascade"))
             .addColumn("game", "integer", (col) => col.references("games.id").onDelete("cascade"))
             .execute();
     };
 
-    /**
-     * Create a new permutation of players
-     * @param {Array<Player>} players array to shuffle
-     */
-    public static shuffle(players: Array<Player>): void {
-        players.sort((player) => Math.random() - Math.random());
+    public static async load(game: Game, data: { user: string; power: string; werewolf: boolean; alive: boolean }): Promise<Player> {
+        const user = await User.load(data.user);
+        const player = new Player(user, game);
+        player.setWerewolf(data.werewolf);
+        player.setAlive(data.alive);
+
+        // TODO load power
+
+        return player;
     }
 
 }

@@ -1,6 +1,7 @@
 import { Chat, ChatType, Message } from "../../models/chatModel";
 import { Game, GameStatus } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
+import SpiritismPower from "../../models/powers/SpiritismPower";
 import database from "../../util/database";
 import { Event } from "../eventController";
 
@@ -68,7 +69,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
  */
 const updateChat = (game: Game, player: Player, data: { dead_player: string }): void => {
     const chaman: Player = game.getPlayer(player.getUser().getUsername());
-    if (chaman.getPower() != 2) {
+    if (chaman.hasPower(SpiritismPower.POWERNAME)) {
         chaman.sendError("CHAT_ERROR", 403, "User hasn't spiritism power");
         return;
     }

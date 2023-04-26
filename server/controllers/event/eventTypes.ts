@@ -14,6 +14,9 @@ export type ClientToServerEvents = {
     USE_POWER_VOYANCE: {
         target: number;
     };
+    USE_POWER_CONTAMINATION: {
+        target: number;
+    };
     USE_POWER: {
         // FIXME ça n'a aucun sens
         victimId: string;

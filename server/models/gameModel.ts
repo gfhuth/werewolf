@@ -2,12 +2,13 @@ import { sql } from "kysely";
 import database from "../util/database";
 import { Player } from "./playerModel";
 import { Chat, ChatType } from "./chatModel";
-import { User } from "./userModel";
-import { Human, Villager, Werewolf } from "./villagerModel";
 import { Vote, VoteType } from "./voteModel";
-import { Clairvoyant, Contamination, Insomnia, Power, Spiritism } from "./powersModel";
 import { randomInt } from "crypto";
 import Logger from "../util/Logger";
+import ContaminationPower from "./powers/ContaminationPower";
+import InsomniaPower from "./powers/InsomniaPower";
+import SpiritismPower from "./powers/SpiritismPower";
+import ClairvoyancePower from "./powers/ClairvoyancePower";
 
 const LOGGER = new Logger("GAME");
 
@@ -35,19 +36,15 @@ export type GameParam = {
     probaSpiritisme: number;
 };
 
-function randfloat(a: number, b: number): number {
-    return Math.random() * b + a;
-}
-
 export class Game {
 
     private static games: Map<number, Game> = new Map();
+
     private gameId: number;
     private gameParam: GameParam;
-    private playersList: Map<string, Player> = new Map();
-    private chatslist: Array<Chat>;
-    private vote: Vote;
-    private currentNumberOfPlayer;
+    private players: Map<string, Player> = new Map();
+    private chats: Array<Chat>;
+    private currentVote: Vote;
 
     /**
      * @param {number} gameId is the id of the game
@@ -56,9 +53,8 @@ export class Game {
     constructor(gameId: number, gameParam: GameParam) {
         this.gameId = gameId;
         this.gameParam = gameParam;
-        this.chatslist = [];
-        this.vote = null;
-        this.currentNumberOfPlayer = 0;
+        this.chats = [];
+        this.currentVote = null;
 
         Game.addGameInList(this);
 
@@ -73,9 +69,9 @@ export class Game {
      * Initialisation des chats lors de la création d'une partie
      */
     public initChats(): void {
-        this.chatslist.push(new Chat(ChatType.CHAT_VILLAGE, this.getAllPlayers()));
-        this.chatslist.push(new Chat(ChatType.CHAT_WEREWOLF, this.getWerewolfs()));
-        this.chatslist.push(new Chat(ChatType.CHAT_SPIRITISM, []));
+        this.chats.push(new Chat(ChatType.CHAT_VILLAGE, this.getAllPlayers()));
+        this.chats.push(new Chat(ChatType.CHAT_WEREWOLF, this.getWerewolfs()));
+        this.chats.push(new Chat(ChatType.CHAT_SPIRITISM, []));
     }
     /**
      * Mise à jour du chat du chaman
@@ -84,16 +80,15 @@ export class Game {
      * @returns {void}
      */
     public updateSpiritismChat(chaman: Player, deadPlayer: Player): void {
-        if (this.chatslist.length !== 3) return;
-        this.chatslist[2].resetChatMembers([chaman, deadPlayer]);
+        if (this.chats.length !== 3) return;
+        this.chats[2].resetChatMembers([chaman, deadPlayer]);
     }
 
     public addPlayer(player: Player): void {
-        this.playersList.set(player.getUser().getUsername(), player);
-        this.currentNumberOfPlayer++;
+        this.players.set(player.getUser().getUsername(), player);
     }
     public removePlayer(username: string): void {
-        this.playersList.delete(username);
+        this.players.delete(username);
     }
 
     private setupRoles(): void {
@@ -102,44 +97,44 @@ export class Game {
         const werewolfs: Array<Player> = [];
         while (werewolfs.length < nbWerewolfs) {
             const werewolf: Player = players[randomInt(0, players.length)];
-            werewolf.setRole(new Werewolf());
+            werewolf.setWerewolf(true);
             werewolf.sendMessage("SET_ROLE", { role: Role.WEREWOLF, nbWerewolfs: nbWerewolfs });
             werewolfs.push(werewolf);
             players.splice(players.indexOf(werewolf), 1);
         }
         players.forEach((player) => {
-            player.setRole(new Human());
+            player.setWerewolf(false);
             player.sendMessage("SET_ROLE", { role: Role.VILLAGER, nbWerewolfs: nbWerewolfs });
         });
     }
 
     private setupPower(): void {
         const werewolfs: Array<Player> = this.getWerewolfs();
-        const humans: Array<Player> = this.getAllPlayers().filter((player) => player.getRole() instanceof Human);
+        const humans: Array<Player> = this.getAllPlayers().filter((player) => !player.isWerewolf());
 
         if (Math.random() <= this.gameParam.probaContamination) {
             const contamination: Player = werewolfs[randomInt(0, werewolfs.length)];
-            contamination.getRole().setPower(new Contamination());
-            contamination.sendMessage("SET_POWER", { power: "Contamination" });
+            contamination.setPower(new ContaminationPower());
+            contamination.sendMessage("SET_POWER", { power: contamination.getPower().getName() });
         }
         if (Math.random() <= this.gameParam.probaInsomnie) {
             const insomnie: Player = humans[randomInt(0, humans.length)];
-            insomnie.getRole().setPower(new Insomnia());
-            insomnie.sendMessage("SET_POWER", { power: "Insomnie" });
+            insomnie.setPower(new InsomniaPower());
+            insomnie.sendMessage("SET_POWER", { power: insomnie.getPower().getName() });
         }
 
-        let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getRole().getPower());
+        let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getPower());
         if (Math.random() <= this.gameParam.probaSpiritisme) {
             const spiritisme: Player = playersWithoutPower[randomInt(0, playersWithoutPower.length)];
-            spiritisme.getRole().setPower(new Spiritism());
-            spiritisme.sendMessage("SET_POWER", { power: "Spiritisme" });
+            spiritisme.setPower(new SpiritismPower());
+            spiritisme.sendMessage("SET_POWER", { power: spiritisme.getPower().getName() });
         }
 
-        playersWithoutPower = playersWithoutPower.filter((player) => !player.getRole().getPower());
+        playersWithoutPower = playersWithoutPower.filter((player) => !player.getPower());
         if (Math.random() <= this.gameParam.probaVoyance) {
             const voyance: Player = playersWithoutPower[randomInt(0, playersWithoutPower.length)];
-            voyance.getRole().setPower(new Spiritism());
-            voyance.sendMessage("SET_POWER", { power: "Voyance" });
+            voyance.setPower(new ClairvoyancePower());
+            voyance.sendMessage("SET_POWER", { power: voyance.getPower().getName() });
         }
     }
 
@@ -153,7 +148,8 @@ export class Game {
         // Initialisation du vote
         this.setVote(new Vote(VoteType.VOTE_VILLAGE, this.getAllPlayers()));
         //Envoie a chaque joueur un nouveau game recap
-        for (const player of this.getAllPlayers()) player.sendNewGameRecap();
+        // TODO : Envoyer l'info de passage au jour au joueur
+        // for (const player of this.getAllPlayers()) player.sendNewGameRecap();
         // TODO: Update table player
         this.lunchNextGameMoment();
     }
@@ -167,7 +163,8 @@ export class Game {
         // Initialisation du vote
         this.setVote(new Vote(VoteType.VOTE_WEREWOLF, this.getWerewolfs()));
         //Envoie a chaque joueur un nouveau game recap
-        for (const player of this.getAllPlayers()) player.sendNewGameRecap();
+        // TODO : Envoyer l'info de passage à la nuit au joueur
+        // for (const player of this.getAllPlayers()) player.sendNewGameRecap();
         // TODO: Update table player
         // call startDay at the end of the day
         this.lunchNextGameMoment();
@@ -221,37 +218,33 @@ export class Game {
     }
 
     public getVote(): Vote {
-        return this.vote;
+        return this.currentVote;
     }
 
     public setVote(vote: Vote): void {
-        this.vote = vote;
+        this.currentVote = vote;
     }
 
     public getChat(type: ChatType): Chat {
-        if (this.chatslist.length !== 3) return null;
-        return this.chatslist[type];
+        if (this.chats.length !== 3) return null;
+        return this.chats[type];
     }
     public getAllPlayers(): Array<Player> {
-        return Array.from(this.playersList.values());
+        return Array.from(this.players.values());
     }
 
     public getPlayer(username: string): Player {
-        return this.playersList.get(username);
-    }
-
-    public getNbOfPlayers(): number {
-        return this.currentNumberOfPlayer;
+        return this.players.get(username);
     }
 
     public getWerewolfs(): Array<Player> {
-        return this.getAllPlayers().filter((player: Player) => player.getRole() instanceof Werewolf);
+        return this.getAllPlayers().filter((player: Player) => player.isWerewolf());
     }
 
     public getGameRecap(): Record<string, any> {
         const usernameList: Array<string> = [];
         const usernameDeathList: Array<string> = [];
-        const iterator = this.playersList.values();
+        const iterator = this.players.values();
         for (let player = iterator.next(); !player.done; player = iterator.next()) {
             usernameList.push(player.value.getUser().getUsername());
             if (player.value.isDeath()) usernameDeathList.push(player.value.getUser().getUsername());
@@ -383,16 +376,28 @@ export class Game {
                 probaSpiritisme: elem.probaSpiritisme
             };
             const game: Game = new Game(elem.id, gameParams);
+            game.load();
         }
 
         // Initialisation des joueurs de chaque partie
-        const players: Array<{ name: string; role: number; power: number; game: number }> = await database.selectFrom("players").select(["name", "role", "power", "game"]).execute();
-        for (const elem of players) {
-            const game: Game = Game.getGame(elem.game);
-            const player: Player = new Player(User.getUser(elem.name), Villager.load(elem.role), elem.power, game);
-            game.addPlayer(player);
+        // const players: Array<{ name: string; role: number; power: number; game: number }> = await database.selectFrom("players").select(["name", "role", "power", "game"]).execute();
+        // for (const elem of players) {
+        //     const game: Game = Game.getGame(elem.game);
+        //     const player: Player = new Player(User.getUser(elem.name), Villager.load(elem.role), elem.power, game);
+        //     game.addPlayer(player);
+        // }
+        LOGGER.log("Chargement des parties déjà créées terminé");
+    }
+
+    public async load(): Promise<void> {
+        const players = await database.selectFrom("players").select(["user", "alive", "werewolf", "power", "game"]).where("game", "=", this.getGameId()).execute();
+
+        for (const dPlayer of players) {
+            const player = await Player.load(this, dPlayer);
+            this.addPlayer(player);
         }
-        console.log("Chargment des parties deja créer terminé");
+
+        LOGGER.log(`Game ${this.gameId} successfully loaded`);
     }
 
 }

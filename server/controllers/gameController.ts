@@ -6,15 +6,13 @@ import database from "../util/database";
 
 import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
+import { sql } from "kysely";
 
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
     try {
         // Récupérer la liste des jeux depuis la base de données SQL et le username
-        const games: Array<{ id: number; startDate: number; hostId: number; nbPlayerMax: number; currentNumberOfPlayer: number }> = await database
-            .selectFrom("games")
-            .select(["id", "startDate", "hostId", "nbPlayerMax", "currentNumberOfPlayer"])
-            .execute();
+        const games: Array<{ id: number; startDate: number; host: string; nbPlayerMax: number }> = await database.selectFrom("games").select(["id", "startDate", "host", "nbPlayerMax"]).execute();
 
         res.status(200).json({ games: games });
     } catch (err) {
@@ -40,31 +38,17 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
             probaInsomnie: number;
             probaVoyance: number;
             probaSpiritisme: number;
-            hostId: number;
-            currentNumberOfPlayer: number;
-            wereWolfCount?: number;
+            host: string;
         } = await database
             .selectFrom("games")
-            .select([
-                "id",
-                "nbPlayerMax",
-                "dayLength",
-                "nightLength",
-                "startDate",
-                "percentageWerewolf",
-                "probaContamination",
-                "probaInsomnie",
-                "probaVoyance",
-                "probaSpiritisme",
-                "hostId",
-                "currentNumberOfPlayer"
-            ])
+            .select(["id", "nbPlayerMax", "dayLength", "nightLength", "startDate", "percentageWerewolf", "probaContamination", "probaInsomnie", "probaVoyance", "probaSpiritisme", "host"])
             .where("id", "=", gameId)
             .executeTakeFirstOrThrow();
 
-        game.wereWolfCount = Math.floor((game.nbPlayerMax * game.percentageWerewolf) / 100);
-        // Renvoyer la parti en longJson
-        res.status(200).json(game);
+        res.status(200).json({
+            ...game,
+            wereWolfCount: Math.floor((game.nbPlayerMax * game.percentageWerewolf) / 100)
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: err.message });
@@ -75,12 +59,14 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
     try {
         const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
         // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
-        const games: Array<{ id: number; startDate: number; hostId: number; nbPlayerMax: number; currentNumberOfPlayer: number }> = await database
+        const games: Array<{ id: number; startDate: number; host: string; nbPlayerMax: number }> = await database
             .selectFrom("games")
-            .select(["games.id", "startDate", "hostId", "nbPlayerMax", "currentNumberOfPlayer"])
+            .select(["games.id", "startDate", "host", "nbPlayerMax"])
             .innerJoin("players", "players.game", "games.id")
-            .where("players.user", "=", user.getUserId())
+            .groupBy(["games.id"])
+            .where("players.user", "=", user.getUsername())
             .execute();
+        
 
         res.status(200).json({ games: games });
     } catch (err) {
@@ -97,7 +83,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
     else date = Date.now() + 1000 * 60 * 60 * 8;
 
     const game = {
-        hostId: user.getUserId(),
+        host: user.getUsername(),
         currentNumberOfPlayer: 1,
         nbPlayerMin: req.body.nbPlayerMin || 5,
         nbPlayerMax: req.body.nbPlayerMax || 20,
@@ -152,17 +138,17 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         await database
             .insertInto("players")
             .values({
-                name: user.getUsername(),
-                role: null,
+                user: user.getUsername(),
+                alive: true,
+                werewolf: false,
                 power: null,
-                user: user.getUserId(),
                 game: gameId.id
             })
             .execute();
 
         // On ajoute l'utilisateur aux joueurs de la partie
         // TODO: ajuster les valeurs de role et power
-        const player: Player = new Player(user, null, null, newHostGame);
+        const player: Player = new Player(user, newHostGame);
         newHostGame.addPlayer(player);
 
         // On ajoute un evenement
@@ -187,25 +173,23 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
         if (game.getPlayer(user.getUsername())) throw new Error("User is already in the game.");
 
         // Check if the game is full or not
-        if (game.getNbOfPlayers() >= game.getGameParam().nbPlayerMax) throw new Error("Game full");
+        if (game.getAllPlayers().length >= game.getGameParam().nbPlayerMax) throw new Error("Game full");
 
         // Ajout du joueur dans la liste des joueurs de la partie
-        const player: Player = new Player(user, null, null, game);
+        const player: Player = new Player(user, game);
         game.addPlayer(player);
 
         // Insert a new record in the user_games table
         await database
             .insertInto("players")
             .values({
-                name: user.getUsername(),
-                role: 0,
-                power: 0,
-                user: user.getUserId(),
+                user: user.getUsername(),
+                alive: true,
+                werewolf: false,
+                power: null,
                 game: gameId
             })
             .execute();
-
-        await database.updateTable("games").set({ currentNumberOfPlayer: game.getNbOfPlayers() }).where("id", "=", gameId).executeTakeFirst();
 
         res.status(200).json({ message: "game successfully join" });
     } catch (err) {
@@ -232,7 +216,7 @@ export const leaveGame = async (req: Request, res: Response): Promise<void> => {
         game.removePlayer(player.getUser().getUsername());
 
         // Insert a new record in the user_games table
-        await database.deleteFrom("players").where("players.game", "=", gameId).where("players.name", "=", user.getUsername()).executeTakeFirst();
+        await database.deleteFrom("players").where("players.game", "=", gameId).where("players.user", "=", user.getUsername()).executeTakeFirst();
 
         res.status(200).json({ message: `player sucessfully remove from the game ${gameId}` });
     } catch (err) {
