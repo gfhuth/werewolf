@@ -1,5 +1,5 @@
 import express from "express";
-import * as gameController from "../controllers/gameSetupController";
+import * as gameController from "../controllers/gameController";
 import { verifyToken } from "../controllers/authenticationController";
 const gameRouter = express.Router();
 

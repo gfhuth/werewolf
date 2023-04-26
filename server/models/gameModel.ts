@@ -4,7 +4,6 @@ import { Player } from "./playerModel";
 import { Chat, ChatType } from "./chatModel";
 import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
-import { Event } from "../controllers/eventController";
 import { Vote, VoteType } from "./voteModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "./powersModel";
 
@@ -70,13 +69,8 @@ export class Game {
      * Initialisation des chats lors de la création d'une partie
      */
     public initChats(): void {
-        this.chatslist.push(new Chat(ChatType.CHAT_VILLAGE, Array.from(this.playersList.values())));
-        this.chatslist.push(
-            new Chat(
-                ChatType.CHAT_WEREWOLF,
-                Array.from(this.playersList.values()).filter((player) => player.getRole() instanceof Werewolf)
-            )
-        );
+        this.chatslist.push(new Chat(ChatType.CHAT_VILLAGE, this.getAllPlayers()));
+        this.chatslist.push(new Chat(ChatType.CHAT_WEREWOLF, this.getWerewolfs()));
         this.chatslist.push(new Chat(ChatType.CHAT_SPIRITISM, []));
     }
     /**
@@ -156,12 +150,7 @@ export class Game {
         this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
         // Initialisation du vote
-        this.setVote(
-            new Vote(
-                VoteType.VOTE_WEREWOLF,
-                this.getAllPlayers().filter((player) => player.getRole() instanceof Werewolf)
-            )
-        );
+        this.setVote(new Vote(VoteType.VOTE_WEREWOLF, this.getWerewolfs()));
         //Envoie a chaque joueur un nouveau game recap
         for (const player of this.getAllPlayers()) player.sendNewGameRecap();
         // TODO: Update table player
@@ -169,7 +158,7 @@ export class Game {
         this.lunchNextGameMoment();
     }
 
-    lunchNextGameMoment(): void {
+    private lunchNextGameMoment(): void {
         let func;
         if (this.getStatus().status % 2 === GameStatus.JOUR) func = this.startDay;
         else func = this.startNight;
@@ -236,6 +225,11 @@ export class Game {
     public getNbOfPlayers(): number {
         return this.currentNumberOfPlayer;
     }
+
+    public getWerewolfs(): Array<Player> {
+        return this.getAllPlayers().filter((player: Player) => player.getRole() instanceof Werewolf);
+    }
+
     public getGameRecap(): Record<string, any> {
         const usernameList: Array<string> = [];
         const usernameDeathList: Array<string> = [];
@@ -376,14 +370,3 @@ export class Game {
     }
 
 }
-
-/** Envoie une websocket a un user contenant le récapitulatif de la partie
- * @param {Game} game GameObject not null
- * @param {User} user UserObject not null
- * @param {Json} data Data given by the message (unused here)
- */
-function getInfoGame(game: Game, player: Player, data: {}): void {
-    player.sendMessage("GET_ALL_INFO_GAME", { status: game.getStatus().status });
-}
-
-Event.registerHandlers("GET_ALL_INFO", getInfoGame);

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getTokenContent } from "./userController";
 import { Game, GameParam } from "../models/gameModel";
+import { Event } from "../controllers/eventController";
 import database from "../util/database";
 
 import { User } from "../models/userModel";
@@ -239,3 +240,14 @@ export const leaveGame = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ message: err.message });
     }
 };
+
+/** Envoie une websocket a un user contenant le récapitulatif de la partie
+ * @param {Game} game GameObject not null
+ * @param {Player} player UserObject not null
+ * @param {Json} data Data given by the message (unused here)
+ */
+function getInfoGame(game: Game, player: Player, data: {}): void {
+    player.sendMessage("GET_ALL_INFO_GAME", { status: game.getStatus().status });
+}
+
+Event.registerHandlers("GET_ALL_INFO", getInfoGame);
