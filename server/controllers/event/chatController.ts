@@ -6,6 +6,7 @@ import database from "../../util/database";
 import { Event } from "../eventController";
 import Logger from "../../util/Logger";
 import { ClientToServerEvents } from "./eventTypes";
+import ClairvoyancePower from "../../models/powers/ClairvoyancePower";
 
 const LOGGER = new Logger("WEBSOCKET");
 
@@ -45,6 +46,11 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
     }
     if (data.chat_type !== ChatType.CHAT_SPIRITISM && game.getStatus() !== GameStatus.NIGHT) {
         player.sendError("CHAT_ERROR", 403, "Chat Spiritism unavailable during the day");
+        return;
+    }
+
+    if (data.chat_type === ChatType.CHAT_WEREWOLF && player.getPower().getName() === ClairvoyancePower.POWERNAME) {
+        player.sendError("CHAT_ERROR", 403, "Insomnia cannot send message into werewolfs chat");
         return;
     }
 

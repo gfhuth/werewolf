@@ -12,11 +12,11 @@ export default class InsomniaPower extends Power {
     public constructor() {
         super(InsomniaPower.POWERNAME);
         // The game begins in the night
-        this.ready = false; 
+        this.ready = false;
     }
 
     public isCompatibleWith(player: Player): boolean {
-        throw new Error("Not Implemented yet");
+        return !player.isWerewolf();
     }
 
     public usePower(game: Game, player: Player, data: Record<string, any>): void {

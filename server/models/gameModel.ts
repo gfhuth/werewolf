@@ -73,7 +73,8 @@ export class Game {
      */
     public initChats(): void {
         this.chats.push(new Chat(ChatType.CHAT_VILLAGE, this.getAllPlayers()));
-        this.chats.push(new Chat(ChatType.CHAT_WEREWOLF, this.getWerewolfs()));
+        // Ajout de l'insomnie dans le chat des loup-garous
+        this.chats.push(new Chat(ChatType.CHAT_WEREWOLF, this.getWerewolfs().concat(this.getAllPlayers().filter((player) => player.getPower().getName() === ClairvoyancePower.POWERNAME))));
         this.chats.push(new Chat(ChatType.CHAT_SPIRITISM, []));
     }
     /**
