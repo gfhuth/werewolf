@@ -6,8 +6,8 @@ import database from "../util/database";
 
 import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
-import { sql } from "kysely";
 import { SQLBoolean } from "../util/sql/schema";
+import { AuthenticatedRequest } from "./authenticationController";
 
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
@@ -56,9 +56,9 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
     }
 }
 
-export async function searchGameByUsername(req: Request, res: Response): Promise<void> {
+export async function searchGameByUsername(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-        const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
+        const user: User = req.user;
         // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
         const games: Array<{ id: number; startDate: number; host: string; nbPlayerMax: number }> = await database
             .selectFrom("games")
@@ -76,8 +76,8 @@ export async function searchGameByUsername(req: Request, res: Response): Promise
     }
 }
 
-export const newGame = async (req: Request, res: Response): Promise<void> => {
-    const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
+export const newGame = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const user: User = req.user;
     // Valeur par défaut de la date
     let date: number;
     if (req.body.startDate) date = parseInt(req.body.startDate);
@@ -159,9 +159,9 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-export const joinGame = async (req: Request, res: Response): Promise<void> => {
+export const joinGame = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
-        const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
+        const user: User = req.user;
         if (!user) throw new Error("No user provided.");
         const gameId: number = parseInt(req.params.id);
         if (!gameId) throw new Error("No game ID provided.");
@@ -199,9 +199,9 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-export const leaveGame = async (req: Request, res: Response): Promise<void> => {
+export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
-        const user: User = User.getUser(getTokenContent(req.headers["x-access-token"] as string).username);
+        const user: User = req.user;
         const gameId: number = parseInt(req.params.id);
         if (!gameId) throw new Error("No game ID provided.");
 

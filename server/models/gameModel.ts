@@ -141,7 +141,7 @@ export class Game {
     /** Apply all action happend during the night and lunch a day
      */
     startDay(): void {
-        console.log(`The sun is rising, status : ${this.getStatus()} for game : ${this.getGameId()}`);
+        LOGGER.log(`The sun is rising, status : ${this.getStatus()} for game : ${this.getGameId()}`);
         // Réinitialisation du chat
         this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
@@ -156,7 +156,7 @@ export class Game {
     /** lunch a night
      */
     startNight(): void {
-        console.log(`The night is falling, status : ${this.getStatus()} for game : ${this.getGameId()}`);
+        LOGGER.log(`The night is falling, status : ${this.getStatus()} for game : ${this.getGameId()}`);
         // Réinitialisation des chats
         this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
