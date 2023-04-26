@@ -144,7 +144,7 @@ export class Game {
         LOGGER.log(`game ${this.getGameId()} changed to day`);
 
         // Mort du résultat des votes
-        const resultWerewolfVote: Player = this.getVote().getResult();
+        const resultWerewolfVote: Player = this.currentVote.getResult();
         if (resultWerewolfVote) resultWerewolfVote.kill();
         LOGGER.log(`player ${resultWerewolfVote.getUser().getUsername()} is dead`);
 
@@ -157,8 +157,6 @@ export class Game {
 
         const infoPlayers = this.getAllPlayers().map((player) => ({
             user: player.getUser().getUsername(),
-            werewolf: player.isWerewolf(),
-            power: player.getPower().getName(),
             alive: !player.isDead()
         }));
 
@@ -176,8 +174,8 @@ export class Game {
         LOGGER.log(`game ${this.getGameId()} changed to night`);
 
         // Mort du résultat des votes
-        if (!this.getVote()) {
-            const resultVillageVote: Player = this.getVote().getResult();
+        if (this.currentVote) {
+            const resultVillageVote: Player = this.currentVote.getResult();
             if (resultVillageVote) resultVillageVote.kill();
             LOGGER.log(`player ${resultVillageVote.getUser().getUsername()} is dead`);
         }
@@ -191,8 +189,6 @@ export class Game {
 
         const infoPlayers = this.getAllPlayers().map((player) => ({
             user: player.getUser().getUsername(),
-            werewolf: player.isWerewolf(),
-            power: player.getPower().getName(),
             alive: !player.isDead()
         }));
 
