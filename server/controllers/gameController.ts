@@ -6,6 +6,7 @@ import database from "../util/database";
 
 import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
+import { sql } from "kysely";
 import { SQLBoolean } from "../util/sql/schema";
 import { AuthenticatedRequest } from "./authenticationController";
 
@@ -56,20 +57,20 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
     }
 }
 
-export async function searchGameByUsername(req: AuthenticatedRequest, res: Response): Promise<void> {
+export function searchGameByUsername(req: AuthenticatedRequest, res: Response): void {
     try {
-        const user: User = req.user;
-        // Récupérer les jeux depuis la base de données SQL avec le nom d'utilisateur
-        const games: Array<{ id: number; startDate: number; host: string; nbPlayerMax: number }> = await database
-            .selectFrom("games")
-            .select(["games.id", "startDate", "host", "nbPlayerMax"])
-            .innerJoin("players", "players.game", "games.id")
-            .groupBy(["games.id"])
-            .where("players.user", "=", user.getUsername())
-            .execute();
-        
-
-        res.status(200).json({ games: games });
+        const user = req.user;
+        res.status(200).json({
+            games: Game.getAllGames()
+                .filter((g) => g.isUserPlaying(user))
+                .map((g) => ({
+                    id: g.getGameId(),
+                    startDate: g.getGameParam().startDate,
+                    host: g.getHost(),
+                    nbPlayerMax: g.getGameParam().nbPlayerMax,
+                    currentNumberOfPlayer: g.getAllPlayers().length
+                }))
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: err.message });
@@ -133,7 +134,7 @@ export const newGame = async (req: AuthenticatedRequest, res: Response): Promise
 
     try {
         const gameId: { id: number } = await database.insertInto("games").values(game).returning("id").executeTakeFirstOrThrow();
-        const newHostGame: Game = new Game(gameId.id, gameParam);
+        const newHostGame: Game = new Game(gameId.id, user, gameParam);
 
         await database
             .insertInto("players")

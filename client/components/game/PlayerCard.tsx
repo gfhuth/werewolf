@@ -92,13 +92,17 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                         </Actionsheet.Content>
                     </Actionsheet>
                 </Center>
-                <View backgroundColor={"rgba(56, 56, 56, 0.8)"} position={"absolute"} width={"100%"} height={"100%"} top={"0"} left={"0"}>
-                    <View width={"100%"} position={"absolute"} backgroundColor={"white"} style={{ transform: [{ rotate: "-25deg" }, {translateX: -12}, {translateY: -8}] }}>
-                        <Text paddingLeft={4} fontFamily={"pixel"} color={"red.700"} fontWeight={"900"} fontSize={"150%"} >
-                            MORT
-                        </Text>
+                {userContext.etatUser === mortVivantEnum.mort ? (
+                    <View backgroundColor={"rgba(56, 56, 56, 0.8)"} position={"absolute"} width={"100%"} height={"100%"} top={"0"} left={"0"}>
+                        <View width={"100%"} position={"absolute"} backgroundColor={"white"} style={{ transform: [{ rotate: "-25deg" }, { translateX: -12 }, { translateY: -8 }] }}>
+                            <Text paddingLeft={4} fontFamily={"pixel"} color={"red.700"} fontWeight={"900"} fontSize={"150%"}>
+                                MORT
+                            </Text>
+                        </View>
                     </View>
-                </View>
+                ) : (
+                    ""
+                )}
             </Box>
         </Pressable>
     );
