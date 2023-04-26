@@ -143,6 +143,11 @@ export class Game {
     startDay(): void {
         LOGGER.log(`game ${this.getGameId()} changed to day`);
 
+        // Mort du résultat des votes
+        const resultWerewolfVote: Player = this.getVote().getResult();
+        if (resultWerewolfVote) resultWerewolfVote.kill();
+        LOGGER.log(`player ${resultWerewolfVote.getUser().getUsername()} is dead`);
+
         // Réinitialisation du chat
         this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
@@ -150,14 +155,12 @@ export class Game {
         // Initialisation du vote
         this.setVote(new Vote(VoteType.VOTE_VILLAGE, this.getAllPlayers()));
 
-        const infoPlayers = this.getAllPlayers().map(
-            (player) => ({
-                user: player.getUser().getUsername(),
-                werewolf: player.isWerewolf(),
-                power: player.getPower().getName(),
-                alive: !player.isDead()
-            })
-        );
+        const infoPlayers = this.getAllPlayers().map((player) => ({
+            user: player.getUser().getUsername(),
+            werewolf: player.isWerewolf(),
+            power: player.getPower().getName(),
+            alive: !player.isDead()
+        }));
 
         // Envoie à chaque joueur un recap de la nuit
         this.getAllPlayers().forEach((player) => {
@@ -172,6 +175,11 @@ export class Game {
     startNight(): void {
         LOGGER.log(`game ${this.getGameId()} changed to night`);
 
+        // Mort du résultat des votes
+        const resultVillageVote: Player = this.getVote().getResult();
+        if (resultVillageVote) resultVillageVote.kill();
+        LOGGER.log(`player ${resultVillageVote.getUser().getUsername()} is dead`);
+
         // Réinitialisation des chats
         this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
@@ -179,14 +187,12 @@ export class Game {
         // Initialisation du vote
         this.setVote(new Vote(VoteType.VOTE_WEREWOLF, this.getWerewolfs()));
 
-        const infoPlayers = this.getAllPlayers().map(
-            (player) => ({
-                user: player.getUser().getUsername(),
-                werewolf: player.isWerewolf(),
-                power: player.getPower().getName(),
-                alive: !player.isDead()
-            })
-        );
+        const infoPlayers = this.getAllPlayers().map((player) => ({
+            user: player.getUser().getUsername(),
+            werewolf: player.isWerewolf(),
+            power: player.getPower().getName(),
+            alive: !player.isDead()
+        }));
 
         // Envoie à chaque joueur un recap du jour
         this.getAllPlayers().forEach((player) => {
