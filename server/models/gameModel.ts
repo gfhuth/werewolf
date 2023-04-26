@@ -114,18 +114,20 @@ export class Game {
             else powersHuman.push(new Clairvoyant());
         }
         Player.shuffle(players);
-        let i;
+        const nbWerewolfs: number = gameParam.percentageWerewolf === 0 ? 1 : Math.ceil(gameParam.percentageWerewolf * this.getAllPlayers().length);
+
         // attribution des roles loups garous et des pouvoirs loups garous
-        for (i = 0; i < Math.floor(gameParam.percentageWerewolf * this.getAllPlayers().length); i++) {
+        for (let i = 0; i < nbWerewolfs; i++) {
             players[i].setRole(new Werewolf());
             if (i < powersWerewolf.length) players[i].getRole().setPower(powersWerewolf[i]);
         }
-        const startIndex = i;
 
         // attribution des roles humains et des pouvoir humains
-        for (i = startIndex; i < this.getAllPlayers().length; i++) {
+        for (let i = nbWerewolfs; i < this.getAllPlayers().length; i++) {
+            console.log(players[i]);
+            console.log(players);
             players[i].setRole(new Human());
-            if (i - startIndex < powersHuman.length) players[i].getRole().setPower(powersHuman[i]);
+            if (i - nbWerewolfs < powersHuman.length) players[i].getRole().setPower(powersHuman[i]);
         }
     }
 
@@ -186,7 +188,7 @@ export class Game {
         // Initialisation des chats
         console.log(`Initialisation des chats : ${this.gameId}`);
         this.initChats();
-        
+
         // Lancement du jours ou de la nuit selon la date actuel
         this.lunchNextGameMoment();
         console.log(`game ${this.gameId} successfuly initialized`);
@@ -270,8 +272,7 @@ export class Game {
 
     public getStatus(): GameStatus {
         const timeSinceGameStart: number = Date.now() - this.gameParam.startDate;
-        if (timeSinceGameStart < 0)
-            return GameStatus.NOT_STARTED;
+        if (timeSinceGameStart < 0) return GameStatus.NOT_STARTED;
         const timeSinceCycleStart = timeSinceGameStart % (this.gameParam.dayLength + this.gameParam.nightLength);
         if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return GameStatus.NIGHT;
         else return GameStatus.DAY;
