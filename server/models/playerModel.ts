@@ -108,12 +108,4 @@ export class Player {
             .execute();
     };
 
-    /**
-     * Create a new permutation of players
-     * @param {Array<Player>} players array to shuffle
-     */
-    public static shuffle(players: Array<Player>): void {
-        players.sort((player) => Math.random() - Math.random());
-    }
-
 }

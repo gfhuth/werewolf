@@ -5,7 +5,7 @@ import { Chat, ChatType } from "./chatModel";
 import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
 import { Vote, VoteType } from "./voteModel";
-import { Clairvoyant, Contamination, Insomnia, Power, Spiritism } from "./powersModel";
+import { Clairvoyant, Contamination, Insomnia, Spiritism } from "./powersModel";
 import { randomInt } from "crypto";
 import Logger from "../util/Logger";
 
@@ -34,10 +34,6 @@ export type GameParam = {
     probaVoyance: number;
     probaSpiritisme: number;
 };
-
-function randfloat(a: number, b: number): number {
-    return Math.random() * b + a;
-}
 
 export class Game {
 
@@ -138,7 +134,7 @@ export class Game {
         playersWithoutPower = playersWithoutPower.filter((player) => !player.getRole().getPower());
         if (Math.random() <= this.gameParam.probaVoyance) {
             const voyance: Player = playersWithoutPower[randomInt(0, playersWithoutPower.length)];
-            voyance.getRole().setPower(new Spiritism());
+            voyance.getRole().setPower(new Clairvoyant());
             voyance.sendMessage("SET_POWER", { power: "Voyance" });
         }
     }
