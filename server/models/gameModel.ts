@@ -141,38 +141,66 @@ export class Game {
     /** Apply all action happend during the night and lunch a day
      */
     startDay(): void {
-        console.log(`The sun is rising, status : ${this.getStatus()} for game : ${this.getGameId()}`);
+        LOGGER.log(`game ${this.getGameId()} changed to day`);
+
+        // Mort du résultat des votes
+        const resultWerewolfVote: Player = this.getVote().getResult();
+        if (resultWerewolfVote) resultWerewolfVote.kill();
+        LOGGER.log(`player ${resultWerewolfVote.getUser().getUsername()} is dead`);
+
         // Réinitialisation du chat
         this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
+
         // Initialisation du vote
         this.setVote(new Vote(VoteType.VOTE_VILLAGE, this.getAllPlayers()));
-        //Envoie a chaque joueur un nouveau game recap
-        // TODO : Envoyer l'info de passage au jour au joueur
-        // for (const player of this.getAllPlayers()) player.sendNewGameRecap();
-        // TODO: Update table player
-        this.lunchNextGameMoment();
+
+        const infoPlayers = this.getAllPlayers().map((player) => ({
+            user: player.getUser().getUsername(),
+            werewolf: player.isWerewolf(),
+            power: player.getPower().getName(),
+            alive: !player.isDead()
+        }));
+
+        // Envoie à chaque joueur un recap de la nuit
+        this.getAllPlayers().forEach((player) => {
+            player.sendMessage("DAY_STARTS", {});
+            player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
+        });
+
+        setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
     }
     /** lunch a night
      */
     startNight(): void {
-        console.log(`The night is falling, status : ${this.getStatus()} for game : ${this.getGameId()}`);
+        LOGGER.log(`game ${this.getGameId()} changed to night`);
+
+        // Mort du résultat des votes
+        const resultVillageVote: Player = this.getVote().getResult();
+        if (resultVillageVote) resultVillageVote.kill();
+        LOGGER.log(`player ${resultVillageVote.getUser().getUsername()} is dead`);
+
         // Réinitialisation des chats
         this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
+
         // Initialisation du vote
         this.setVote(new Vote(VoteType.VOTE_WEREWOLF, this.getWerewolfs()));
-        //Envoie a chaque joueur un nouveau game recap
-        // TODO : Envoyer l'info de passage à la nuit au joueur
-        // for (const player of this.getAllPlayers()) player.sendNewGameRecap();
-        // TODO: Update table player
-        // call startDay at the end of the day
-        this.lunchNextGameMoment();
-    }
 
-    private lunchNextGameMoment(): void {
-        if (this.getStatus() === GameStatus.DAY) setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
-        else setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
+        const infoPlayers = this.getAllPlayers().map((player) => ({
+            user: player.getUser().getUsername(),
+            werewolf: player.isWerewolf(),
+            power: player.getPower().getName(),
+            alive: !player.isDead()
+        }));
+
+        // Envoie à chaque joueur un recap du jour
+        this.getAllPlayers().forEach((player) => {
+            player.sendMessage("NIGHT_STARTS", {});
+            player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
+        });
+
+        setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
     }
 
     /** Function to add when a game is restored or start
@@ -255,27 +283,6 @@ export class Game {
             deathPlayer: usernameDeathList
         };
     }
-
-    /** Compute the status of the game
-     * return an object of shape { status: number, timePassed: number }
-     * status :
-     *   -1 = not started, 0 = first day, 1 = first night, 2 = second days, ...
-     * timePassed : Time passed since the start of the current day or night
-     * @returns { JSON }
-     */
-    // public getStatus(): { status: number; timePassed: number } {
-    //     const timeSinceGameStart: number = Date.now() - this.gameParam.startDate;
-    //     if (timeSinceGameStart < 0) {
-    //         return { status: -1, timePassed: 0 };
-    //     } else {
-    //         const timeOfOneCycle = this.gameParam.dayLength + this.gameParam.nightLength;
-    //         const numberOfCycle = Math.floor(timeSinceGameStart / timeOfOneCycle);
-    //         const timeSinceCycleStart = timeSinceGameStart % timeOfOneCycle;
-    //         // If we are day.
-    //         if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return { status: 1 + 2 * numberOfCycle, timePassed: timeSinceCycleStart };
-    //         else return { status: 2 * (numberOfCycle + 1), timePassed: timeSinceCycleStart - this.gameParam.nightLength };
-    //     }
-    // }
 
     public getStatus(): GameStatus {
         const timeSinceGameStart: number = Date.now() - this.gameParam.startDate;

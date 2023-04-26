@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import database from "../util/database";
 import { User } from "../models/userModel";
+import { AuthenticatedRequest } from "./authenticationController";
 
 const { JWT_SECRET } = process.env;
 
@@ -55,7 +56,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     });
 };
 
-export const whoAmI = async (req: Request, res: Response): Promise<void> => {
+export const whoAmI = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const username: string = getTokenContent(req.headers["x-access-token"] as string).username;
         res.status(200).json({ username: username });
