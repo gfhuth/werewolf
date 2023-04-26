@@ -1,8 +1,9 @@
 import { WS } from "@env";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import Logger from "../utils/Logger";
 import { useToast } from "native-base";
+import { UserContext, mortVivantEnum } from "./UserContext";
 
 export type EventHandlerCallback = (data: any) => void;
 
@@ -28,6 +29,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
     const [jourNuit, setJourNuit] = useState("");
     const toast = useToast();
+    const userContext = useContext(UserContext);
 
     const setMessageErreur = (messageErreur: string): void => {
         toast.show({
@@ -83,7 +85,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     };
 
     const registerEventHandler = (event: string, callback: EventHandlerCallback): void => {
-        setEventHandlers(eh => ({ ...eh, [event]: callback }));
+        setEventHandlers((eh) => ({ ...eh, [event]: callback }));
     };
 
     const sendMessage = (event: string, data: any): void => {
@@ -96,11 +98,25 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         sendJsonMessage(result);
     };
 
+    /**
+     * Utilisé pour set vivant ou mort une personne
+     * @param data array des informations
+     */
+    const listeDesInfosDesJoueur = (data: { players: Array<{ user: string; alive: boolean }> }): void => {
+        LOGGER.log(`Liste des informations des joueurs`);
+
+        const result = data.players.filter((info) => info.user == userContext.username);
+        if (result[1].alive == true) 
+            userContext.setEtatUser(mortVivantEnum.vivant);
+        else 
+            userContext.setEtatUser(mortVivantEnum.mort);
+    };
+
     useEffect(() => {
         registerEventHandler("CHAT_ERROR", errorHandler);
         registerEventHandler("VOTE_ERROR", errorHandler);
         registerEventHandler("GAME_DELETED", errorHandler);
-        //TODO Récuperer les joueurs mort
+        registerEventHandler("LIST_PLAYERS", listeDesInfosDesJoueur);
     }, []);
 
     return <GameContext.Provider value={{ jourNuit, setJourNuit, eventHandlers, registerEventHandler, onMessage, sendJsonMessage: sendMessage }}>{props.children}</GameContext.Provider>;
