@@ -21,6 +21,11 @@ export default class ClairvoyancePower extends Power {
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_CLAIRVOYANCE"]): void {
+        if (player.getPower().getName() !== ClairvoyancePower.POWERNAME) {
+            player.sendError("POWER_ERROR", 403, "Player don't have clairvoyance power");
+            return;
+        }
+
         const victim: Player = game.getPlayer(data.target);
         const roleVictim: Role = victim.isWerewolf() ? Role.WEREWOLF : Role.VILLAGER;
         player.sendMessage("CLAIRVOYANCE_RESPONSE", { role: roleVictim, power: victim.getPower().getName() });
@@ -29,4 +34,4 @@ export default class ClairvoyancePower extends Power {
 
 }
 
-Event.registerHandlers("USE_POWER_CONTAMINATION", usePower);
+Event.registerHandlers("USE_POWER_CLAIRVOYANCE", usePower);
