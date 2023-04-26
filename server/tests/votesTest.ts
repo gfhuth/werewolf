@@ -27,7 +27,7 @@ describe("Test votes", () => {
         expect(isAuthenticated).toEqual(true);
     });
 
-    test("Send message", async () => {
+    test("Send vote", async () => {
         client1.sendMessage(
             JSON.stringify({
                 game_id: 1,
