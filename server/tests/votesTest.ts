@@ -50,8 +50,8 @@ describe("Test votes", () => {
             })
         );
 
-        const res1: Record<string, any> = await client1.getNextMessage();
-        const res2: Record<string, any> = await client2.getNextMessage();
+        const res1: Record<string, any> = await client1.getNextEvent("VOTE_RECEIVED");
+        const res2: Record<string, any> = await client2.getNextEvent("VOTE_RECEIVED");
 
         if (res1.event === "VOTE_RECEIVED") {
             expect(res1.data.vote_type).toEqual(VoteType.VOTE_WEREWOLF);

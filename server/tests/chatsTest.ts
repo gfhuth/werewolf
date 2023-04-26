@@ -53,8 +53,8 @@ describe("Test chats", () => {
             })
         );
 
-        const res1: Record<string, any> = await client1.getNextMessage();
-        const res2: Record<string, any> = await client2.getNextMessage();
+        const res1: Record<string, any> = await client1.getNextEvent("CHAT_RECEIVED");
+        const res2: Record<string, any> = await client2.getNextEvent("CHAT_RECEIVED");
 
         if (res1.event === "CHAT_RECEIVED") {
             expect(res1.data.chat_type).toEqual(ChatType.CHAT_WEREWOLF);

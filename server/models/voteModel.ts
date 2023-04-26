@@ -27,6 +27,10 @@ export class Vote {
         return this.participants;
     }
 
+    public getResult(): Player {
+        return this.result;
+    }
+
     public isClosed(): boolean {
         return this.result !== null;
     }
