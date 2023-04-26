@@ -6,11 +6,12 @@ import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
 import { Vote, VoteType } from "./voteModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "./powersModel";
+import Logger from "../util/Logger";
 
 export enum GameStatus {
     NOT_STARTED = -1,
-    JOUR = 0,
-    NUIT = 1,
+    NIGHT = 0,
+    DAY = 1,
 }
 
 export enum Role {
@@ -59,7 +60,7 @@ export class Game {
         Game.addGameInList(this);
 
         // Si game pas commencé, on ajoute un evenement, Sinon on reprend la partie ou on en était.
-        if (this.getStatus().status === GameStatus.NOT_STARTED) setTimeout(this.initGame.bind(this), this.gameParam.startDate - Date.now());
+        if (this.getStatus() === GameStatus.NOT_STARTED) setTimeout(this.initGame.bind(this), this.gameParam.startDate - Date.now());
         else this.initGame();
     }
 
@@ -131,7 +132,7 @@ export class Game {
     /** Apply all action happend during the night and lunch a day
      */
     startDay(): void {
-        console.log(`The sun is rising, status : ${this.getStatus().status} for game :${this.getGameId()}`);
+        console.log(`The sun is rising, status : ${this.getStatus()} for game :${this.getGameId()}`);
         // Réinitialisation du chat
         this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
@@ -145,7 +146,7 @@ export class Game {
     /** lunch a night
      */
     startNight(): void {
-        console.log(`The night is falling, status : ${this.getStatus().status} for game :${this.getGameId()}`);
+        console.log(`The night is falling, status : ${this.getStatus()} for game :${this.getGameId()}`);
         // Réinitialisation des chats
         this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
@@ -159,10 +160,8 @@ export class Game {
     }
 
     private lunchNextGameMoment(): void {
-        let func;
-        if (this.getStatus().status % 2 === GameStatus.JOUR) func = this.startDay;
-        else func = this.startNight;
-        setTimeout(func, this.gameParam.dayLength);
+        if (this.getStatus() === GameStatus.DAY) setTimeout(this.startDay.bind(this), this.gameParam.dayLength);
+        else setTimeout(this.startDay.bind(this), this.gameParam.dayLength);
     }
 
     /** Function to add when a game is restored or start
@@ -179,12 +178,15 @@ export class Game {
         //     console.log("Suppresions de la partie");
         //     return;
         // }
-        console.log(`Initialisation des chats : ${this.gameId}`);
-        // Initialisation des chats
-        this.initChats();
+
         //Initialisation des roles et des pouvoirs
-        const gameStatus = this.getStatus();
-        if (gameStatus.status === GameStatus.JOUR) this.setupGamePowerAndRole();
+        console.log(`Initialisation des rôles et des pouvoirs : ${this.gameId}`);
+        this.setupGamePowerAndRole();
+
+        // Initialisation des chats
+        console.log(`Initialisation des chats : ${this.gameId}`);
+        this.initChats();
+        
         // Lancement du jours ou de la nuit selon la date actuel
         this.lunchNextGameMoment();
         console.log(`game ${this.gameId} successfuly initialized`);
@@ -252,18 +254,27 @@ export class Game {
      * timePassed : Time passed since the start of the current day or night
      * @returns { JSON }
      */
-    public getStatus(): { status: number; timePassed: number } {
+    // public getStatus(): { status: number; timePassed: number } {
+    //     const timeSinceGameStart: number = Date.now() - this.gameParam.startDate;
+    //     if (timeSinceGameStart < 0) {
+    //         return { status: -1, timePassed: 0 };
+    //     } else {
+    //         const timeOfOneCycle = this.gameParam.dayLength + this.gameParam.nightLength;
+    //         const numberOfCycle = Math.floor(timeSinceGameStart / timeOfOneCycle);
+    //         const timeSinceCycleStart = timeSinceGameStart % timeOfOneCycle;
+    //         // If we are day.
+    //         if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return { status: 1 + 2 * numberOfCycle, timePassed: timeSinceCycleStart };
+    //         else return { status: 2 * (numberOfCycle + 1), timePassed: timeSinceCycleStart - this.gameParam.nightLength };
+    //     }
+    // }
+
+    public getStatus(): GameStatus {
         const timeSinceGameStart: number = Date.now() - this.gameParam.startDate;
-        if (timeSinceGameStart < 0) {
-            return { status: -1, timePassed: 0 };
-        } else {
-            const timeOfOneCycle = this.gameParam.dayLength + this.gameParam.nightLength;
-            const numberOfCycle = Math.floor(timeSinceGameStart / timeOfOneCycle);
-            const timeSinceCycleStart = timeSinceGameStart % timeOfOneCycle;
-            // If we are day.
-            if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return { status: 1 + 2 * numberOfCycle, timePassed: timeSinceCycleStart };
-            else return { status: 2 * (numberOfCycle + 1), timePassed: timeSinceCycleStart - this.gameParam.nightLength };
-        }
+        if (timeSinceGameStart < 0)
+            return GameStatus.NOT_STARTED;
+        const timeSinceCycleStart = timeSinceGameStart % (this.gameParam.dayLength + this.gameParam.nightLength);
+        if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return GameStatus.NIGHT;
+        else return GameStatus.DAY;
     }
 
     /* ------------------ Static Function ------------------ */

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getTokenContent } from "./userController";
-import { Game, GameParam } from "../models/gameModel";
+import { Game, GameParam, GameStatus } from "../models/gameModel";
 import { Event } from "../controllers/eventController";
 import database from "../util/database";
 
@@ -181,7 +181,7 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
 
         const game: Game = Game.getGame(gameId);
         if (!game) throw new Error("Game doesn't exist");
-        if (game.getStatus().status > 0) throw new Error("Game already started");
+        if (game.getStatus() === GameStatus.DAY || game.getStatus() === GameStatus.NIGHT) throw new Error("Game already started");
 
         // Check if player already in game
         if (game.getPlayer(user.getUsername())) throw new Error("User is already in the game.");
@@ -222,7 +222,7 @@ export const leaveGame = async (req: Request, res: Response): Promise<void> => {
 
         const game: Game = Game.getGame(gameId);
         if (!game) throw new Error("Game doesn't exist");
-        if (game.getStatus().status > 0) throw new Error("Game already started");
+        if (game.getStatus() === GameStatus.DAY || game.getStatus() === GameStatus.NIGHT) throw new Error("Game already started");
 
         // Check if player already in game
         if (!game.getPlayer(user.getUsername())) throw new Error("User haven't join this game.");
@@ -247,7 +247,7 @@ export const leaveGame = async (req: Request, res: Response): Promise<void> => {
  * @param {Json} data Data given by the message (unused here)
  */
 function getInfoGame(game: Game, player: Player, data: {}): void {
-    player.sendMessage("GET_ALL_INFO_GAME", { status: game.getStatus().status });
+    player.sendMessage("GET_ALL_INFO_GAME", { status: game.getStatus() });
 }
 
 Event.registerHandlers("GET_ALL_INFO", getInfoGame);
