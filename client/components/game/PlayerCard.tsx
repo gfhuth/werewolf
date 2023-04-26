@@ -2,6 +2,7 @@ import { Actionsheet, Box, Button, Center, Container, Hidden, Image, Pressable, 
 import { images } from "./image";
 import { GameContext } from "../../context/GameContext";
 import { useContext, useEffect, useState } from "react";
+import { UserContext } from "../../context/UserContext";
 
 export type Role = {
     name: string;
@@ -15,6 +16,10 @@ export type Player = {
 export default function PlayerCard(props: { player: Player }): React.ReactElement {
     const [isOpenVote, setIsOpen] = useState(false);
     const gameContext = useContext(GameContext);
+    const userContext = useContext(UserContext);
+
+    const { isOpen, onOpen, onClose } = useDisclose();
+    const [playerVote, setPlayerVote] = useState("");
 
     const toast = useToast();
 
@@ -28,8 +33,8 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
         });
     };
 
-    const vote = (): void => {
-        gameContext.sendJsonMessage("VOTE_SENT", { vote_type: "village", vote: "username de la personne" });
+    const sendVote = (): void => {
+        gameContext.sendJsonMessage("VOTE_SENT", { vote_type: userContext.role, vote: playerVote });
     };
 
     const receivedVote = (): void => {
@@ -40,11 +45,17 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
         gameContext.registerEventHandler("VOTE_RECEIVED", receivedVote);
     }, []);
 
-    const { isOpen, onOpen, onClose } = useDisclose();
     return (
         <Box bg="light.100" borderRadius={5} p={2}>
             <Center>
-                <Pressable onPress={onOpen} display={"flex"} flexDirection={"row"}>
+                <Pressable
+                    onPress={(): void => {
+                        setPlayerVote(props.player.username);
+                        onOpen();
+                    }}
+                    display={"flex"}
+                    flexDirection={"row"}
+                >
                     <Image alt="Player image" source={require("../../assets/images/player.png")} width={70} height={70} resizeMode="cover" />
                     <Container>
                         <Container display={"flex"} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"} mb={2} style={{ gap: 3 }}>
@@ -72,7 +83,7 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                                 Actions possibles :
                             </Text>
                         </Box>
-                        <Actionsheet.Item onPress={vote}>VOTE</Actionsheet.Item>
+                        <Actionsheet.Item onPress={sendVote}>VOTE</Actionsheet.Item>
                         <Actionsheet.Item isDisabled>Share</Actionsheet.Item>
                         <Actionsheet.Item>Play</Actionsheet.Item>
                         <Actionsheet.Item>Favourite</Actionsheet.Item>

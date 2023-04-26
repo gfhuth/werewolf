@@ -44,7 +44,6 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         LOGGER.log(`Message received : ${JSON.stringify(event)}`);
         try {
             const data = JSON.parse(event.data);
-            LOGGER.log(`ERREUR Message received : ${data.event}`);
             const eventName = data.event as string;
             const handler = eventHandlers[eventName];
             try {

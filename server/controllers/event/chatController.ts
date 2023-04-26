@@ -4,6 +4,9 @@ import { Player } from "../../models/playerModel";
 import SpiritismPower from "../../models/powers/SpiritismPower";
 import database from "../../util/database";
 import { Event } from "../eventController";
+import Logger from "../../util/Logger";
+
+const LOGGER = new Logger("WEBSOCKET");
 
 /**
  * Enregistre un nouveau message dans la base de données et envoie le message sur le chat
@@ -22,6 +25,8 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
     };
     // TODO: vérifier que le message est sans erreurs
 
+
+    LOGGER.log(`New message`);
     // On récupère le chat concerné
     const chat: Chat = game.getChat(data.chat_type);
 
@@ -76,13 +81,15 @@ const updateChat = (game: Game, player: Player, data: { dead_player: string }): 
     game.updateSpiritismChat(chaman, game.getPlayer(data.dead_player));
 };
 
-const getAllChats = async (game: Game, player: Player, data: {}): Promise<void> => {
+const getAllChats = async (game: Game, player: Player): Promise<void> => {
     let res: { [key in ChatType]: Array<Message> };
-
+    LOGGER.log(`CHAT ALL CHAT START`);
     res[ChatType.CHAT_VILLAGE] = game.getChat(ChatType.CHAT_VILLAGE).getMessages();
     res[ChatType.CHAT_WEREWOLF] = game.getChat(ChatType.CHAT_WEREWOLF).getMessages();
     res[ChatType.CHAT_SPIRITISM] = game.getChat(ChatType.CHAT_SPIRITISM).getMessages();
+    LOGGER.log(`CHAT ALL CHAT END`);
 
+    
     player.sendMessage("GET_ALL_INFO_CHAT", res);
 };
 

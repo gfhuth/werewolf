@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { GameContext } from "./GameContext";
+import Logger from "../utils/Logger";
+
+const LOGGER = new Logger("WEBSOCKET");
+
 
 export const UserContext = React.createContext<{
     token: string;
@@ -21,10 +26,27 @@ export const UserContext = React.createContext<{
         });
 
 export function UserProvider(props: { children: React.ReactNode }): React.ReactElement {
+    const gameContext = useContext(GameContext);
+    
     const [token, setToken] = useState("");
     const [username, setUsername] = useState("");
     const [role, setRole] = useState("");
     const [pouvoir, setPouvoir] = useState("");
 
-    return <UserContext.Provider value={{ token, setToken, username, setUsername }}>{props.children}</UserContext.Provider>;
+
+    const onRole = (data: { role: string; nbWerewolfs: number }): void => {
+        LOGGER.log(`Nouveau role: ${data.role}`);
+        setRole(data.role);
+    };
+    const onPouvoir = (data: { power: string}): void => {
+        LOGGER.log(`Nouveau pouvoir: ${data.power}`);
+        setPouvoir(data.power);
+    };
+
+    useEffect(() => {
+        gameContext.registerEventHandler("SET_ROLE", onRole);
+        gameContext.registerEventHandler("SET_POWER", onPouvoir);
+    }, []);
+
+    return <UserContext.Provider value={{ role, pouvoir, token, setToken, username, setUsername, setRole, setPouvoir }}>{props.children}</UserContext.Provider>;
 }
