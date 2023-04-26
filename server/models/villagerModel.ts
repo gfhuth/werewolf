@@ -55,8 +55,10 @@ export class Werewolf extends Villager {
     }
 
     public setPower(power: Power): void {
-        if (power.isWerewolfPower()) this.power = power;
-
+        if (power.isWerewolfPower()) {
+            this.power = power;
+            return;
+        }
         throw new Error("A Human power is given but a Werewolf power is required.");
     }
     public getPower(): Power {
