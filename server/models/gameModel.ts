@@ -7,6 +7,9 @@ import { Human, Villager, Werewolf } from "./villagerModel";
 import { Vote, VoteType } from "./voteModel";
 import { Clairvoyant, Contamination, Insomnia, Power, Spiritism } from "./powersModel";
 import { randomInt } from "crypto";
+import Logger from "../util/Logger";
+
+const LOGGER = new Logger("GAME");
 
 export enum GameStatus {
     NOT_STARTED = -1,
@@ -93,8 +96,8 @@ export class Game {
         this.playersList.delete(username);
     }
 
-    private setupRole(): void {
-        const nbWerewolfs: number = this.gameParam.percentageWerewolf === 0 ? 1 : Math.ceil(this.gameParam.percentageWerewolf * this.getAllPlayers().length);
+    private setupRoles(): void {
+        const nbWerewolfs: number = Math.max(1, Math.ceil(this.gameParam.percentageWerewolf * this.getAllPlayers().length));
         const players: Array<Player> = this.getAllPlayers();
         const werewolfs: Array<Player> = [];
         while (werewolfs.length < nbWerewolfs) {
@@ -102,9 +105,7 @@ export class Game {
             werewolf.setRole(new Werewolf());
             werewolf.sendMessage("SET_ROLE", { role: Role.WEREWOLF, nbWerewolfs: nbWerewolfs });
             werewolfs.push(werewolf);
-            players.forEach((player, index) => {
-                if (player == werewolf) players.splice(index, 1);
-            });
+            players.splice(players.indexOf(werewolf), 1);
         }
         players.forEach((player) => {
             player.setRole(new Human());
@@ -183,7 +184,7 @@ export class Game {
      * @param {number} gameId id of the starting game
      * */
     public async initGame(): Promise<void> {
-        console.log(`Initialisation de la partie : ${this.gameId}`);
+        LOGGER.log(`Initialisation de la partie : ${this.gameId}`);
         // if (this.getGameParam().nbPlayerMin > this.getNbOfPlayers()) {
         //     Game.removeGame(this.getGameId());
         //     await database.deleteFrom("games").where("games.id", "=", this.getGameId()).executeTakeFirst();
@@ -193,17 +194,17 @@ export class Game {
         // }
 
         //Initialisation des roles et des pouvoirs
-        console.log(`Initialisation des rôles : ${this.gameId}`);
-        this.setupRole();
-        console.log(`Initialisation des pouvoirs : ${this.gameId}`);
+        LOGGER.log(`Initialisation des rôles : ${this.gameId}`);
+        this.setupRoles();
+        LOGGER.log(`Initialisation des pouvoirs : ${this.gameId}`);
         this.setupPower();
 
         // Initialisation des chats
-        console.log(`Initialisation des chats : ${this.gameId}`);
+        LOGGER.log(`Initialisation des chats : ${this.gameId}`);
         this.initChats();
 
         // Lancement du jeu avec la première nuit
-        console.log(`game ${this.gameId} successfuly initialized`);
+        LOGGER.log(`game ${this.gameId} successfuly initialized`);
         this.startNight();
     }
     /* ------------------ Getter et Setter ------------------ */
