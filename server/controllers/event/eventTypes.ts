@@ -8,10 +8,10 @@ export type ClientToServerEvents = {
         content: string;
     };
     GET_ALL_INFO: {};
-    UPDATE_CHAT_SPIRITSM: {
+    USE_POWER_SPIRITISM: {
         target: string;
     };
-    USE_POWER_VOYANCE: {
+    USE_POWER_CLAIRVOYANCE: {
         target: string;
     };
     USE_POWER_CONTAMINATION: {

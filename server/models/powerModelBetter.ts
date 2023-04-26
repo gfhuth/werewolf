@@ -4,6 +4,7 @@ import { Player } from "./playerModel";
 export default abstract class Power {
 
     private name: string;
+    protected ready: boolean;
 
     public constructor(name: string) {
         this.name = name;

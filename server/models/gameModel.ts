@@ -138,6 +138,10 @@ export class Game {
         }
     }
 
+    applyPower(): void {
+        throw new Error("Not Implemented yet");
+    }
+
     /** Apply all action happend during the night and lunch a day
      */
     startDay(): void {

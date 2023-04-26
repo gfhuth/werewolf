@@ -7,8 +7,12 @@ import Power from "../powerModelBetter";
 
 export default class InsomniaPower extends Power {
 
+    public static POWERNAME = "INSOMNIA";
+
     public constructor() {
-        super("INSOMNIA");
+        super(InsomniaPower.POWERNAME);
+        // The game begins in the night
+        this.ready = false; 
     }
 
     public isCompatibleWith(player: Player): boolean {

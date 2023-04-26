@@ -41,16 +41,20 @@ export class Player {
         this.power = power;
     }
 
-    public hasPower(name: string): boolean {
-        return this.getPower() && this.getPower().getName() === name;
-    }
-
     public isWerewolf(): boolean {
         return this.werewolf;
     }
 
     public setWerewolf(value: boolean): void {
         this.werewolf = value;
+    }
+
+    public contaminated(): boolean {
+        if (this.werewolf === false) {
+            this.werewolf = true;
+            return true;
+        }
+        return false;
     }
 
     public sendMessage<T extends keyof ServerToClientEvents>(event: T, data: ServerToClientEvents[T]): void {

@@ -8,16 +8,19 @@ import Power from "../powerModelBetter";
 export default class SpiritismPower extends Power {
 
     public static POWERNAME = "SPIRITISM";
+    private victim: Player;
 
     public constructor() {
         super(SpiritismPower.name);
+        // The game begins in the night
+        this.ready = false; 
     }
 
     public isCompatibleWith(player: Player): boolean {
         throw new Error("Not Implemented yet");
     }
 
-    public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_VOYANCE"]): void {
+    public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_SPIRITISM"]): void {
         throw new Error("Method not implemented.");
     }
 

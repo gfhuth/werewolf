@@ -7,8 +7,13 @@ import Power from "../powerModelBetter";
 
 export default class ContaminationPower extends Power {
 
+    public static POWERNAME = "CONTAMINATION";
+    private victim: Player;
+
     public constructor() {
-        super("CONTAMINATION");
+        super(ContaminationPower.POWERNAME);
+        // The game begins in the night
+        this.ready = true;  
     }
 
     public isCompatibleWith(player: Player): boolean {
@@ -16,6 +21,7 @@ export default class ContaminationPower extends Power {
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_CONTAMINATION"]): void {
+        // game.getPlayer(data.target).
         throw new Error("Method not implemented.");
     }
 
