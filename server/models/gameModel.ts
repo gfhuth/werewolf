@@ -6,7 +6,7 @@ import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
 import { Vote, VoteType } from "./voteModel";
 import { Clairvoyant, Contamination, Insomnia, Spiritism } from "./powersModel";
-import Logger from "../util/Logger";
+import { randomInt } from "crypto";
 
 export enum GameStatus {
     NOT_STARTED = -1,
@@ -93,10 +93,29 @@ export class Game {
         this.playersList.delete(username);
     }
 
+    private setupRole(): void {
+        const nbWerewolfs: number = this.gameParam.percentageWerewolf === 0 ? 1 : Math.ceil(this.gameParam.percentageWerewolf * this.getAllPlayers().length);
+        const players: Array<Player> = this.getAllPlayers();
+        const werewolfs: Array<Player> = [];
+        while (werewolfs.length < nbWerewolfs) {
+            const werewolf: Player = players[randomInt(0, players.length)];
+            werewolf.setRole(new Werewolf());
+            werewolf.sendMessage("SET_ROLE", { role: Role.WEREWOLF });
+            werewolfs.push(werewolf);
+            players.forEach((player, index) => {
+                if (player == werewolf) players.splice(index, 1);
+            });
+        }
+        players.forEach((player) => {
+            player.setRole(new Human());
+            player.sendMessage("SET_ROLE", { role: Role.VILLAGER });
+        });
+    }
+
     /** Set all role in the game
      * @param {Game} game Game with all player added
      */
-    setupGamePowerAndRole(): void {
+    private setupGamePowerAndRole(): void {
         const gameParam = this.getGameParam();
         const players = this.getAllPlayers();
 
@@ -134,7 +153,7 @@ export class Game {
     /** Apply all action happend during the night and lunch a day
      */
     startDay(): void {
-        console.log(`The sun is rising, status : ${this.getStatus()} for game :${this.getGameId()}`);
+        console.log(`The sun is rising, status : ${this.getStatus()} for game : ${this.getGameId()}`);
         // Réinitialisation du chat
         this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
@@ -148,7 +167,7 @@ export class Game {
     /** lunch a night
      */
     startNight(): void {
-        console.log(`The night is falling, status : ${this.getStatus()} for game :${this.getGameId()}`);
+        console.log(`The night is falling, status : ${this.getStatus()} for game : ${this.getGameId()}`);
         // Réinitialisation des chats
         this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
         this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
@@ -182,8 +201,10 @@ export class Game {
         // }
 
         //Initialisation des roles et des pouvoirs
-        console.log(`Initialisation des rôles et des pouvoirs : ${this.gameId}`);
-        this.setupGamePowerAndRole();
+        console.log(`Initialisation des rôles : ${this.gameId}`);
+        this.setupRole();
+        // console.log(`Initialisation des pouvoirs : ${this.gameId}`);
+        // this.setupGamePowerAndRole();
 
         // Initialisation des chats
         console.log(`Initialisation des chats : ${this.gameId}`);
