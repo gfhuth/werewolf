@@ -7,6 +7,7 @@ import database from "../util/database";
 import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
 import { sql } from "kysely";
+import { SQLBoolean } from "../util/sql/schema";
 
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
@@ -84,7 +85,6 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
 
     const game = {
         host: user.getUsername(),
-        currentNumberOfPlayer: 1,
         nbPlayerMin: req.body.nbPlayerMin || 5,
         nbPlayerMax: req.body.nbPlayerMax || 20,
         dayLength: req.body.dayLength || 14 * 60 * 60 * 1000,
@@ -139,8 +139,8 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
             .insertInto("players")
             .values({
                 user: user.getUsername(),
-                alive: true,
-                werewolf: false,
+                alive: SQLBoolean.true,
+                werewolf: SQLBoolean.false,
                 power: null,
                 game: gameId.id
             })
@@ -154,6 +154,7 @@ export const newGame = async (req: Request, res: Response): Promise<void> => {
         // On ajoute un evenement
         res.status(200).json({ message: `New game created and start in ${(game.startDate - Date.now()) / 60000} min` });
     } catch (e) {
+        console.error(e);
         res.sendStatus(500);
     }
 };
@@ -184,8 +185,8 @@ export const joinGame = async (req: Request, res: Response): Promise<void> => {
             .insertInto("players")
             .values({
                 user: user.getUsername(),
-                alive: true,
-                werewolf: false,
+                alive: SQLBoolean.true,
+                werewolf: SQLBoolean.false,
                 power: null,
                 game: gameId
             })

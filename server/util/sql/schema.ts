@@ -1,5 +1,13 @@
 import { Generated } from "kysely";
 
+export enum SQLBoolean {
+    true = 1,
+    false = 0,
+}
+export function toBoolean(sql: SQLBoolean): boolean {
+    return sql === SQLBoolean.true;
+}
+
 export interface UserTable {
     username: string;
     password: string;
@@ -10,8 +18,8 @@ export interface PlayerTable {
     power: string;
     user: string;
     game: number;
-    alive: boolean;
-    werewolf: boolean;
+    alive: SQLBoolean;
+    werewolf: SQLBoolean;
 }
 
 export interface GameTable {
@@ -32,7 +40,7 @@ export interface GameTable {
 export interface MessageTable {
     id: Generated<number>;
     game: number;
-    type: number,
+    type: number;
     user: string;
     content: string;
     date: number;
@@ -42,5 +50,5 @@ export interface Database {
     users: UserTable;
     players: PlayerTable;
     games: GameTable;
-    messages: MessageTable
+    messages: MessageTable;
 }

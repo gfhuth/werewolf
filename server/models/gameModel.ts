@@ -3,12 +3,12 @@ import database from "../util/database";
 import { Player } from "./playerModel";
 import { Chat, ChatType } from "./chatModel";
 import { Vote, VoteType } from "./voteModel";
-import { randomInt } from "crypto";
 import Logger from "../util/Logger";
 import ContaminationPower from "./powers/ContaminationPower";
 import InsomniaPower from "./powers/InsomniaPower";
 import SpiritismPower from "./powers/SpiritismPower";
 import ClairvoyancePower from "./powers/ClairvoyancePower";
+import { toBoolean } from "../util/sql/schema";
 
 const LOGGER = new Logger("GAME");
 
@@ -96,7 +96,7 @@ export class Game {
         const players: Array<Player> = this.getAllPlayers();
         const werewolfs: Array<Player> = [];
         while (werewolfs.length < nbWerewolfs) {
-            const werewolf: Player = players[randomInt(0, players.length)];
+            const werewolf: Player = players[Math.floor(Math.random() * players.length)];
             werewolf.setWerewolf(true);
             werewolf.sendMessage("SET_ROLE", { role: Role.WEREWOLF, nbWerewolfs: nbWerewolfs });
             werewolfs.push(werewolf);
@@ -113,26 +113,26 @@ export class Game {
         const humans: Array<Player> = this.getAllPlayers().filter((player) => !player.isWerewolf());
 
         if (Math.random() <= this.gameParam.probaContamination) {
-            const contamination: Player = werewolfs[randomInt(0, werewolfs.length)];
+            const contamination: Player = werewolfs[Math.floor(Math.random() * werewolfs.length)];
             contamination.setPower(new ContaminationPower());
             contamination.sendMessage("SET_POWER", { power: contamination.getPower().getName() });
         }
         if (Math.random() <= this.gameParam.probaInsomnie) {
-            const insomnie: Player = humans[randomInt(0, humans.length)];
+            const insomnie: Player = humans[Math.floor(Math.random() * humans.length)];
             insomnie.setPower(new InsomniaPower());
             insomnie.sendMessage("SET_POWER", { power: insomnie.getPower().getName() });
         }
 
         let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getPower());
         if (Math.random() <= this.gameParam.probaSpiritisme) {
-            const spiritisme: Player = playersWithoutPower[randomInt(0, playersWithoutPower.length)];
+            const spiritisme: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
             spiritisme.setPower(new SpiritismPower());
             spiritisme.sendMessage("SET_POWER", { power: spiritisme.getPower().getName() });
         }
 
         playersWithoutPower = playersWithoutPower.filter((player) => !player.getPower());
         if (Math.random() <= this.gameParam.probaVoyance) {
-            const voyance: Player = playersWithoutPower[randomInt(0, playersWithoutPower.length)];
+            const voyance: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
             voyance.setPower(new ClairvoyancePower());
             voyance.sendMessage("SET_POWER", { power: voyance.getPower().getName() });
         }
@@ -339,10 +339,7 @@ export class Game {
             .createTable("games")
             .ifNotExists()
             .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
-            .addColumn("hostId", "integer", (col) => col.notNull())
-            //TODO add statuts needed for the game (for example : isNight, idPersonAlives,...)
-            .addColumn("currentNumberOfPlayer", "integer", (col) => col.defaultTo(1).notNull())
-            //param of type gameParam
+            .addColumn("host", "text", (col) => col.notNull().references("users.username"))
             .addColumn("nbPlayerMin", "integer", (col) => col.defaultTo(5).notNull())
             .addColumn("nbPlayerMax", "integer", (col) => col.defaultTo(20).notNull())
             .addColumn("dayLength", "integer", (col) => col.defaultTo(10).notNull())
@@ -393,7 +390,7 @@ export class Game {
         const players = await database.selectFrom("players").select(["user", "alive", "werewolf", "power", "game"]).where("game", "=", this.getGameId()).execute();
 
         for (const dPlayer of players) {
-            const player = await Player.load(this, dPlayer);
+            const player = await Player.load(this, { ...dPlayer, alive: toBoolean(dPlayer.alive), werewolf: toBoolean(dPlayer.werewolf) });
             this.addPlayer(player);
         }
 
