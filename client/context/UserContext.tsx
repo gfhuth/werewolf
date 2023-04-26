@@ -40,7 +40,7 @@ export function UserProvider(props: { children: React.ReactNode }): React.ReactE
     const [username, setUsername] = useState("");
     const [role, setRole] = useState("");
     const [pouvoir, setPouvoir] = useState("");
-    const [etatUser, setEtatUser] = useState<mortVivantEnum>(mortVivantEnum.mort);
+    const [etatUser, setEtatUser] = useState<mortVivantEnum>(mortVivantEnum.vivant);
 
 
     const onRole = (data: { role: string; nbWerewolfs: number }): void => {
