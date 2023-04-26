@@ -7,6 +7,7 @@ const LOGGER = new Logger("WEBSOCKET");
 
 export const UserContext = React.createContext<{
     token: string;
+    etatUser: string;
     setToken:(token: string) => void;
     username: string;
     role :string;
@@ -14,15 +15,18 @@ export const UserContext = React.createContext<{
     setUsername: (username: string) => void;
     setRole: (role: string) => void;
     setPouvoir: (pouvoir: string) => void;
+    setEtatUser: (etat: string) => void;
         }>({
             role: "",
+            etatUser: "", //Vivant ou mort
             pouvoir: "",
             token: "",
             setToken: () => null,
             username: "",
             setUsername: () => null,
             setRole: () => null,
-            setPouvoir: () => null
+            setPouvoir: () => null,
+            setEtatUser: () => null
         });
 
 export function UserProvider(props: { children: React.ReactNode }): React.ReactElement {
@@ -32,6 +36,7 @@ export function UserProvider(props: { children: React.ReactNode }): React.ReactE
     const [username, setUsername] = useState("");
     const [role, setRole] = useState("");
     const [pouvoir, setPouvoir] = useState("");
+    const [etatUser, setEtatUser] = useState("vivant");
 
 
     const onRole = (data: { role: string; nbWerewolfs: number }): void => {

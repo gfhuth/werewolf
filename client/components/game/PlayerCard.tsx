@@ -50,8 +50,12 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
             <Center>
                 <Pressable
                     onPress={(): void => {
-                        setPlayerVote(props.player.username);
-                        onOpen();
+                        if (userContext.etatUser == "vivant") {
+                            setPlayerVote(props.player.username);
+                            onOpen();
+                        } else {
+                            setMessageToast("Vous etes mort, vous ne pouvez pas voter");
+                        }
                     }}
                     display={"flex"}
                     flexDirection={"row"}
