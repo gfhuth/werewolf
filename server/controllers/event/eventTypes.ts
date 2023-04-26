@@ -45,7 +45,7 @@ export type ServerToClientEvents = {
         status: number;
     };
     LIST_PLAYERS: {
-        players: Array<{ user: string; werewolf: boolean; power: string; alive: boolean }>
+        players: Array<{ user: string; alive: boolean }>
     };
     NIGHT_STARTS: {};
     SET_POWER: {
