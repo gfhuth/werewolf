@@ -9,13 +9,13 @@ export type ClientToServerEvents = {
     };
     GET_ALL_INFO: {};
     UPDATE_CHAT_SPIRITSM: {
-        dead_player: string;
+        target: string;
     };
     USE_POWER_VOYANCE: {
-        target: number;
+        target: string;
     };
     USE_POWER_CONTAMINATION: {
-        target: number;
+        target: string;
     };
     USE_POWER: {
         // FIXME ça n'a aucun sens

@@ -84,7 +84,6 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
 
     const registerEventHandler = (event: string, callback: EventHandlerCallback): void => {
         setEventHandlers(eh => ({ ...eh, [event]: callback }));
-        console.log("here");
     };
 
     const sendMessage = (event: string, data: any): void => {
