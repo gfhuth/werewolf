@@ -1,7 +1,6 @@
 import { ServerToClientEvents } from "../controllers/event/eventTypes";
 import database from "../util/database";
 import { Game } from "./gameModel";
-import { Contamination } from "./powersModel";
 import { User } from "./userModel";
 import { Human, Villager, Werewolf } from "./villagerModel";
 
@@ -108,17 +107,13 @@ export class Player {
             .addColumn("game", "integer", (col) => col.references("games.id").onDelete("cascade"))
             .execute();
     };
-    /** Create a new permutation of players
-     * @param {Player[]} players players to shuffle
+
+    /**
+     * Create a new permutation of players
+     * @param {Array<Player>} players array to shuffle
      */
-    public static shuffle(players: Player[]): void {
-        for (let i = 0; i < players.length; i++) {
-            const playerTemp = players[i];
-            //Bettween i and players.length
-            const j = Math.floor(Math.random() * players.length) + i;
-            players[i] = players[j];
-            players[j] = playerTemp;
-        }
+    public static shuffle(players: Array<Player>): void {
+        players.sort((player) => Math.random() - Math.random());
     }
 
 }
