@@ -34,7 +34,6 @@ describe("Test games", () => {
                     probaSpiritisme: 0.1
                 })
             );
-        console.log(res.text);
         expect(res.status).toEqual(200);
     });
 

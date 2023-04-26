@@ -145,8 +145,10 @@ export class Game {
 
         // Mort du résultat des votes
         const resultWerewolfVote: Player = this.currentVote.getResult();
-        if (resultWerewolfVote) resultWerewolfVote.kill();
-        LOGGER.log(`player ${resultWerewolfVote.getUser().getUsername()} is dead`);
+        if (resultWerewolfVote) {
+            resultWerewolfVote.kill();
+            LOGGER.log(`player ${resultWerewolfVote.getUser().getUsername()} is dead`);
+        }
 
         // Réinitialisation du chat
         this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
@@ -176,8 +178,10 @@ export class Game {
         // Mort du résultat des votes
         if (this.currentVote) {
             const resultVillageVote: Player = this.currentVote.getResult();
-            if (resultVillageVote) resultVillageVote.kill();
-            LOGGER.log(`player ${resultVillageVote.getUser().getUsername()} is dead`);
+            if (resultVillageVote) {
+                resultVillageVote.kill();
+                LOGGER.log(`player ${resultVillageVote.getUser().getUsername()} is dead`);
+            }
         }
 
         // Réinitialisation des chats
