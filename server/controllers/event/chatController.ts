@@ -1,11 +1,9 @@
 import { Chat, ChatType, Message } from "../../models/chatModel";
 import { Game, GameStatus } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
-import SpiritismPower from "../../models/powers/SpiritismPower";
 import database from "../../util/database";
 import { Event } from "../eventController";
 import Logger from "../../util/Logger";
-import { ClientToServerEvents } from "./eventTypes";
 import ClairvoyancePower from "../../models/powers/ClairvoyancePower";
 
 const LOGGER = new Logger("WEBSOCKET");
@@ -73,21 +71,6 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
     }
 };
 
-// /**
-//  * Met à jour les membres du chat du chaman
-//  * @param {Game} game Partie dans laquelle le chat est à mettre à jour
-//  * @param {Player} player Utilisateur qui a le pouvoir du spiritisme
-//  * @param {Require<string, any>} data Nom du joueur mort avec qui le chaman échange la nuit
-//  */
-// const updateChat = (game: Game, player: Player, data: { dead_player: string }): void => {
-//     const chaman: Player = game.getPlayer(player.getUser().getUsername());
-//     if (chaman.hasPower(SpiritismPower.POWERNAME)) {
-//         chaman.sendError("CHAT_ERROR", 403, "User hasn't spiritism power");
-//         return;
-//     }
-//     game.updateSpiritismChat(chaman, game.getPlayer(data.dead_player));
-// };
-
 const getAllChats = async (game: Game, player: Player): Promise<void> => {
     let res: { [key in ChatType]: Array<Message> };
     LOGGER.log(`CHAT ALL CHAT START`);
@@ -103,4 +86,3 @@ const getAllChats = async (game: Game, player: Player): Promise<void> => {
 // Liste des événements relatifs aux messages
 Event.registerHandlers("CHAT_SENT", newMessage);
 Event.registerHandlers("GET_ALL_INFO", getAllChats);
-// Event.registerHandlers("UPDATE_CHAT_SPIRITSM", updateChat);

@@ -13,17 +13,34 @@ export default class SpiritismPower extends Power {
     public constructor() {
         super(SpiritismPower.name);
         // The game begins in the night
-        this.ready = false; 
+        this.ready = false;
     }
 
     public isCompatibleWith(player: Player): boolean {
-        throw new Error("Not Implemented yet");
+        return true;
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_SPIRITISM"]): void {
-        throw new Error("Method not implemented.");
+        if (player.getPower().getName() !== SpiritismPower.POWERNAME) {
+            player.sendError("POWER_ERROR", 403, "Player don't have spiritism power");
+            return;
+        }
+
+        if (!game.getPlayer(data.target)) {
+            player.sendError("POWER_ERROR", 403, "Dead player is not in the game");
+            return;
+        }
+
+        const deadPlayer: Player = game.getPlayer(data.target);
+        if (!deadPlayer.isDead()) {
+            player.sendError("POWER_ERROR", 403, "Dead player is not dead");
+            return;
+        }
+
+        game.setChatSpiritism(player, deadPlayer);
+        this.ready = true;
     }
 
 }
 
-Event.registerHandlers("USE_POWER_CONTAMINATION", usePower);
+Event.registerHandlers("USE_POWER_SPIRITISM", usePower);

@@ -48,10 +48,6 @@ export class Game {
     private chats: Array<Chat>;
     private currentVote: Vote;
 
-    /**
-     * @param {number} gameId is the id of the game
-     * @param {GameParam} gameParam parameters of the game
-     */
     constructor(gameId: number, host: User, gameParam: GameParam) {
         this.gameId = gameId;
         this.host = host;
@@ -83,9 +79,8 @@ export class Game {
      * @param {Player} deadPlayer Joueur mort qui échange avec lui la nuit
      * @returns {void}
      */
-    public updateSpiritismChat(chaman: Player, deadPlayer: Player): void {
-        if (this.chats.length !== 3) return;
-        this.chats[2].resetChatMembers([chaman, deadPlayer]);
+    public setChatSpiritism(chaman: Player, deadPlayer: Player): void {
+        this.chats[ChatType.CHAT_SPIRITISM].resetChatMembers([chaman, deadPlayer]);
     }
 
     public addPlayer(player: Player): void {
