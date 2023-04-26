@@ -40,6 +40,9 @@ export type ServerToClientEvents = {
     GET_ALL_INFO_GAME: {
         status: number;
     };
+    LIST_PLAYERS: {
+        players: Array<string>
+    };
     SET_POWER: {
         power: string
     };
