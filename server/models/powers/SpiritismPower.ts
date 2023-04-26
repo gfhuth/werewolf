@@ -38,7 +38,6 @@ export default class SpiritismPower extends Power {
         }
 
         game.setChatSpiritism(player, deadPlayer);
-        this.ready = true;
     }
 
 }
