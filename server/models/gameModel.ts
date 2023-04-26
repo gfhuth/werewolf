@@ -176,9 +176,11 @@ export class Game {
         LOGGER.log(`game ${this.getGameId()} changed to night`);
 
         // Mort du résultat des votes
-        const resultVillageVote: Player = this.getVote().getResult();
-        if (resultVillageVote) resultVillageVote.kill();
-        LOGGER.log(`player ${resultVillageVote.getUser().getUsername()} is dead`);
+        if (!this.getVote()) {
+            const resultVillageVote: Player = this.getVote().getResult();
+            if (resultVillageVote) resultVillageVote.kill();
+            LOGGER.log(`player ${resultVillageVote.getUser().getUsername()} is dead`);
+        }
 
         // Réinitialisation des chats
         this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
@@ -232,6 +234,7 @@ export class Game {
         LOGGER.log(`game ${this.gameId} successfuly initialized`);
         this.startNight();
     }
+
     /* ------------------ Getter et Setter ------------------ */
 
     /** Return Id of the game
