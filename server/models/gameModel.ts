@@ -284,27 +284,6 @@ export class Game {
         };
     }
 
-    /** Compute the status of the game
-     * return an object of shape { status: number, timePassed: number }
-     * status :
-     *   -1 = not started, 0 = first day, 1 = first night, 2 = second days, ...
-     * timePassed : Time passed since the start of the current day or night
-     * @returns { JSON }
-     */
-    // public getStatus(): { status: number; timePassed: number } {
-    //     const timeSinceGameStart: number = Date.now() - this.gameParam.startDate;
-    //     if (timeSinceGameStart < 0) {
-    //         return { status: -1, timePassed: 0 };
-    //     } else {
-    //         const timeOfOneCycle = this.gameParam.dayLength + this.gameParam.nightLength;
-    //         const numberOfCycle = Math.floor(timeSinceGameStart / timeOfOneCycle);
-    //         const timeSinceCycleStart = timeSinceGameStart % timeOfOneCycle;
-    //         // If we are day.
-    //         if (timeSinceCycleStart - this.gameParam.nightLength <= 0) return { status: 1 + 2 * numberOfCycle, timePassed: timeSinceCycleStart };
-    //         else return { status: 2 * (numberOfCycle + 1), timePassed: timeSinceCycleStart - this.gameParam.nightLength };
-    //     }
-    // }
-
     public getStatus(): GameStatus {
         const timeSinceGameStart: number = Date.now() - this.gameParam.startDate;
         if (timeSinceGameStart < 0) return GameStatus.NOT_STARTED;
