@@ -25,7 +25,6 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
     };
     // TODO: vérifier que le message est sans erreurs
 
-
     LOGGER.log(`New message`);
     // On récupère le chat concerné
     const chat: Chat = game.getChat(data.chat_type);
@@ -47,11 +46,13 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
         return;
     }
 
-    if (data.chat_type === ChatType.CHAT_WEREWOLF && player.getPower().getName() === ClairvoyancePower.POWERNAME) {
-        player.sendError("CHAT_ERROR", 403, "Insomnia cannot send message into werewolfs chat");
-        return;
+    if (player.getPower()) {
+        if (data.chat_type === ChatType.CHAT_WEREWOLF && player.getPower().getName() === ClairvoyancePower.POWERNAME) {
+            player.sendError("CHAT_ERROR", 403, "Insomnia cannot send message into werewolfs chat");
+            return;
+        }
     }
-    
+
     // On envoie le message sur ce chat
     if (chat) {
         if (chat.getMembers().length === 0) {
@@ -78,7 +79,6 @@ const getAllChats = async (game: Game, player: Player): Promise<void> => {
     res[ChatType.CHAT_SPIRITISM] = game.getChat(ChatType.CHAT_SPIRITISM).getMessages();
     LOGGER.log(`CHAT ALL CHAT END`);
 
-    
     player.sendMessage("GET_ALL_INFO_CHAT", res);
 };
 
