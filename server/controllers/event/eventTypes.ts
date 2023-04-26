@@ -34,6 +34,7 @@ export type ServerToClientEvents = {
         chat_type: ChatType;
         content: string;
     };
+    DAY_STARTS: {};
     GAME_DELETED: {
         message: string;
     };
@@ -44,14 +45,15 @@ export type ServerToClientEvents = {
         status: number;
     };
     LIST_PLAYERS: {
-        players: Array<string>
+        players: Array<{ user: string; werewolf: boolean; power: string; alive: boolean }>
     };
+    NIGHT_STARTS: {};
     SET_POWER: {
-        power: string
+        power: string;
     };
     SET_ROLE: {
-        role: number,
-        nbWerewolfs: number
+        role: number;
+        nbWerewolfs: number;
     };
     VOTE_RECEIVED: {
         vote_type: VoteType;
