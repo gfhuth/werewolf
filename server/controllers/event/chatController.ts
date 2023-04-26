@@ -34,15 +34,15 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
         player.sendError("CHAT_ERROR", 403, "Game is not started");
         return;
     }
-    if (data.chat_type !== ChatType.CHAT_VILLAGE && game.getStatus() !== GameStatus.DAY) {
-        player.sendError("CHAT_ERROR", 403, "Chat Viallage unavailable during the night");
+    if (data.chat_type === ChatType.CHAT_VILLAGE && game.getStatus() !== GameStatus.DAY) {
+        player.sendError("CHAT_ERROR", 403, "Chat Village unavailable during the night");
         return;
     }
-    if (data.chat_type !== ChatType.CHAT_WEREWOLF && game.getStatus() !== GameStatus.NIGHT) {
+    if (data.chat_type === ChatType.CHAT_WEREWOLF && game.getStatus() !== GameStatus.NIGHT) {
         player.sendError("CHAT_ERROR", 403, "Chat Werewolf unavailable during the day");
         return;
     }
-    if (data.chat_type !== ChatType.CHAT_SPIRITISM && game.getStatus() !== GameStatus.NIGHT) {
+    if (data.chat_type === ChatType.CHAT_SPIRITISM && game.getStatus() !== GameStatus.NIGHT) {
         player.sendError("CHAT_ERROR", 403, "Chat Spiritism unavailable during the day");
         return;
     }
@@ -51,9 +51,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
         player.sendError("CHAT_ERROR", 403, "Insomnia cannot send message into werewolfs chat");
         return;
     }
-
-    await database.insertInto("messages").values(message).execute();
-
+    
     // On envoie le message sur ce chat
     if (chat) {
         if (chat.getMembers().length === 0) {
@@ -64,6 +62,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
             player.sendError("CHAT_ERROR", 403, "This player is not a member of this chat");
             return;
         }
+        await database.insertInto("messages").values(message).execute();
         chat.addMessage(message);
     } else {
         player.sendError("CHAT_ERROR", 500, "Chat null");
