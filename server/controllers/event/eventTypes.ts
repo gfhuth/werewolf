@@ -1,4 +1,5 @@
 import { ChatType, Message } from "../../models/chatModel";
+import { Role } from "../../models/gameModel";
 import { VoteType } from "../../models/voteModel";
 
 export type ClientToServerEvents = {
@@ -34,6 +35,10 @@ export type ServerToClientEvents = {
         chat_type: ChatType;
         content: string;
     };
+    CLAIRVOYANCE_RESPONSE: {
+        role: Role;
+        power: string;
+    };
     DAY_STARTS: {};
     GAME_DELETED: {
         message: string;
@@ -45,7 +50,7 @@ export type ServerToClientEvents = {
         status: number;
     };
     LIST_PLAYERS: {
-        players: Array<{ user: string; alive: boolean }>
+        players: Array<{ user: string; alive: boolean }>;
     };
     NIGHT_STARTS: {};
     SET_POWER: {
