@@ -41,7 +41,7 @@ export type ServerToClientEvents = {
     };
     DAY_STARTS: {};
     END_GAME: {
-        message: string;
+        winningRole: Role;
     };
     GAME_DELETED: {
         message: string;

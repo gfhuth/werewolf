@@ -154,12 +154,12 @@ export class Game {
     }
 
     public verifyEndGame(): boolean {
-        let endMessage: string;
-        if (this.getWerewolfs().filter((player) => !player.isDead()).length === 0) endMessage = "Victoire des villageois !!!";
-        else if (this.getAllPlayers().filter((player) => !player.isWerewolf() && !player.isDead()).length === 0) endMessage = "Victoire des loup-garous !!!";
+        let winningRole: Role;
+        if (this.getWerewolfs().filter((player) => !player.isDead()).length === 0) winningRole = Role.VILLAGER;
+        else if (this.getAllPlayers().filter((player) => !player.isWerewolf() && !player.isDead()).length === 0) winningRole = Role.WEREWOLF;
 
-        if (endMessage) {
-            this.getAllPlayers().forEach((player) => player.sendMessage("END_GAME", { message: endMessage }));
+        if (winningRole === Role.VILLAGER || winningRole === Role.WEREWOLF) {
+            this.getAllPlayers().forEach((player) => player.sendMessage("END_GAME", { winningRole: winningRole }));
             return true;
         }
 
