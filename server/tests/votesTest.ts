@@ -1,29 +1,31 @@
 import { VoteType } from "../models/voteModel";
-import { Client } from "./websocketsTest";
-import { token1, token2, username1 } from "./usersTest";
+import { client1, client2 } from "./usersTest";
 
-let client1: Client;
-let client2: Client;
+// beforeAll(async () => {
+//     client1.setWebsocketConnection();
+//     await client1.connect();
 
-beforeAll(async () => {
-    client1 = new Client();
-    await client1.connect();
+//     client2.setWebsocketConnection();
+//     await client2.connect();
+// });
 
-    client2 = new Client();
-    await client2.connect();
-});
-
-afterAll(() => {
-    client1.closeSocket();
-    client2.closeSocket();
-});
+// afterAll(() => {
+//     client1.closeSocket();
+//     client2.closeSocket();
+// });
 
 describe("Test votes", () => {
     test("Authenticate client on websocket", async () => {
-        let isAuthenticated: boolean = await client1.authenticate(token1);
+        client1.setWebsocketConnection();
+        await client1.connect();
+
+        client2.setWebsocketConnection();
+        await client2.connect();
+
+        let isAuthenticated: boolean = await client1.authenticate();
         expect(isAuthenticated).toEqual(true);
 
-        isAuthenticated = await client2.authenticate(token2);
+        isAuthenticated = await client2.authenticate();
         expect(isAuthenticated).toEqual(true);
     });
 
@@ -34,7 +36,7 @@ describe("Test votes", () => {
                 event: "VOTE_SENT",
                 data: {
                     vote_type: VoteType.VOTE_WEREWOLF,
-                    vote: username1
+                    vote: client1.getName()
                 }
             })
         );
@@ -45,7 +47,7 @@ describe("Test votes", () => {
                 event: "VOTE_SENT",
                 data: {
                     vote_type: VoteType.VOTE_WEREWOLF,
-                    vote: username1
+                    vote: client1.getName()
                 }
             })
         );
@@ -60,5 +62,9 @@ describe("Test votes", () => {
             expect(res2.event).toEqual("VOTE_RECEIVED");
             expect(res1.data.vote_type).toEqual(VoteType.VOTE_WEREWOLF);
         }
+    });
+    test("Close socket", () => {
+        client1.closeSocket();
+        client2.closeSocket();
     });
 });

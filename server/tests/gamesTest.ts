@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import request from "supertest";
-import { token1, token2 } from "./usersTest";
+import { client1, client2 } from "./usersTest";
 
 const { PORT, HOST } = process.env;
 
@@ -19,7 +19,7 @@ describe("Test games", () => {
         const res = await request(url)
             .post("/game/new")
             .set("content-type", "application/json")
-            .set("x-access-token", token1)
+            .set("x-access-token", client1.getToken())
             .send(
                 JSON.stringify({
                     nbPlayerMin: 2,
@@ -38,7 +38,7 @@ describe("Test games", () => {
     });
 
     test("Join game", async () => {
-        const res = await request(url).post("/game/1/join").set("x-access-token", token2);
+        const res = await request(url).post("/game/1/join").set("x-access-token", client2.getToken());
         expect(res.status).toEqual(200);
 
         // On attend testTiming secondes pour que la partie créée commence

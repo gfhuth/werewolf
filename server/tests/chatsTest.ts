@@ -1,29 +1,31 @@
 import { ChatType } from "../models/chatModel";
-import { Client } from "./websocketsTest";
-import { token1, token2 } from "./usersTest";
+import { client1, client2 } from "./usersTest";
 
-let client1: Client;
-let client2: Client;
+// beforeAll(async () => {
+//     client1.setWebsocketConnection();
+//     await client1.connect();
 
-beforeAll(async () => {
-    client1 = new Client();
-    await client1.connect();
+//     client2.setWebsocketConnection();
+//     await client2.connect();
+// });
 
-    client2 = new Client();
-    await client2.connect();
-});
-
-afterAll(() => {
-    client1.closeSocket();
-    client2.closeSocket();
-});
+// afterAll(() => {
+//     client1.closeSocket();
+//     client2.closeSocket();
+// });
 
 describe("Test chats", () => {
     test("Authenticate client on websocket", async () => {
-        let isAuthenticated: boolean = await client1.authenticate(token1);
+        client1.setWebsocketConnection();
+        await client1.connect();
+
+        client2.setWebsocketConnection();
+        await client2.connect();
+
+        let isAuthenticated: boolean = await client1.authenticate();
         expect(isAuthenticated).toEqual(true);
 
-        isAuthenticated = await client2.authenticate(token2);
+        isAuthenticated = await client2.authenticate();
         expect(isAuthenticated).toEqual(true);
     });
     test("Send message", async () => {
@@ -72,5 +74,9 @@ describe("Test chats", () => {
             expect(res1.status).toEqual(403);
             expect(res1.message).toEqual("This player is not a member of this chat");
         }
+    });
+    test("Close socket", () => {
+        client1.closeSocket();
+        client2.closeSocket();
     });
 });
