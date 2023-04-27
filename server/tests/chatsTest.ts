@@ -1,33 +1,22 @@
 import { ChatType } from "../models/chatModel";
 import { client1, client2 } from "./usersTest";
 
-// beforeAll(async () => {
-//     client1.setWebsocketConnection();
-//     await client1.connect();
-
-//     client2.setWebsocketConnection();
-//     await client2.connect();
-// });
-
-// afterAll(() => {
-//     client1.closeSocket();
-//     client2.closeSocket();
-// });
-
 describe("Test chats", () => {
-    test("Authenticate client on websocket", async () => {
+    beforeAll(async () => {
         client1.setWebsocketConnection();
         await client1.connect();
+        await client1.authenticate();
 
         client2.setWebsocketConnection();
         await client2.connect();
-
-        let isAuthenticated: boolean = await client1.authenticate();
-        expect(isAuthenticated).toEqual(true);
-
-        isAuthenticated = await client2.authenticate();
-        expect(isAuthenticated).toEqual(true);
+        await client2.authenticate();
     });
+
+    afterAll(() => {
+        client1.closeSocket();
+        client2.closeSocket();
+    });
+
     test("Send message", async () => {
         const now: number = Date.now();
 

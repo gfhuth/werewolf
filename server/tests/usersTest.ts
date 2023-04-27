@@ -1,14 +1,130 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import * as WebSocket from "ws";
 import request from "supertest";
-
 import jwt from "jsonwebtoken";
-import { Client } from "./websocketsTest";
+import Logger from "../util/Logger";
 
 const { PORT, HOST } = process.env;
 
 const url = `http://${HOST}:${PORT}`;
+
+const LOGGER = new Logger("CLIENTS");
+
+export class Client {
+
+    private name: string;
+    private token: string;
+
+    private ws: WebSocket.WebSocket;
+    private messages: Array<string>;
+    private messageResolver: (msg: Record<string, any>) => void | null;
+
+    private expectedEvents: Array<Record<string, any>>;
+
+    constructor(name: string) {
+        this.name = name;
+        this.token = "";
+
+        this.messages = [];
+        this.ws = null;
+        this.messageResolver = null;
+
+        this.expectedEvents = [];
+    }
+
+    public getName(): string {
+        return this.name;
+    }
+
+    public getToken(): string {
+        return this.token;
+    }
+
+    public setToken(token: string): void {
+        this.token = token;
+    }
+
+    public getExpectedEvent(): Array<Record<string, any>> {
+        return this.expectedEvents;
+    }
+
+    public addExpectedEvent(expectedEvent: Record<string, any>): void {
+        this.expectedEvents.push(expectedEvent);
+    }
+
+    public getWebSocket(): WebSocket.WebSocket {
+        return this.ws;
+    }
+
+    public setWebsocketConnection(): void {
+        if (!this.ws) this.ws = new WebSocket.WebSocket(`ws://${HOST}:${PORT}`);
+    }
+
+    public closeSocket(): void {
+        this.ws.close();
+        this.ws = null;
+    }
+
+    public getNextMessage(): Promise<Record<string, any>> {
+        return new Promise((resolve) => {
+            if (this.messages.length > 0) LOGGER.log(this.messages[0]);
+            if (this.messages.length > 0) return resolve(JSON.parse(this.messages.shift()));
+            else this.messageResolver = resolve;
+        });
+    }
+
+    public async getNextEvent(event: string): Promise<Record<string, any>> {
+        let message: Record<string, any>;
+        while ((message = await this.getNextMessage()).event !== event) {}
+        return message;
+    }
+
+    public sendMessage(message: string): void {
+        this.ws.send(message);
+    }
+
+    public connect(): Promise<void> {
+        return new Promise((resolve) => {
+            this.ws.on("open", () => {
+                resolve();
+            });
+            this.ws.on("message", (msg) => {
+                const data: string = msg as unknown as string;
+                if (this.messageResolver) {
+                    this.messageResolver(JSON.parse(data));
+                    this.messageResolver = null;
+                } else {
+                    this.messages.push(data);
+                }
+            });
+        });
+    }
+
+    public async authenticate(): Promise<boolean> {
+        this.sendMessage(
+            JSON.stringify({
+                event: "AUTHENTICATION",
+                data: { token: this.token }
+            })
+        );
+        const res: Record<string, any> = await this.getNextEvent("AUTHENTICATION");
+        return res.status === 200;
+    }
+
+    public async verifyEvent(): Promise<void> {
+        let message: Record<string, any>;
+        while (!this.expectedEvents.map<string>((res) => res.event).includes((message = await this.getNextMessage()).event)) {}
+
+        expect(message).toMatchObject(this.expectedEvents.find((res) => res.event === message.event));
+    }
+
+    public reinitExpectedEvents(): void {
+        this.expectedEvents.length = 0;
+    }
+
+}
 
 const client1 = new Client("pierreh");
 const password1 = "AZERTY1234";

@@ -1,32 +1,20 @@
 import { VoteType } from "../models/voteModel";
 import { client1, client2 } from "./usersTest";
 
-// beforeAll(async () => {
-//     client1.setWebsocketConnection();
-//     await client1.connect();
-
-//     client2.setWebsocketConnection();
-//     await client2.connect();
-// });
-
-// afterAll(() => {
-//     client1.closeSocket();
-//     client2.closeSocket();
-// });
-
 describe("Test votes", () => {
-    test("Authenticate client on websocket", async () => {
+    beforeAll(async () => {
         client1.setWebsocketConnection();
         await client1.connect();
+        await client1.authenticate();
 
         client2.setWebsocketConnection();
         await client2.connect();
+        await client2.authenticate();
+    });
 
-        let isAuthenticated: boolean = await client1.authenticate();
-        expect(isAuthenticated).toEqual(true);
-
-        isAuthenticated = await client2.authenticate();
-        expect(isAuthenticated).toEqual(true);
+    afterAll(() => {
+        client1.closeSocket();
+        client2.closeSocket();
     });
 
     test("Send vote", async () => {
@@ -62,9 +50,5 @@ describe("Test votes", () => {
             expect(res2.event).toEqual("VOTE_RECEIVED");
             expect(res1.data.vote_type).toEqual(VoteType.VOTE_WEREWOLF);
         }
-    });
-    test("Close socket", () => {
-        client1.closeSocket();
-        client2.closeSocket();
     });
 });
