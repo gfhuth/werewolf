@@ -9,6 +9,11 @@ export type ClientToServerEvents = {
         content: string;
     };
     GET_ALL_INFO: {};
+    RESPONSE_RATIFICATION: {
+        vote_type: VoteType;
+        playerVoted: string;
+        ratification: boolean;
+    };
     USE_POWER_SPIRITISM: {
         target: string;
     };
@@ -24,11 +29,15 @@ export type ClientToServerEvents = {
     };
     VOTE_SENT: {
         vote_type: VoteType;
-        vote: string;
+        playerVoted: string;
     };
 };
 
 export type ServerToClientEvents = {
+    ASK_RATIFICATION: {
+        vote_type: VoteType;
+        playerVoted: string;
+    };
     CHAT_RECEIVED: {
         author: string;
         date: number;
@@ -63,12 +72,13 @@ export type ServerToClientEvents = {
         role: number;
         nbWerewolfs: number;
     };
-    VOTE_RECEIVED: {
+    VOTE_INVALID: {
         vote_type: VoteType;
+        playerVoted: string;
     };
     VOTE_VALID: {
         vote_type: VoteType;
-        result: string;
+        playerVoted: string;
     };
     USE_POWER_VALID: {
         // Empty

@@ -8,14 +8,14 @@ export enum VoteType {
 export class Vote {
 
     private type: VoteType;
-    private votes: { [key: string]: Player } = {};
+    private votes: { [key: string]: { [key: string]: boolean | undefined } } = {};
     private participants: Array<Player>;
     private result: Player;
 
     constructor(type: VoteType, players: Array<Player>) {
         this.type = type;
         this.participants = players;
-        players.forEach((player) => (this.votes[player.getUser().getUsername()] = null));
+        players.forEach((player) => (this.votes[player.getUser().getUsername()] = {}));
         this.result = null;
     }
 
@@ -35,18 +35,37 @@ export class Vote {
         return this.result !== null;
     }
 
-    public addVote(playerWhoVote: Player, vote: Player): void {
-        this.votes[playerWhoVote.getUser().getUsername()] = vote;
+    private voteValidation(playerVoted: Player): void {
+        let nbVote: number;
+        for (const player of this.participants) {
+            if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()] === undefined) return;
+            if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()]) nbVote++;
+        }
+        if (nbVote <= this.participants.length / 2) {
+            this.participants.forEach((player) => player.sendMessage("VOTE_INVALID", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
+            return;
+        }
 
-        playerWhoVote.sendMessage("VOTE_RECEIVED", { vote_type: this.type });
-
-        // On vérifie si on peut valider le vote
-        for (const player in this.votes) if (this.votes[player] !== vote) return;
-
-        this.result = vote;
-
+        this.result = playerVoted;
         // On annonce à tous les joueurs que le vote est validé
-        for (const player of this.participants) player.sendMessage("VOTE_VALID", { vote_type: this.type, result: this.result.getUser().getUsername() });
+        this.participants.forEach((player) => player.sendMessage("VOTE_VALID", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
+    }
+
+    public addProposition(playerWhoVote: Player, playerVoted: Player): void {
+        this.votes[playerVoted.getUser().getUsername()][playerWhoVote.getUser().getUsername()] = true;
+        this.participants
+            .filter((player) => player !== playerWhoVote)
+            .forEach((player) => player.sendMessage("ASK_RATIFICATION", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
+
+        // On regarde si le vote est terminée et/ou valide
+        this.voteValidation(playerVoted);
+    }
+
+    public ratifyProposition(playerWhoRatify: Player, playerVoted: Player, ratification: boolean): void {
+        this.votes[playerVoted.getUser().getUsername()][playerWhoRatify.getUser().getUsername()] = ratification;
+        
+        // On regarde si le vote est terminée et/ou valide
+        this.voteValidation(playerVoted);
     }
 
 }
