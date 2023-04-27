@@ -71,11 +71,12 @@ export class WebsocketConnection {
                 this.user = User.getUser(username);
                 this.user.setWebsocket(this.ws);
 
+                this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" }));
+                LOGGER.log(`Authentication succeeded : user ${this.user.getUsername()} logged in`);
+
                 // Envoie des sockettes en attentes
                 this.user.sendWaitingMessages();
 
-                this.ws.send(JSON.stringify({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" }));
-                LOGGER.log(`Authentication succeeded : user ${this.user.getUsername()} logged in`);
                 return;
             }
             if (!this.isAuthenticated()) {

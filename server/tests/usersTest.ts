@@ -59,7 +59,7 @@ export class Client {
     }
 
     public setWebsocketConnection(): void {
-        if (!this.ws) this.ws = new WebSocket.WebSocket(`ws://${HOST}:${PORT}`);
+        this.ws = new WebSocket.WebSocket(`ws://${HOST}:${PORT}`);
     }
 
     public closeSocket(): void {
@@ -102,20 +102,25 @@ export class Client {
         });
     }
 
-    public async authenticate(): Promise<boolean> {
+    public async authenticate(): Promise<void> {
         this.sendMessage(
             JSON.stringify({
                 event: "AUTHENTICATION",
                 data: { token: this.token }
             })
         );
-        const res: Record<string, any> = await this.getNextEvent("AUTHENTICATION");
-        return res.status === 200;
+        const res: Record<string, any> = await this.getNextMessage();
+        LOGGER.log(JSON.stringify(res));
+        expect(res.status).toEqual(200);
     }
 
     public async verifyEvent(): Promise<void> {
         let message: Record<string, any>;
-        while (!this.expectedEvents.map<string>((res) => res.event).includes((message = await this.getNextMessage()).event)) {}
+        message = await this.getNextMessage();
+        while (!this.expectedEvents.map<string>((res) => res.event).includes(message.event)) {
+            console.log(message, this.expectedEvents);
+            message = await this.getNextMessage();
+        }
 
         expect(message).toMatchObject(this.expectedEvents.find((res) => res.event === message.event));
     }
