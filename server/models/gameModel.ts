@@ -110,7 +110,7 @@ export class Game {
         const nbWerewolfs: number = Math.max(1, Math.ceil(this.gameParam.percentageWerewolf * this.getAllPlayers().length));
         const players: Array<Player> = this.getAllPlayers();
         const werewolfs: Array<Player> = [];
-        while (werewolfs.length < nbWerewolfs) {
+        while (players.length > 0 && werewolfs.length < nbWerewolfs) {
             const werewolf: Player = players[Math.floor(Math.random() * players.length)];
             werewolf.setWerewolf(true);
             werewolf.sendMessage("SET_ROLE", { role: Role.WEREWOLF, nbWerewolfs: nbWerewolfs });
