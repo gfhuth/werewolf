@@ -139,14 +139,14 @@ export class Game {
         }
 
         let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getPower());
-        if (Math.random() <= this.gameParam.probaSpiritisme) {
+        if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaSpiritisme) {
             const spiritisme: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
             spiritisme.setPower(new SpiritismPower());
             spiritisme.sendMessage("SET_POWER", { power: spiritisme.getPower().getName() });
         }
 
         playersWithoutPower = playersWithoutPower.filter((player) => !player.getPower());
-        if (Math.random() <= this.gameParam.probaVoyance) {
+        if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaVoyance) {
             const voyance: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
             voyance.setPower(new ClairvoyancePower());
             voyance.sendMessage("SET_POWER", { power: voyance.getPower().getName() });
