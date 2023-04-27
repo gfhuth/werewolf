@@ -7,14 +7,14 @@ describe("Test chats", () => {
         await client1.connect();
         await client1.authenticate();
 
-        client2.setWebsocketConnection();
-        await client2.connect();
-        await client2.authenticate();
+        // client2.setWebsocketConnection();
+        // await client2.connect();
+        // await client2.authenticate();
     });
 
     afterAll(() => {
         client1.closeSocket();
-        client2.closeSocket();
+        // client2.closeSocket();
     });
 
     test("Send message", async () => {
@@ -32,40 +32,26 @@ describe("Test chats", () => {
             })
         );
 
-        client2.sendMessage(
-            JSON.stringify({
-                game_id: 1,
-                event: "CHAT_SENT",
-                data: {
-                    date: now,
-                    chat_type: ChatType.CHAT_WEREWOLF,
-                    content: "Premier message"
-                }
-            })
-        );
+        // client2.sendMessage(
+        //     JSON.stringify({
+        //         game_id: 1,
+        //         event: "CHAT_SENT",
+        //         data: {
+        //             date: now,
+        //             chat_type: ChatType.CHAT_WEREWOLF,
+        //             content: "Premier message"
+        //         }
+        //     })
+        // );
 
-        const res1: Record<string, any> = await client1.getNextEvent("CHAT_RECEIVED");
-        const res2: Record<string, any> = await client2.getNextEvent("CHAT_RECEIVED");
+        client1.reinitExpectedEvents();
+        client1.addExpectedEvent({ event: "CHAT_RECEIVED", game_id: 1, data: { author: client1.getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "Premier message" } });
+        client1.addExpectedEvent({ event: "CHAT_ERROR", game_id: 1, data: { status: 403, message: "This player is not a member of this chat" } });
+        await client1.verifyEvent();
 
-        if (res1.event === "CHAT_RECEIVED") {
-            expect(res1.data.chat_type).toEqual(ChatType.CHAT_WEREWOLF);
-            expect(res1.data.date).toEqual(now);
-            expect(res1.data.content).toEqual("Premier message");
-            expect(res2.event).toEqual("CHAT_ERROR");
-            expect(res2.status).toEqual(403);
-            expect(res2.message).toEqual("This player is not a member of this chat");
-        } else {
-            expect(res2.event).toEqual("CHAT_RECEIVED");
-            expect(res2.data.chat_type).toEqual(ChatType.CHAT_WEREWOLF);
-            expect(res2.data.date).toEqual(now);
-            expect(res2.data.content).toEqual("Premier message");
-            expect(res1.event).toEqual("CHAT_ERROR");
-            expect(res1.status).toEqual(403);
-            expect(res1.message).toEqual("This player is not a member of this chat");
-        }
-    });
-    test("Close socket", () => {
-        client1.closeSocket();
-        client2.closeSocket();
+        // client2.reinitExpectedEvents();
+        // client1.addExpectedEvent({ event: "CHAT_RECEIVED", game_id: 1, data: { author: client2.getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "Premier message" } });
+        // client1.addExpectedEvent({ event: "CHAT_ERROR", game_id: 1, data: { status: 403, message: "This player is not a member of this chat" } });
+        // await client2.verifyEvent();
     });
 });

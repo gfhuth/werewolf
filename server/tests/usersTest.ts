@@ -69,7 +69,7 @@ export class Client {
 
     public getNextMessage(): Promise<Record<string, any>> {
         return new Promise((resolve) => {
-            if (this.messages.length > 0) LOGGER.log(this.messages[0]);
+            // if (this.messages.length > 0) LOGGER.log(this.messages[0]);
             if (this.messages.length > 0) return resolve(JSON.parse(this.messages.shift()));
             else this.messageResolver = resolve;
         });
