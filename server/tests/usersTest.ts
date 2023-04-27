@@ -110,7 +110,7 @@ export class Client {
             })
         );
         const res: Record<string, any> = await this.getNextMessage();
-        LOGGER.log(JSON.stringify(res));
+        // LOGGER.log(JSON.stringify(res));
         expect(res.status).toEqual(200);
     }
 
@@ -118,11 +118,11 @@ export class Client {
         let message: Record<string, any>;
         message = await this.getNextMessage();
         while (!this.expectedEvents.map<string>((res) => res.event).includes(message.event)) {
-            console.log(message, this.expectedEvents);
+            // console.log(message, this.expectedEvents);
             message = await this.getNextMessage();
         }
 
-        expect(message).toMatchObject(this.expectedEvents.find((res) => res.event === message.event));
+        expect(this.expectedEvents).toContainEqual(message);
     }
 
     public reinitExpectedEvents(): void {
