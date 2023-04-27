@@ -24,7 +24,7 @@ describe("Test votes", () => {
                 event: "VOTE_SENT",
                 data: {
                     vote_type: VoteType.VOTE_WEREWOLF,
-                    vote: client1.getName()
+                    playerVoted: client1.getName()
                 }
             })
         );
@@ -35,19 +35,19 @@ describe("Test votes", () => {
                 event: "VOTE_SENT",
                 data: {
                     vote_type: VoteType.VOTE_WEREWOLF,
-                    vote: client1.getName()
+                    playerVoted: client1.getName()
                 }
             })
         );
 
         client1.reinitExpectedEvents();
-        client1.addExpectedEvent({ event: "VOTE_RECEIVED", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF } });
-        client1.addExpectedEvent({ event: "VOTE_ERROR", game_id: 1, data: { status: 403, message: "Player doesn't participate to this vote" } });
+        client1.addExpectedEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: client1.getName() } });
+        client1.addExpectedEvent({ event: "VOTE_ERROR", game_id: 1, data: { status: 403, message: "Player voted doesn't participate to this vote" } });
         await client1.verifyEvent();
 
         client2.reinitExpectedEvents();
-        client2.addExpectedEvent({ event: "VOTE_RECEIVED", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF } });
-        client2.addExpectedEvent({ event: "VOTE_ERROR", game_id: 1, data: { status: 403, message: "Player doesn't participate to this vote" } });
+        client2.addExpectedEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: client1.getName() } });
+        client2.addExpectedEvent({ event: "VOTE_ERROR", game_id: 1, data: { status: 403, message: "Player voted doesn't participate to this vote" } });
         await client2.verifyEvent();
     });
 });
