@@ -13,10 +13,15 @@ import { AuthenticatedRequest } from "./authenticationController";
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
     try {
-        // Récupérer la liste des jeux depuis la base de données SQL et le username
-        const games: Array<{ id: number; startDate: number; host: string; nbPlayerMax: number }> = await database.selectFrom("games").select(["id", "startDate", "host", "nbPlayerMax"]).execute();
-
-        res.status(200).json({ games: games });
+        res.status(200).json({
+            games: Game.getAllGames().map((g) => ({
+                id: g.getGameId(),
+                startDate: g.getGameParam().startDate,
+                host: g.getHost().getUsername(),
+                nbPlayerMax: g.getGameParam().nbPlayerMax,
+                currentNumberOfPlayer: g.getAllPlayers().length
+            }))
+        });
     } catch (err) {
         console.log(err);
         res.sendStatus(500);
@@ -66,7 +71,7 @@ export function searchGameByUsername(req: AuthenticatedRequest, res: Response): 
                 .map((g) => ({
                     id: g.getGameId(),
                     startDate: g.getGameParam().startDate,
-                    host: g.getHost(),
+                    host: g.getHost().getUsername(),
                     nbPlayerMax: g.getGameParam().nbPlayerMax,
                     currentNumberOfPlayer: g.getAllPlayers().length
                 }))

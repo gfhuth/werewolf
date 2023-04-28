@@ -134,7 +134,7 @@ export class Game {
             contamination.setPower(new ContaminationPower());
             contamination.sendMessage("SET_POWER", { power: contamination.getPower().getName() });
         }
-        if (Math.random() <= this.gameParam.probaInsomnie) {
+        if (humans.length > 0 && Math.random() <= this.gameParam.probaInsomnie) {
             const insomnie: Player = humans[Math.floor(Math.random() * humans.length)];
             insomnie.setPower(new InsomniaPower());
             insomnie.sendMessage("SET_POWER", { power: insomnie.getPower().getName() });
