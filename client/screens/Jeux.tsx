@@ -1,14 +1,11 @@
 import Background from "../components/Background";
 import NavigationUI from "../components/NavigationUI";
-import useWebSocket from "react-use-websocket";
-import { TextInput } from "react-native-gesture-handler";
-import { ImageBackground, Button, StyleSheet, Text, View } from "react-native";
-import React, { useState, useCallback, useEffect, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { UserContext } from "../context/UserContext";
-import { GameContext } from "../context/GameContext";
+import { GameContext, jourOuNuit } from "../context/GameContext";
 import ChatComponent from "../components/game/Chat";
 import Collapsible from "../components/Collapsible";
-import { Box } from "native-base";
+import { Box, Text, View } from "native-base";
 import PlayersList from "../components/game/PlayersList";
 
 export default function Jeux(): React.ReactElement {
@@ -23,6 +20,17 @@ export default function Jeux(): React.ReactElement {
     return (
         <Background>
             <NavigationUI allowBack />
+            <View>
+                {gameContext.jourNuit == jourOuNuit.jour ? (
+                    <Text color={"white"} fontWeight={"900"} fontSize={"150%"}>
+                        TMP : Jour
+                    </Text>
+                ) : (
+                    <Text color={"white"} fontWeight={"900"} fontSize={"150%"}>
+                        TMP : Nuit
+                    </Text>
+                )}
+            </View>
 
             <PlayersList />
 

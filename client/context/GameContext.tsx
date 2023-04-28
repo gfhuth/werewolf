@@ -9,15 +9,20 @@ export type EventHandlerCallback = (data: any) => void;
 
 const LOGGER = new Logger("WEBSOCKET");
 
+export enum jourOuNuit {
+    jour = 0,
+    nuit = 1,
+}
+
 export const GameContext = React.createContext<{
-    jourNuit: string;
-    setJourNuit:(token: string) => void;
+    jourNuit: jourOuNuit;
+    setJourNuit:(enumJourNuit: jourOuNuit) => void;
     eventHandlers: { [key: string]: EventHandlerCallback };
     registerEventHandler: (event: string, callback: EventHandlerCallback) => void;
     sendJsonMessage: (event: string, data: any) => void;
     onMessage: (event: MessageEvent<any>) => void;
         }>({
-            jourNuit: "",
+            jourNuit: jourOuNuit.nuit,
             setJourNuit: () => null,
             eventHandlers: {},
             registerEventHandler: () => null,
@@ -27,7 +32,7 @@ export const GameContext = React.createContext<{
 
 export function GameProvider(props: { children: React.ReactNode; gameId: number }): React.ReactElement {
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
-    const [jourNuit, setJourNuit] = useState("");
+    const [jourNuit, setJourNuit] = useState<jourOuNuit>(jourOuNuit.nuit);
     const toast = useToast();
     const userContext = useContext(UserContext);
 
@@ -79,11 +84,6 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         setMessageErreur(data.message);
     };
 
-    const infoParties = (data: { status: number; message: string }): void => {
-        LOGGER.log(`Websocket information partie : ${JSON.stringify(data)}`);
-        //setJourNuit
-    };
-
     const registerEventHandler = (event: string, callback: EventHandlerCallback): void => {
         setEventHandlers((eh) => ({ ...eh, [event]: callback }));
     };
@@ -112,11 +112,22 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
             userContext.setEtatUser(mortVivantEnum.mort);
     };
 
+    const setJour = (): void => {
+        LOGGER.log(`Jour`);
+        setJourNuit(jourOuNuit.jour);
+    };
+    const setNuit = (): void => {
+        LOGGER.log(`Nuit`);
+        setJourNuit(jourOuNuit.nuit);
+    };
+
     useEffect(() => {
         registerEventHandler("CHAT_ERROR", errorHandler);
         registerEventHandler("VOTE_ERROR", errorHandler);
         registerEventHandler("GAME_DELETED", errorHandler);
         registerEventHandler("LIST_PLAYERS", listeDesInfosDesJoueur);
+        registerEventHandler("NIGHT_STARTS", setNuit);
+        registerEventHandler("DAY_STARTS", setJour);
     }, []);
 
     return <GameContext.Provider value={{ jourNuit, setJourNuit, eventHandlers, registerEventHandler, onMessage, sendJsonMessage: sendMessage }}>{props.children}</GameContext.Provider>;
