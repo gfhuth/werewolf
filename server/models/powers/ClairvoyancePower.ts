@@ -21,6 +21,14 @@ export default class ClairvoyancePower extends Power {
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_CLAIRVOYANCE"]): void {
+        if (player.isDead()) {
+            player.sendError("POWER_ERROR", 403, "Dead player cannot use power clairvoyance");
+            return;
+        }
+        if (!player.getPower()) {
+            player.sendError("POWER_ERROR", 403, "Player don't have any power");
+            return;
+        }
         if (player.getPower().getName() !== ClairvoyancePower.POWERNAME) {
             player.sendError("POWER_ERROR", 403, "Player don't have clairvoyance power");
             return;

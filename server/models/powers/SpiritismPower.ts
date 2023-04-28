@@ -21,6 +21,14 @@ export default class SpiritismPower extends Power {
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_SPIRITISM"]): void {
+        if (player.isDead()) {
+            player.sendError("POWER_ERROR", 403, "Dead player cannot use power spiritism");
+            return;
+        }
+        if (!player.getPower()) {
+            player.sendError("POWER_ERROR", 403, "Player don't have any power");
+            return;
+        }
         if (player.getPower().getName() !== SpiritismPower.POWERNAME) {
             player.sendError("POWER_ERROR", 403, "Player don't have spiritism power");
             return;
