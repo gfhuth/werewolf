@@ -45,6 +45,12 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
         player.sendError("CHAT_ERROR", 403, "Chat Spiritism unavailable during the day");
         return;
     }
+    if (data.chat_type !== ChatType.CHAT_SPIRITISM) {
+        if (player.isDead()) {
+            player.sendError("CHAT_ERROR", 403, "Dead player cannot send message in the chat");
+            return;
+        }
+    }
 
     if (player.getPower()) {
         if (data.chat_type === ChatType.CHAT_WEREWOLF && player.getPower().getName() === ClairvoyancePower.POWERNAME) {

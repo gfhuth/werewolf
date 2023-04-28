@@ -39,6 +39,7 @@ export class Vote {
         let nbVote: number;
         for (const player of this.participants) {
             if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()] === undefined) return;
+
             if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()]) nbVote++;
         }
         if (nbVote <= this.participants.length / 2) {
@@ -63,7 +64,7 @@ export class Vote {
 
     public ratifyProposition(playerWhoRatify: Player, playerVoted: Player, ratification: boolean): void {
         this.votes[playerVoted.getUser().getUsername()][playerWhoRatify.getUser().getUsername()] = ratification;
-        
+
         // On regarde si le vote est terminée et/ou valide
         this.voteValidation(playerVoted);
     }

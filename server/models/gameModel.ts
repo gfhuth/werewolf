@@ -20,7 +20,7 @@ export enum GameStatus {
 }
 
 export enum Role {
-    VILLAGER,
+    HUMAN,
     WEREWOLF,
 }
 
@@ -119,8 +119,10 @@ export class Game {
         }
         players.forEach((player) => {
             player.setWerewolf(false);
-            player.sendMessage("SET_ROLE", { role: Role.VILLAGER, nbWerewolfs: nbWerewolfs });
+            player.sendMessage("SET_ROLE", { role: Role.HUMAN, nbWerewolfs: nbWerewolfs });
         });
+        LOGGER.log(`${nbWerewolfs} werewolf(s) in this game`);
+        werewolfs.forEach((player) => LOGGER.log(`${player.getUser().getUsername()} is a werewolf in this game`));
     }
 
     private setupPower(): void {
@@ -155,10 +157,10 @@ export class Game {
 
     public verifyEndGame(): boolean {
         let winningRole: Role;
-        if (this.getWerewolfs().filter((player) => !player.isDead()).length === 0) winningRole = Role.VILLAGER;
+        if (this.getWerewolfs().filter((player) => !player.isDead()).length === 0) winningRole = Role.HUMAN;
         else if (this.getAllPlayers().filter((player) => !player.isWerewolf() && !player.isDead()).length === 0) winningRole = Role.WEREWOLF;
 
-        if (winningRole === Role.VILLAGER || winningRole === Role.WEREWOLF) {
+        if (winningRole === Role.HUMAN || winningRole === Role.WEREWOLF) {
             this.getAllPlayers().forEach((player) => player.sendMessage("END_GAME", { winningRole: winningRole }));
             return true;
         }
@@ -186,10 +188,9 @@ export class Game {
         if (!isEndGame) {
             // Réinitialisation du chat
             this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
-            this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
             // Initialisation du vote
-            this.setVote(new Vote(VoteType.VOTE_VILLAGE, this.getAllPlayers()));
+            this.setVote(new Vote(VoteType.VOTE_VILLAGE, Player.alivePlayers(this.getAllPlayers())));
 
             const infoPlayers = this.getAllPlayers().map((player) => ({
                 user: player.getUser().getUsername(),
@@ -224,10 +225,13 @@ export class Game {
         if (!isEndGame) {
             // Réinitialisation des chats
             this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
+            this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(this.getWerewolfs().concat(this.getAllPlayers().filter((player) => !player.isWerewolf() && player.isDead())));
+
             this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
+            this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
             // Initialisation du vote
-            this.setVote(new Vote(VoteType.VOTE_WEREWOLF, this.getWerewolfs()));
+            this.setVote(new Vote(VoteType.VOTE_WEREWOLF, Player.alivePlayers(this.getWerewolfs())));
 
             const infoPlayers = this.getAllPlayers().map((player) => ({
                 user: player.getUser().getUsername(),

@@ -24,6 +24,14 @@ const voteVerification = (game: Game, player: Player, data: { vote_type: VoteTyp
         player.sendError("VOTE_ERROR", 403, "Player voted doesn't participate to this vote");
         return false;
     }
+    if (Player.alivePlayers(game.getVote().getParticipants()).length === 0) {
+        player.sendError("VOTE_ERROR", 403, "There is no alive player in this game");
+        return false;
+    }
+    if (player.isDead()) {
+        player.sendError("VOTE_ERROR", 403, "Dead player cannot participate to the vote");
+        return false;
+    }
     return true;
 };
 

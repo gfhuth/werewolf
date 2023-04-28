@@ -18,6 +18,10 @@ export class Player {
         this.isAlive = true;
     }
 
+    public static alivePlayers(players: Array<Player>): Array<Player> {
+        return players.filter((player) => !player.isDead());
+    }
+
     public isDead(): boolean {
         return !this.isAlive;
     }
