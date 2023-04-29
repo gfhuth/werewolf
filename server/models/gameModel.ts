@@ -169,7 +169,15 @@ export class Game {
     }
 
     applyPower(): void {
-        throw new Error("Not Implemented yet");
+        this.getAllPlayers()
+            .filter((player) => player.getPower() && player.getPower().getDataForDayPower())
+            .map((player) => player.getPower().usePower(this, player, player.getPower().getDataForDayPower()));
+    }
+
+    private resetPowers(): void {
+        this.getAllPlayers()
+            .filter((player) => player.getPower())
+            .forEach((player) => player.getPower().setAlreadyUsed(false));
     }
 
     startDay(): void {
@@ -223,6 +231,9 @@ export class Game {
         const isEndGame: boolean = this.verifyEndGame();
 
         if (!isEndGame) {
+            // Réinitialisation des pouvoirs
+            this.resetPowers();
+
             // Réinitialisation des chats
             this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
             this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(this.getWerewolfs().concat(this.getAllPlayers().filter((player) => !player.isWerewolf() && player.isDead())));

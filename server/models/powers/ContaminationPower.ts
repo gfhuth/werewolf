@@ -12,8 +12,6 @@ export default class ContaminationPower extends Power {
 
     public constructor() {
         super(ContaminationPower.POWERNAME);
-        // The game begins in the night
-        this.ready = true;  
     }
 
     public isCompatibleWith(player: Player): boolean {
@@ -21,8 +19,21 @@ export default class ContaminationPower extends Power {
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_CONTAMINATION"]): void {
-        // game.getPlayer(data.target).
-        throw new Error("Method not implemented.");
+        if (player.getPower().getName() !== ContaminationPower.POWERNAME) {
+            player.sendError("POWER_ERROR", 403, "Player don't have contamination power");
+            return;
+        }
+        const victim: Player = game.getPlayer(data.target);
+        if (victim.isDead()) {
+            player.sendError("POWER_ERROR", 403, "Contaminated player is dead");
+            return;
+        }
+        if (!this.dataForDayPower) {
+            this.dataForDayPower = data; 
+        } else {
+            victim.setWerewolf(true);
+            this.dataForDayPower = undefined;
+        }
     }
 
 }

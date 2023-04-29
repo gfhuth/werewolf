@@ -23,10 +23,6 @@ export type ClientToServerEvents = {
     USE_POWER_CONTAMINATION: {
         target: string;
     };
-    USE_POWER: {
-        // FIXME ça n'a aucun sens
-        victimId: string;
-    };
     VOTE_SENT: {
         vote_type: VoteType;
         playerVoted: string;
