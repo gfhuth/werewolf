@@ -16,6 +16,7 @@ export const usePower = async (game: Game, player: Player, data: Record<string, 
         return;
     }
     const power: Power = player.getPower();
+    // TODO: vérifier que le joueur a le bon pouvoir et pas un autre
     if (power.getAlreadyUsed()) {
         player.sendError("POWER_ERROR", 403, "Player has already used his power");
         return;
