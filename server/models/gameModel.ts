@@ -168,10 +168,18 @@ export class Game {
         return false;
     }
 
-    applyPower(): void {
+    public applyPowers(): void {
         this.getAllPlayers()
             .filter((player) => player.getPower() && player.getPower().getDataForDayPower())
             .map((player) => player.getPower().usePower(this, player, player.getPower().getDataForDayPower()));
+    }
+
+    public executionResultVote(): void {
+        const resultWerewolfVote: Player = this.currentVote.getResult();
+        if (resultWerewolfVote) {
+            resultWerewolfVote.kill();
+            LOGGER.log(`player ${resultWerewolfVote.getUser().getUsername()} is dead`);
+        }
     }
 
     private resetPowers(): void {
@@ -183,12 +191,11 @@ export class Game {
     startDay(): void {
         LOGGER.log(`game ${this.getGameId()} changed to day`);
 
+        // Application des pouvoirs
+        this.applyPowers();
+
         // Mort du résultat des votes
-        const resultWerewolfVote: Player = this.currentVote.getResult();
-        if (resultWerewolfVote) {
-            resultWerewolfVote.kill();
-            LOGGER.log(`player ${resultWerewolfVote.getUser().getUsername()} is dead`);
-        }
+        this.executionResultVote();
 
         // Vérification si fin de partie
         const isEndGame: boolean = this.verifyEndGame();
@@ -219,13 +226,7 @@ export class Game {
         LOGGER.log(`game ${this.getGameId()} changed to night`);
 
         // Mort du résultat des votes
-        if (this.currentVote) {
-            const resultVillageVote: Player = this.currentVote.getResult();
-            if (resultVillageVote) {
-                resultVillageVote.kill();
-                LOGGER.log(`player ${resultVillageVote.getUser().getUsername()} is dead`);
-            }
-        }
+        if (this.currentVote) this.executionResultVote();
 
         // Vérification si fin de partie
         const isEndGame: boolean = this.verifyEndGame();
