@@ -170,8 +170,8 @@ export class Game {
 
     public applyPowers(): void {
         this.getAllPlayers()
-            .filter((player) => player.getPower() && player.getPower().getDataForDayPower())
-            .map((player) => player.getPower().usePower(this, player, player.getPower().getDataForDayPower()));
+            .filter((player) => player.getPower() && player.getPower().getApplyDay())
+            .map((player) => player.getPower().applyPower(this, player));
     }
 
     public executionResultVote(): void {

@@ -11,7 +11,7 @@ export default class ClairvoyancePower extends Power {
     private victim: Player;
 
     public constructor() {
-        super(ClairvoyancePower.POWERNAME);
+        super(ClairvoyancePower.POWERNAME, false);
     }
 
     public isCompatibleWith(player: Player): boolean {
@@ -24,9 +24,14 @@ export default class ClairvoyancePower extends Power {
             return;
         }
 
-        const victim: Player = game.getPlayer(data.target);
-        const roleVictim: Role = victim.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
-        player.sendMessage("CLAIRVOYANCE_RESPONSE", { role: roleVictim, power: victim.getPower().getName() });
+        this.addTarget(game.getPlayer(data.target));
+        this.applyPower(game, player);
+    }
+
+    public applyPower(game: Game, player: Player): void {
+        const target: Player = this.getTargets()[0];
+        const roleVictim: Role = target.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
+        player.sendMessage("CLAIRVOYANCE_RESPONSE", { role: roleVictim, power: target.getPower().getName() });
     }
 
 }

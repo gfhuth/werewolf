@@ -11,7 +11,7 @@ export default class SpiritismPower extends Power {
     private victim: Player;
 
     public constructor() {
-        super(SpiritismPower.name);
+        super(SpiritismPower.name, false);
     }
 
     public isCompatibleWith(player: Player): boolean {
@@ -30,7 +30,12 @@ export default class SpiritismPower extends Power {
             return;
         }
 
-        game.setChatSpiritism(player, deadPlayer);
+        this.addTarget(deadPlayer);
+        this.applyPower(game, player);
+    }
+
+    public applyPower(game: Game, player: Player): void {
+        game.setChatSpiritism(player, this.getTargets()[0]);
     }
 
 }

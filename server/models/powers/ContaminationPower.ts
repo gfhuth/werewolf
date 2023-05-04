@@ -11,7 +11,7 @@ export default class ContaminationPower extends Power {
     private victim: Player;
 
     public constructor() {
-        super(ContaminationPower.POWERNAME);
+        super(ContaminationPower.POWERNAME, true);
     }
 
     public isCompatibleWith(player: Player): boolean {
@@ -28,12 +28,12 @@ export default class ContaminationPower extends Power {
             player.sendError("POWER_ERROR", 403, "Contaminated player is dead");
             return;
         }
-        if (!this.dataForDayPower) {
-            this.dataForDayPower = data; 
-        } else {
-            victim.setWerewolf(true);
-            this.dataForDayPower = undefined;
-        }
+
+        this.addTarget(victim);
+    }
+
+    public applyPower(game: Game, player: Player): void {
+        this.getTargets()[0].setWerewolf(true);
     }
 
 }
