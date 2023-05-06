@@ -32,6 +32,7 @@ export default class SpiritismPower extends Power {
 
         this.addTarget(deadPlayer);
         this.applyPower(game, player);
+        this.setAlreadyUsed(true);
     }
 
     public applyPower(game: Game, player: Player): void {

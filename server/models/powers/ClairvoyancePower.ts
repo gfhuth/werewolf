@@ -26,6 +26,7 @@ export default class ClairvoyancePower extends Power {
 
         this.addTarget(game.getPlayer(data.target));
         this.applyPower(game, player);
+        this.setAlreadyUsed(true);
     }
 
     public applyPower(game: Game, player: Player): void {

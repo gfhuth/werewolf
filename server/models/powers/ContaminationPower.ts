@@ -30,6 +30,7 @@ export default class ContaminationPower extends Power {
         }
 
         this.addTarget(victim);
+        this.setAlreadyUsed(true);
     }
 
     public applyPower(game: Game, player: Player): void {
