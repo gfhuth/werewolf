@@ -86,17 +86,17 @@ export class WebsocketConnection {
 
             const game: Game = Game.getGame(data.game_id);
             if (!game) {
-                this.ws.send(JSON.stringify({ status: 409, message: "Game doesn't exist" }));
+                this.ws.send(JSON.stringify({ event: "GAME_VERIFICATION", status: 409, message: "Game doesn't exist" }));
                 return;
             }
             if (!game.getPlayer(this.user.getUsername())) {
-                this.ws.send(JSON.stringify({ status: 409, message: "User doesn't exist in this game" }));
+                this.ws.send(JSON.stringify({ event: "PLAYER_VERIFICATION", status: 409, message: "User doesn't exist in this game" }));
                 return;
             }
             const player: Player = game.getPlayer(this.user.getUsername());
 
             if (!Event.getEventActions(data.event)) {
-                this.ws.send(JSON.stringify({ status: 500, message: "Event doesn't exist" }));
+                this.ws.send(JSON.stringify({ event: "EVENT_VERIFICATION", status: 500, message: "Event doesn't exist" }));
                 return;
             }
 
