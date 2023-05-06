@@ -7,6 +7,9 @@ import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
 import { SQLBoolean } from "../util/sql/schema";
 import { AuthenticatedRequest } from "./authenticationController";
+import Logger from "../util/Logger";
+
+const LOGGER = new Logger("MANAGE_GAME");
 
 export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
@@ -29,7 +32,7 @@ export async function searchGame(req: Request, res: Response): Promise<void> {
 export async function searchGameById(req: Request, res: Response): Promise<void> {
     try {
         const gameId: number = parseInt(req.params.id);
-        if (!gameId) throw new Error("Invalid game ID provided.");
+        if (!gameId) throw new Error("Invalid game ID provided");
 
         // Récupérer le jeu depuis la base de données SQL avec l'ID
         const game: {
@@ -55,7 +58,7 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
             wereWolfCount: Math.floor(game.nbPlayerMax * game.percentageWerewolf)
         });
     } catch (err) {
-        console.log(err);
+        LOGGER.log(err.message);
         res.status(500).json({ message: err.message });
     }
 }
@@ -75,7 +78,7 @@ export function searchGameByUsername(req: AuthenticatedRequest, res: Response): 
                 }))
         });
     } catch (err) {
-        console.log(err);
+        LOGGER.log(err.message);
         res.status(500).json({ message: err.message });
     }
 }
@@ -166,16 +169,16 @@ export const newGame = async (req: AuthenticatedRequest, res: Response): Promise
 export const joinGame = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const user: User = req.user;
-        if (!user) throw new Error("No user provided.");
+        if (!user) throw new Error("No user provided");
         const gameId: number = parseInt(req.params.id);
-        if (!gameId) throw new Error("No game ID provided.");
+        if (!gameId) throw new Error("No game ID provided");
 
         const game: Game = Game.getGame(gameId);
         if (!game) throw new Error("Game doesn't exist");
         if (game.getStatus() === GameStatus.DAY || game.getStatus() === GameStatus.NIGHT) throw new Error("Game already started");
 
         // Check if player already in game
-        if (game.getPlayer(user.getUsername())) throw new Error("User is already in the game.");
+        if (game.getPlayer(user.getUsername())) throw new Error("User is already in the game");
 
         // Check if the game is full or not
         if (game.getAllPlayers().length >= game.getGameParam().nbPlayerMax) throw new Error("Game full");
@@ -198,7 +201,7 @@ export const joinGame = async (req: AuthenticatedRequest, res: Response): Promis
 
         res.status(200).json({ message: "game successfully join" });
     } catch (err) {
-        console.log(err);
+        LOGGER.log(err.message);
         res.status(500).json({ message: err.message });
     }
 };
@@ -207,14 +210,14 @@ export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promi
     try {
         const user: User = req.user;
         const gameId: number = parseInt(req.params.id);
-        if (!gameId) throw new Error("No game ID provided.");
+        if (!gameId) throw new Error("No game ID provided");
 
         const game: Game = Game.getGame(gameId);
         if (!game) throw new Error("Game doesn't exist");
         if (game.getStatus() === GameStatus.DAY || game.getStatus() === GameStatus.NIGHT) throw new Error("Game already started");
 
         // Check if player already in game
-        if (!game.getPlayer(user.getUsername())) throw new Error("User haven't join this game.");
+        if (!game.getPlayer(user.getUsername())) throw new Error("User haven't join this game");
 
         // Supressions du joueur dans la liste des joueurs de la partie
         const player: Player = game.getPlayer(user.getUsername());
@@ -225,7 +228,7 @@ export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promi
 
         res.status(200).json({ message: `player sucessfully remove from the game ${gameId}` });
     } catch (err) {
-        console.log(err);
+        LOGGER.log(err.message);
         res.status(500).json({ message: err.message });
     }
 };
