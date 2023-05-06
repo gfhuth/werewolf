@@ -137,5 +137,5 @@ describe("Test websockets", () => {
         client1.reinitExpectedEvents();
         client1.addExpectedEvent({ event: "EVENT_VERIFICATION", status: 500, message: "Event doesn't exist" });
         await client1.verifyEvent();
-    })
+    });
 });
