@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
-import { getTokenContent } from "./userController";
 import { Game, GameParam, GameStatus } from "../models/gameModel";
 import { Event } from "../controllers/eventController";
 import database from "../util/database";
 
 import { User } from "../models/userModel";
 import { Player } from "../models/playerModel";
-import { sql } from "kysely";
 import { SQLBoolean } from "../util/sql/schema";
 import { AuthenticatedRequest } from "./authenticationController";
 
@@ -54,7 +52,7 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
 
         res.status(200).json({
             ...game,
-            wereWolfCount: Math.floor((game.nbPlayerMax * game.percentageWerewolf) / 100)
+            wereWolfCount: Math.floor(game.nbPlayerMax * game.percentageWerewolf)
         });
     } catch (err) {
         console.log(err);
