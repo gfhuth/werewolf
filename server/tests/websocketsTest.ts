@@ -1,5 +1,7 @@
 import { client1 } from "./usersTest";
 
+const testTiming = 2;
+
 describe("Test websockets", () => {
     beforeAll(async () => {
         client1.setWebsocketConnection();
@@ -8,6 +10,11 @@ describe("Test websockets", () => {
 
     afterAll(() => {
         client1.closeSocket();
+    });
+
+    test("Wait the game begin", async () => {
+        // On attend testTiming secondes pour que la partie créée commence
+        await new Promise((resolve) => setTimeout(resolve, testTiming * 1000));
     });
 
     test("Utilisateur non authentifié", async () => {

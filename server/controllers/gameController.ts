@@ -117,10 +117,9 @@ export const newGame = async (req: AuthenticatedRequest, res: Response): Promise
         { minRange: Date.now(), value: game.startDate, maxRange: Infinity, errorMessage: "Start date passed" }
     ];
 
-    for (let i = 0; i < conditions.length; i++) {
-        const cond = conditions[i];
+    for (const cond of conditions) {
         if (cond.value < cond.minRange || cond.value > cond.maxRange) {
-            res.status(406).send(cond.errorMessage);
+            res.status(406).json({ message: cond.errorMessage });
             return;
         }
     }
@@ -154,7 +153,6 @@ export const newGame = async (req: AuthenticatedRequest, res: Response): Promise
             .execute();
 
         // On ajoute l'utilisateur aux joueurs de la partie
-        // TODO: ajuster les valeurs de role et power
         const player: Player = new Player(user, newHostGame);
         newHostGame.addPlayer(player);
 
