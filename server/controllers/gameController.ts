@@ -197,7 +197,7 @@ export const joinGame = async (req: AuthenticatedRequest, res: Response): Promis
             })
             .execute();
 
-        res.status(200).json({ message: "game successfully join" });
+        res.status(200).json({ message: "Game successfully join" });
     } catch (err) {
         LOGGER.log(err.message);
         res.status(500).json({ message: err.message });

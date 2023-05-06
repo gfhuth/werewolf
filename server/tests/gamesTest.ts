@@ -35,7 +35,7 @@ describe("Test games", () => {
             .send(
                 JSON.stringify({
                     nbPlayerMin: 2,
-                    nbPlayerMax: 17,
+                    nbPlayerMax: 5,
                     dayLength: 10 * 1000,
                     nightLength: 10 * 1000,
                     startDate: date.getTime(),
@@ -76,6 +76,7 @@ describe("Test games", () => {
         // Ajout des joueurs dans la partie 1
         let res = await request(url).post("/game/1/join").set("x-access-token", client1.getToken());
         expect(res.status).toEqual(200);
+        expect(res.body).toEqual({ message: "Game successfully join" });
 
         res = await request(url).post("/game/1/join").set("x-access-token", client2.getToken());
         expect(res.status).toEqual(200);
@@ -103,6 +104,24 @@ describe("Test games", () => {
         expect(res.status).toEqual(200);
     });
 
+    test("Error when joining the game", async () => {
+        let res = await request(url).post("/game/toto/join").set("x-access-token", client9.getToken());
+        expect(res.status).toEqual(500);
+        expect(res.body).toEqual({ message: "No game ID provided" });
+
+        res = await request(url).post("/game/3/join").set("x-access-token", client9.getToken());
+        expect(res.status).toEqual(500);
+        expect(res.body).toEqual({ message: "Game doesn't exist" });
+
+        res = await request(url).post("/game/1/join").set("x-access-token", client0.getToken());
+        expect(res.status).toEqual(500);
+        expect(res.body).toEqual({ message: "User is already in the game" });
+
+        res = await request(url).post("/game/2/join").set("x-access-token", client9.getToken());
+        expect(res.status).toEqual(500);
+        expect(res.body).toEqual({ message: "Game full" });
+    });
+
     test("Search game", async () => {
         const res = await request(url).get("/game/search").set("x-access-token", client2.getToken());
         expect(res.status).toEqual(200);
@@ -119,7 +138,7 @@ describe("Test games", () => {
                     id: 2,
                     startDate: date.getTime(),
                     host: client4.getName(),
-                    nbPlayerMax: 17,
+                    nbPlayerMax: 5,
                     currentNumberOfPlayer: 5
                 }
             ]
@@ -167,7 +186,7 @@ describe("Test games", () => {
                     id: 2,
                     startDate: date.getTime(),
                     host: client4.getName(),
-                    nbPlayerMax: 17,
+                    nbPlayerMax: 5,
                     currentNumberOfPlayer: 5
                 }
             ]
