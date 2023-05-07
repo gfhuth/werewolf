@@ -274,6 +274,7 @@ export class Game {
      * */
     public async initGame(): Promise<void> {
         // Vérification des conditions de lancement de la partie
+        if (!Game.games.has(this.gameId)) return;
         if (this.getGameParam().nbPlayerMin > this.getAllPlayers().length) {
             this.getAllPlayers().forEach((player) => player.sendMessage("GAME_DELETED", { message: "game deleted" }));
             LOGGER.log(`Game ${this.gameId} cancelled because there isn't enough players`);

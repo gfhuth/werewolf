@@ -11,7 +11,7 @@ export default class SpiritismPower extends Power {
     private victim: Player;
 
     public constructor() {
-        super(SpiritismPower.name, false);
+        super(SpiritismPower.POWERNAME, false);
     }
 
     public isCompatibleWith(player: Player): boolean {
