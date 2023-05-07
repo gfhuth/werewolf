@@ -4,7 +4,6 @@ import React, { useEffect, useContext } from "react";
 import { UserContext } from "../context/UserContext";
 import { GameContext, jourOuNuit } from "../context/GameContext";
 import ChatComponent from "../components/game/Chat";
-import Collapsible from "../components/Collapsible";
 import { Box, Text, View } from "native-base";
 import PlayersList from "../components/game/PlayersList";
 
@@ -13,7 +12,12 @@ export default function Jeux(): React.ReactElement {
 
     const { token } = useContext(UserContext);
 
+    const getAllInfos = (): void => {
+        gameContext.sendJsonMessage("GET_ALL_INFO", {});
+    };
+
     useEffect(() => {
+        gameContext.registerEventHandler("AUTHENTICATION", getAllInfos);
         gameContext.sendJsonMessage("AUTHENTICATION", { token: token });
     }, []);
 
@@ -34,10 +38,8 @@ export default function Jeux(): React.ReactElement {
 
             <PlayersList />
 
-            <Box bg="light.100" minWidth={200} px={5} py={2} position={"absolute"} maxWidth={"100%"} right={0} bottom={0}>
-                <Collapsible name="Chat" isDefaultOpen={false}>
-                    <ChatComponent />
-                </Collapsible>
+            <Box bg="light.100" minWidth={200} position={"absolute"} maxWidth={"100%"} right={0} bottom={0}>
+                <ChatComponent />
             </Box>
         </Background>
     );
