@@ -6,9 +6,7 @@ type functionHandler = (game: Game, player: Player, data: Record<string, any>) =
 
 export class Event {
 
-    private static eventHandlers: {
-        [key: string]: Array<functionHandler>;
-    } = {};
+    private static eventHandlers: { [key: string]: Array<functionHandler> } = {};
 
     /**
      * Renvoie la liste des méthodes associées à un événement

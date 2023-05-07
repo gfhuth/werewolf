@@ -212,19 +212,19 @@ export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promi
 
         const game: Game = Game.getGame(gameId);
         if (!game) throw new Error("Game doesn't exist");
-        if (game.getStatus() === GameStatus.DAY || game.getStatus() === GameStatus.NIGHT) throw new Error("Game already started");
+        if (game.getStatus() !== GameStatus.NOT_STARTED) throw new Error("Game already started");
 
         // Check if player already in game
         if (!game.getPlayer(user.getUsername())) throw new Error("User haven't join this game");
 
-        // Supressions du joueur dans la liste des joueurs de la partie
+        // Supression du joueur dans la liste des joueurs de la partie
         const player: Player = game.getPlayer(user.getUsername());
         game.removePlayer(player.getUser().getUsername());
 
         // Insert a new record in the user_games table
         await database.deleteFrom("players").where("players.game", "=", gameId).where("players.user", "=", user.getUsername()).executeTakeFirst();
 
-        res.status(200).json({ message: `player sucessfully remove from the game ${gameId}` });
+        res.status(200).json({ message: `Player sucessfully remove from the game ${gameId}` });
     } catch (err) {
         LOGGER.log(err.message);
         res.status(500).json({ message: err.message });
