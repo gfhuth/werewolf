@@ -266,15 +266,14 @@ export class Game {
      * @param {number} gameId id of the starting game
      * */
     public async initGame(): Promise<void> {
-        LOGGER.log(`Initialisation de la partie : ${this.gameId}`);
-        // if (this.getGameParam().nbPlayerMin > this.getNbOfPlayers()) {
-        //     Game.removeGame(this.getGameId());
-        //     await database.deleteFrom("games").where("games.id", "=", this.getGameId()).executeTakeFirst();
-        //     this.getAllPlayers().forEach((player) => player.sendMessage("GAME_DELETED", { message: "game deleted" }));
-        //     console.log("Suppresions de la partie");
-        //     return;
-        // }
+        // Vérification des conditions de lancement de la partie
+        if (this.getGameParam().nbPlayerMin > this.getAllPlayers().length) {
+            this.getAllPlayers().forEach((player) => player.sendMessage("GAME_DELETED", { message: "game deleted" }));
+            LOGGER.log(`Game ${this.gameId} cancelled because there isn't enough players`);
+            return;
+        }
 
+        LOGGER.log(`Initialisation de la partie : ${this.gameId}`);
         //Initialisation des roles et des pouvoirs
         LOGGER.log(`Initialisation des rôles : ${this.gameId}`);
         this.setupRoles();
@@ -393,10 +392,6 @@ export class Game {
     public static getAllGames(): Array<Game> {
         return Array.from(Game.games.values());
     }
-
-    public static removeGame = (gameId: number): void => {
-        Game.games.delete(gameId);
-    };
 
     public static addGameInList(game: Game): void {
         Game.games.set(game.getGameId(), game);

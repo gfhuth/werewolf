@@ -157,6 +157,7 @@ export const newGame = async (req: AuthenticatedRequest, res: Response): Promise
         newHostGame.addPlayer(player);
 
         // On ajoute un evenement
+        LOGGER.log(`New game created and start in ${(game.startDate - Date.now()) / 60000} min`);
         res.status(200).json({ message: `New game created and start in ${(game.startDate - Date.now()) / 60000} min` });
     } catch (e) {
         console.error(e);
