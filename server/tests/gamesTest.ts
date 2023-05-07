@@ -111,7 +111,7 @@ describe("Test games", () => {
 
         res = await request(url).post("/game/3/join").set("x-access-token", client9.getToken());
         expect(res.status).toEqual(500);
-        expect(res.body).toEqual({ message: "Game doesn't exist" });
+        expect(res.body).toEqual({ message: "Game doesn't exist or has been deleted by the host" });
 
         res = await request(url).post("/game/1/join").set("x-access-token", client0.getToken());
         expect(res.status).toEqual(500);
@@ -216,7 +216,7 @@ describe("Test games", () => {
 
         res = await request(url).post("/game/3/leave").set("x-access-token", client7.getToken());
         expect(res.status).toEqual(500);
-        expect(res.body).toEqual({ message: "Game doesn't exist" });
+        expect(res.body).toEqual({ message: "Game doesn't exist or has been deleted by the host" });
     });
 
     test("Other players leaving a game", async () => {
@@ -228,8 +228,46 @@ describe("Test games", () => {
         expect(res.status).toEqual(200);
         expect(res.body).toEqual({ message: "Player sucessfully remove from the game 2" });
 
-        res = await request(url).post("/game/2/leave").set("x-access-token", client5.getToken());
+        res = await request(url).post("/game/2/leave").set("x-access-token", client4.getToken());
         expect(res.status).toEqual(200);
-        expect(res.body).toEqual({ message: "Player sucessfully remove from the game 2" });
+        expect(res.body).toEqual({ message: "Game 2 deleted because the host leaves the game" });
+    });
+
+    test("Search game after deletion", async () => {
+        const res = await request(url).get("/game/search").set("x-access-token", client2.getToken());
+        expect(res.status).toEqual(200);
+        expect(res.body).toEqual({
+            games: [
+                {
+                    id: 1,
+                    startDate: date.getTime(),
+                    host: client0.getName(),
+                    nbPlayerMax: 39,
+                    currentNumberOfPlayer: 6
+                }
+            ]
+        });
+    });
+
+    test("Display user's games after deletion", async () => {
+        const res = await request(url).get("/game/me").set("x-access-token", client5.getToken());
+        expect(res.status).toEqual(200);
+        expect(res.body).toEqual({
+            games: [
+                {
+                    id: 1,
+                    startDate: date.getTime(),
+                    host: client0.getName(),
+                    nbPlayerMax: 39,
+                    currentNumberOfPlayer: 6
+                }
+            ]
+        });
+    });
+
+    test("Join game that doesn't exist", async () => {
+        const res = await request(url).post("/game/2/join").set("x-access-token", client9.getToken());
+        expect(res.status).toEqual(500);
+        expect(res.body).toEqual({ message: "Game doesn't exist or has been deleted by the host" });
     });
 });
