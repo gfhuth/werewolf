@@ -65,7 +65,7 @@ export type ServerToClientEvents = {
         power: string;
     };
     SET_ROLE: {
-        role: number;
+        role: Role;
         nbWerewolfs: number;
     };
     VOTE_INVALID: {

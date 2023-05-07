@@ -20,8 +20,8 @@ export enum GameStatus {
 }
 
 export enum Role {
-    HUMAN,
-    WEREWOLF,
+    HUMAN = "HUMAN",
+    WEREWOLF = "WEREWOLF",
 }
 
 export type GameParam = {
