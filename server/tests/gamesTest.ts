@@ -198,4 +198,38 @@ describe("Test games", () => {
         expect(res.status).toEqual(200);
         expect(res.body).toEqual({ games: [] });
     });
+
+    test("Leave game", async () => {
+        const res = await request(url).post("/game/2/leave").set("x-access-token", client8.getToken());
+        expect(res.status).toEqual(200);
+        expect(res.body).toEqual({ message: "Player sucessfully remove from the game 2" });
+    });
+
+    test("Error leaving a game", async () => {
+        let res = await request(url).post("/game/2/leave").set("x-access-token", client8.getToken());
+        expect(res.status).toEqual(500);
+        expect(res.body).toEqual({ message: "User haven't join this game" });
+
+        res = await request(url).post("/game/toto/leave").set("x-access-token", client7.getToken());
+        expect(res.status).toEqual(500);
+        expect(res.body).toEqual({ message: "No game ID provided" });
+
+        res = await request(url).post("/game/3/leave").set("x-access-token", client7.getToken());
+        expect(res.status).toEqual(500);
+        expect(res.body).toEqual({ message: "Game doesn't exist" });
+    });
+
+    test("Other players leaving a game", async () => {
+        let res = await request(url).post("/game/2/leave").set("x-access-token", client7.getToken());
+        expect(res.status).toEqual(200);
+        expect(res.body).toEqual({ message: "Player sucessfully remove from the game 2" });
+
+        res = await request(url).post("/game/2/leave").set("x-access-token", client6.getToken());
+        expect(res.status).toEqual(200);
+        expect(res.body).toEqual({ message: "Player sucessfully remove from the game 2" });
+
+        res = await request(url).post("/game/2/leave").set("x-access-token", client5.getToken());
+        expect(res.status).toEqual(200);
+        expect(res.body).toEqual({ message: "Player sucessfully remove from the game 2" });
+    });
 });
