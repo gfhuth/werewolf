@@ -52,7 +52,7 @@ export type ServerToClientEvents = {
         message: string;
     };
     GET_ALL_INFO_CHAT: {
-        [key in ChatType]: Array<Message>;
+        [key in ChatType]?: Array<Message>;
     };
     GET_ALL_INFO_GAME: {
         status: number;
