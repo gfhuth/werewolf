@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Collapsible from "../Collapsible";
 
 type LocalMessage = {
-    type: TypeChat;
+    type: ChatType;
     date: Date;
     author: string;
     content: string;
@@ -20,19 +20,24 @@ type ServerMessage = {
     date: number;
 };
 
-enum TypeChat {
-    CHAT_VILLAGE = "Village",
-    CHAT_WEREWOLF = "Loups",
-    CHAT_SPIRITISM = "Spiritisme",
+enum ChatType {
+    CHAT_VILLAGE = "CHAT_VILLAGE",
+    CHAT_WEREWOLF = "CHAT_WEREWOLF",
+    CHAT_SPIRITISM = "CHAT_SPIRITISM",
 }
+const ChatName: { [key in ChatType]: string } = {
+    CHAT_VILLAGE: "Village",
+    CHAT_WEREWOLF: "Loups",
+    CHAT_SPIRITISM: "Spiritisme"
+};
 
 export default function ChatComponent(): React.ReactElement {
     const gameContext = useContext(GameContext);
 
     const [messages, setMessages] = useState<Array<LocalMessage>>([]);
     const [message, setMessage] = useState("");
-    const [chats, setChats] = useState<Array<TypeChat>>([]);
-    const [selectedChat, setSelectedChat] = useState<TypeChat>(TypeChat.CHAT_VILLAGE);
+    const [chats, setChats] = useState<Array<ChatType>>([]);
+    const [selectedChat, setSelectedChat] = useState<ChatType>(ChatType.CHAT_VILLAGE);
 
     const sendMessage = (): void => {
         console.log(gameContext.jourNuit);
@@ -40,10 +45,10 @@ export default function ChatComponent(): React.ReactElement {
         setMessage("");
     };
 
-    const infoChat = (data: { [key in TypeChat]: Array<ServerMessage> }): void => {
+    const infoChat = (data: { [key in ChatType]: Array<ServerMessage> }): void => {
         // Il s'agit du récap des chats : l'info qu'on avait avant devient invalide
         const msgs: Array<LocalMessage> = [];
-        const newChats = Object.keys(data) as unknown as TypeChat[];
+        const newChats = Object.keys(data) as unknown as ChatType[];
         for (const key of newChats) {
             msgs.push(
                 ...data[key].map((msg) => ({
@@ -63,7 +68,7 @@ export default function ChatComponent(): React.ReactElement {
         setMessages((currentMessages) => [
             ...currentMessages,
             {
-                type: data.chat_type as unknown as TypeChat,
+                type: data.chat_type as unknown as ChatType,
                 date: new Date(data.date),
                 author: data.author,
                 content: data.content
@@ -78,9 +83,9 @@ export default function ChatComponent(): React.ReactElement {
 
     return (
         <Collapsible name="Chat" isDefaultOpen={false}>
-            <Select selectedValue={selectedChat} onValueChange={(value):void => setSelectedChat(value as unknown as TypeChat)}>
-                {chats.map(chat => (
-                    <Select.Item label={chat} value={chat} />
+            <Select selectedValue={selectedChat} onValueChange={(value): void => setSelectedChat(value as unknown as ChatType)}>
+                {chats.map((chat) => (
+                    <Select.Item label={ChatName[chat]} value={chat} />
                 ))}
             </Select>
             <View>
