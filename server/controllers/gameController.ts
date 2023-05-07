@@ -15,17 +15,19 @@ export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
     try {
         res.status(200).json({
-            games: Game.getAllGames().filter(g => {
-                if (g.getGameParam().startDate < Date.now() && g.verifyEndGame()) return false;
-                if (g.getGameParam().startDate < Date.now() && g.getGameParam().nbPlayerMin > g.getAllPlayers().length) return false;
-                return true;
-            }).map((g) => ({
-                id: g.getGameId(),
-                startDate: g.getGameParam().startDate,
-                host: g.getHost().getUsername(),
-                nbPlayerMax: g.getGameParam().nbPlayerMax,
-                currentNumberOfPlayer: g.getAllPlayers().length
-            }))
+            games: Game.getAllGames()
+                .filter((g) => {
+                    if (g.getGameParam().startDate < Date.now() && g.verifyEndGame()) return false;
+                    if (g.getGameParam().startDate < Date.now() && g.getGameParam().nbPlayerMin > g.getAllPlayers().length) return false;
+                    return true;
+                })
+                .map((g) => ({
+                    id: g.getGameId(),
+                    startDate: g.getGameParam().startDate,
+                    host: g.getHost().getUsername(),
+                    nbPlayerMax: g.getGameParam().nbPlayerMax,
+                    currentNumberOfPlayer: g.getAllPlayers().length
+                }))
         });
     } catch (err) {
         console.log(err);
@@ -177,8 +179,8 @@ export const joinGame = async (req: AuthenticatedRequest, res: Response): Promis
         if (!gameId) throw new Error("No game ID provided");
 
         const game: Game = Game.getGame(gameId);
-        if (!game) throw new Error("Game doesn't exist");
-        if (game.getStatus() === GameStatus.DAY || game.getStatus() === GameStatus.NIGHT) throw new Error("Game already started");
+        if (!game) throw new Error("Game doesn't exist or has been deleted by the host");
+        if (game.getStatus() !== GameStatus.NOT_STARTED) throw new Error("Game already started");
 
         // Check if player already in game
         if (game.getPlayer(user.getUsername())) throw new Error("User is already in the game");
@@ -216,11 +218,20 @@ export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promi
         if (!gameId) throw new Error("No game ID provided");
 
         const game: Game = Game.getGame(gameId);
-        if (!game) throw new Error("Game doesn't exist");
+        if (!game) throw new Error("Game doesn't exist or has been deleted by the host");
         if (game.getStatus() !== GameStatus.NOT_STARTED) throw new Error("Game already started");
 
         // Check if player already in game
         if (!game.getPlayer(user.getUsername())) throw new Error("User haven't join this game");
+
+        // Si le joueur est l'hôte de la partie, on supprime la partie
+        if (game.getHost() === user) {
+            await database.deleteFrom("games").where("games.id", "=", gameId).execute();
+            game.delete();
+            res.status(200).json({ message: `Game ${gameId} deleted because the host leaves the game` });
+            LOGGER.log(`Game ${gameId} deleted because the host leaves the game`);
+            return;
+        }
 
         // Supression du joueur dans la liste des joueurs de la partie
         const player: Player = game.getPlayer(user.getUsername());

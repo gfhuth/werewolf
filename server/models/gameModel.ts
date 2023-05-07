@@ -96,14 +96,21 @@ export class Game {
     public addPlayer(player: Player): void {
         this.players.set(player.getUser().getUsername(), player);
     }
+
     public removePlayer(username: string): void {
         this.players.delete(username);
     }
+
     public isUserPlaying(user: User): boolean {
         return this.players.has(user.getUsername());
     }
+
     public getHost(): User {
         return this.host;
+    }
+
+    public delete(): void {
+        Game.games.delete(this.gameId);
     }
 
     private setupRoles(): void {
