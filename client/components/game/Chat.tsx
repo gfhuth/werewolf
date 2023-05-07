@@ -21,9 +21,9 @@ type ServerMessage = {
 };
 
 enum TypeChat {
-    CHAT_VILLAGE,
-    CHAT_WEREWOLF,
-    CHAT_SPIRITISM,
+    CHAT_VILLAGE = "Village",
+    CHAT_WEREWOLF = "Loups",
+    CHAT_SPIRITISM = "Spiritisme",
 }
 
 export default function ChatComponent(): React.ReactElement {
@@ -36,7 +36,7 @@ export default function ChatComponent(): React.ReactElement {
 
     const sendMessage = (): void => {
         console.log(gameContext.jourNuit);
-        gameContext.sendJsonMessage("CHAT_SENT", { date: new Date().getTime(), content: message, chat_type: 0 });
+        gameContext.sendJsonMessage("CHAT_SENT", { date: new Date().getTime(), content: message, chat_type: selectedChat });
         setMessage("");
     };
 
@@ -44,7 +44,7 @@ export default function ChatComponent(): React.ReactElement {
         // Il s'agit du récap des chats : l'info qu'on avait avant devient invalide
         const msgs: Array<LocalMessage> = [];
         const newChats = Object.keys(data) as unknown as TypeChat[];
-        for (const key of chats) {
+        for (const key of newChats) {
             msgs.push(
                 ...data[key].map((msg) => ({
                     date: new Date(msg.date),
@@ -55,6 +55,7 @@ export default function ChatComponent(): React.ReactElement {
             );
         }
         setChats(newChats);
+        setSelectedChat(newChats[0]);
         setMessages(msgs);
     };
 
@@ -77,9 +78,9 @@ export default function ChatComponent(): React.ReactElement {
 
     return (
         <Collapsible name="Chat" isDefaultOpen={false}>
-            <Select selectedValue={selectedChat as unknown as string} onValueChange={(value):void => setSelectedChat(value as unknown as TypeChat)}>
+            <Select selectedValue={selectedChat} onValueChange={(value):void => setSelectedChat(value as unknown as TypeChat)}>
                 {chats.map(chat => (
-                    <Select.Item label={TypeChat[chat]} value={chat as unknown as string} />
+                    <Select.Item label={chat} value={chat} />
                 ))}
             </Select>
             <View>
