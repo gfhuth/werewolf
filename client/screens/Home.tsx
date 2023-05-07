@@ -45,7 +45,7 @@ function GameCard(props: { game: Partie; buttons?: Array<React.ReactNode> }): Re
                 </Text>
                 <HStack justifyContent={"space-between"} alignItems={"end"}>
                     <Text fontSize={"105%"}>{capitalize(game.date < new Date() ? moment(game.date).from(moment()) : moment().to(moment(game.date)))}</Text>
-                    <View>{props.buttons}</View>
+                    <View display={"flex"} alignItems={"end"}>{props.buttons}</View>
                 </HStack>
             </Box>
             <Divider my={5} thickness="0" />
@@ -123,6 +123,22 @@ export default function Home(): React.ReactElement {
             .catch(console.error);
     };
 
+    const leaveGame = (gameId: number): void => {
+        request(`${API_BASE_URL}/game/${gameId}/leave`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "x-access-token": context.token
+            }
+        })
+            .then((res) => {
+                requestListeDesParties();
+                requestListeDesPartiesUser();
+            })
+            .catch(console.error);
+    };
+
     useEffect(() => {
         if (isFocused) {
             requestListeDesParties();
@@ -152,7 +168,9 @@ export default function Home(): React.ReactElement {
                                                 Rejoindre la partie
                                             </Button>
                                         ) : (
-                                            <Text fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>La partie a déjà commencée</Text>
+                                            <Text fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
+                                                La partie a déjà commencée
+                                            </Text>
                                         )
                                     ]}
                                 />
@@ -172,7 +190,14 @@ export default function Home(): React.ReactElement {
                                             Go to game
                                         </Button>
                                     ) : (
-                                        <Text fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>La partie n'a pas encore commencée</Text>
+                                        <>
+                                            <Text fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
+                                                La partie n'a pas encore commencée
+                                            </Text>
+                                            <Button key={1} size="md" fontSize="lg" width={"20"} colorScheme={"red"} onPress={(): void => leaveGame(informationPartie.id)}>
+                                                Quitter
+                                            </Button>
+                                        </>
                                     )
                                 ]}
                             />
