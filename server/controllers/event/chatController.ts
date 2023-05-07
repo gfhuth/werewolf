@@ -78,11 +78,17 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
 };
 
 const getAllChats = async (game: Game, player: Player): Promise<void> => {
-    let res: { [key in ChatType]: Array<Message> };
+    const res: { [key in ChatType]?: Array<Message> } = {};
     LOGGER.log(`CHAT ALL CHAT START`);
-    res[ChatType.CHAT_VILLAGE] = game.getChat(ChatType.CHAT_VILLAGE).getMessages();
-    res[ChatType.CHAT_WEREWOLF] = game.getChat(ChatType.CHAT_WEREWOLF).getMessages();
-    res[ChatType.CHAT_SPIRITISM] = game.getChat(ChatType.CHAT_SPIRITISM).getMessages();
+    const chatTypes = Object.keys(ChatType) as unknown as ChatType[];
+    for (const chatType of chatTypes) {
+        const chat = game.getChat(chatType);
+        if (!chat || !chat.hasMember(player)) continue;
+        res[chatType] = chat.getMessages();
+    }
+    // res[ChatType.CHAT_VILLAGE] = game.getChat(ChatType.CHAT_VILLAGE).getMessages();
+    // res[ChatType.CHAT_WEREWOLF] = game.getChat(ChatType.CHAT_WEREWOLF).getMessages();
+    // res[ChatType.CHAT_SPIRITISM] = game.getChat(ChatType.CHAT_SPIRITISM).getMessages();
     LOGGER.log(`CHAT ALL CHAT END`);
 
     player.sendMessage("GET_ALL_INFO_CHAT", res);

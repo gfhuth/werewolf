@@ -1,16 +1,14 @@
-import { Actionsheet, Box, Button, Center, Container, Hidden, Image, Pressable, Text, Tooltip, View, useDisclose, useToast } from "native-base";
+import { Actionsheet, Box, Center, Container, Image, Pressable, Text, Tooltip, View, useDisclose, useToast } from "native-base";
 import { images } from "./image";
-import { GameContext } from "../../context/GameContext";
+import { GameContext, Power, Role } from "../../context/GameContext";
 import { useContext, useEffect, useState } from "react";
-import { UserContext, mortVivantEnum } from "../../context/UserContext";
+import { UserContext } from "../../context/UserContext";
 
-export type Role = {
-    name: string;
-};
 export type Player = {
-    id: number;
     username: string;
     roles: Array<Role>;
+    powers: Array<Power>;
+    alive: boolean
 };
 
 export default function PlayerCard(props: { player: Player }): React.ReactElement {
@@ -34,11 +32,12 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
     };
 
     const sendVote = (): void => {
-        gameContext.sendJsonMessage("VOTE_SENT", { vote_type: userContext.role, vote: playerVote });
+        // TODO changer le type du vote
+        gameContext.sendJsonMessage("VOTE_SENT", { vote_type: "", vote: playerVote });
     };
 
     const receivedVote = (): void => {
-        setMessageToast("Le vote a bien était pris en compte");
+        setMessageToast("Le vote a bien été pris en compte");
     };
 
     useEffect(() => {
@@ -48,11 +47,11 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
     return (
         <Pressable
             onPress={(): void => {
-                if (userContext.etatUser === mortVivantEnum.vivant) {
+                if (gameContext.me.alive) {
                     setPlayerVote(props.player.username);
                     onOpen();
                 } else {
-                    setMessageToast("Vous etes mort, vous ne pouvez pas voter");
+                    setMessageToast("Vous êtes mort, vous ne pouvez pas voter");
                 }
             }}
         >
@@ -62,8 +61,13 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                     <Container>
                         <Container display={"flex"} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"} mb={2} style={{ gap: 3 }}>
                             {props.player.roles.map((role, i) => (
-                                <Tooltip key={i} label={role.name} placement="top">
-                                    <Image alt={`${role.name} role image`} source={images[role.name].uri} width={30} height={30} resizeMode="cover" />
+                                <Tooltip key={i} label={role.toString()} placement="top">
+                                    <Image alt={`${role.toString()} role image`} source={images[role.toString()].uri} width={30} height={30} resizeMode="cover" />
+                                </Tooltip>
+                            ))}
+                            {props.player.powers.map((power, i) => (
+                                <Tooltip key={i} label={power.toString()} placement="top">
+                                    <Image alt={`${power.toString()} role image`} source={images[power.toString()].uri} width={30} height={30} resizeMode="cover" />
                                 </Tooltip>
                             ))}
                         </Container>
@@ -92,7 +96,7 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                         </Actionsheet.Content>
                     </Actionsheet>
                 </Center>
-                {userContext.etatUser === mortVivantEnum.mort ? (
+                {!props.player.alive ? (
                     <View backgroundColor={"rgba(56, 56, 56, 0.8)"} position={"absolute"} width={"100%"} height={"100%"} top={"0"} left={"0"}>
                         <View width={"100%"} position={"absolute"} backgroundColor={"white"} style={{ transform: [{ rotate: "-25deg" }, { translateX: -12 }, { translateY: -8 }] }}>
                             <Text paddingLeft={4} fontFamily={"pixel"} color={"red.700"} fontWeight={"900"} fontSize={"150%"}>

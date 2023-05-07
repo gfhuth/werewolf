@@ -2,79 +2,30 @@ import { useContext, useEffect, useState } from "react";
 import { GameContext } from "../../context/GameContext";
 import PlayerCard, { Player } from "./PlayerCard";
 import { Container, Text } from "native-base";
+import { UserContext } from "../../context/UserContext";
 
 export default function PlayersList(props: {}): React.ReactElement {
     const gameContext = useContext(GameContext);
+    const userContext = useContext(UserContext);
 
-    const [players, setPlayers] = useState<Array<Player>>([
-        {
-            id: 1,
-            username: "Batman",
-            roles: [
-                {
-                    name: "Loup"
-                },
-                {
-                    name: "Villageois"
-                }
-            ]
-        },
-        {
-            id: 2,
-            username: "Robin",
-            roles: [
-                {
-                    name: "Loup"
-                },
-                {
-                    name: "Villageois"
-                }
-            ]
-        },
-        {
-            id: 3,
-            username: "Alfred",
-            roles: [
-                {
-                    name: "Loup"
-                },
-                {
-                    name: "Villageois"
-                }
-            ]
-        },
-        {
-            id: 4,
-            username: "Joker",
-            roles: [
-                {
-                    name: "Loup"
-                },
-                {
-                    name: "Villageois"
-                }
-            ]
-        },
-        {
-            id: 5,
-            username: "Wayne",
-            roles: [
-                {
-                    name: "Loup"
-                },
-                {
-                    name: "Villageois"
-                }
-            ]
-        }
-    ]);
+    const [players, setPlayers] = useState<Array<Player>>([]);
 
-    const onPlayerListUpdate = (): void => {
-        // TODO
+    const onPlayerListUpdate = (data: { players: Array<{ user: string; alive: boolean }> }): void => {
+        setPlayers(
+            data.players.map((player) => ({
+                username: player.user,
+                roles: player.user === userContext.username ? [gameContext.me.role] : [],
+                powers: player.user === userContext.username ? [gameContext.me.power] : [],
+                alive: player.alive
+            }))
+        );
+        // Update myself
+        const me = data.players.find((player) => player.user === userContext.username);
+        if (me) gameContext.me.setIsAlive(me.alive);
     };
 
     useEffect(() => {
-        gameContext.registerEventHandler("", onPlayerListUpdate);
+        gameContext.registerEventHandler("LIST_PLAYERS", onPlayerListUpdate);
     }, []);
 
     return (

@@ -1,23 +1,23 @@
 import { ImageSourcePropType } from "react-native";
 
 const images : {[key:string]: {uri:ImageSourcePropType}} = {
-    Chaman: {
-        uri: require("../../assets/images/roles/Chaman.png")
+    SPIRITISM: {
+        uri: require("../../assets/images/powers/SPIRITISM.png")
     },
-    Contamination: {
-        uri: require("../../assets/images/roles/Contamination.png")
+    CONTAMINATION: {
+        uri: require("../../assets/images/powers/CONTAMINATION.png")
     },
-    Insomnie: {
-        uri: require("../../assets/images/roles/Insomnie.png")
+    INSOMNIA: {
+        uri: require("../../assets/images/powers/INSOMNIA.png")
     },
-    Loup: {
-        uri: require("../../assets/images/roles/Loup.png")
+    WEREWOLF: {
+        uri: require("../../assets/images/roles/WEREWOLF.png")
     },
-    Villageois: {
-        uri: require("../../assets/images/roles/Villageois.png")
+    HUMAN: {
+        uri: require("../../assets/images/roles/HUMAN.png")
     },
-    Voyante: {
-        uri: require("../../assets/images/roles/Voyante.png")
+    CLAIRVOYANCE: {
+        uri: require("../../assets/images/powers/CLAIRVOYANCE.png")
     }
 };
 

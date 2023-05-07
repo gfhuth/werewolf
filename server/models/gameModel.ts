@@ -20,8 +20,8 @@ export enum GameStatus {
 }
 
 export enum Role {
-    HUMAN,
-    WEREWOLF,
+    HUMAN = "HUMAN",
+    WEREWOLF = "WEREWOLF",
 }
 
 export type GameParam = {
@@ -90,7 +90,7 @@ export class Game {
      * @returns {void}
      */
     public setChatSpiritism(chaman: Player, deadPlayer: Player): void {
-        this.chats[ChatType.CHAT_SPIRITISM].resetChatMembers([chaman, deadPlayer]);
+        this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([chaman, deadPlayer]);
     }
 
     public addPlayer(player: Player): void {
@@ -319,7 +319,7 @@ export class Game {
     }
 
     public getChat(type: ChatType): Chat {
-        return this.chats[type];
+        return this.chats.find(chat => chat.getType() === type);
     }
     public getAllPlayers(): Array<Player> {
         return Array.from(this.players.values());

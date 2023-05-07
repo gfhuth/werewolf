@@ -40,7 +40,7 @@ export interface GameTable {
 export interface MessageTable {
     id: Generated<number>;
     game: number;
-    type: number;
+    type: string;
     user: string;
     content: string;
     date: number;

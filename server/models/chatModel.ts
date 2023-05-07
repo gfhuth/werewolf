@@ -3,12 +3,12 @@ import database from "../util/database";
 import { Player } from "./playerModel";
 
 export enum ChatType {
-    CHAT_VILLAGE,
-    CHAT_WEREWOLF,
-    CHAT_SPIRITISM,
+    CHAT_VILLAGE = "CHAT_VILLAGE",
+    CHAT_WEREWOLF = "CHAT_WEREWOLF",
+    CHAT_SPIRITISM = "CHAT_SPIRITISM",
 }
 
-export type Message = { game: number; type: number; user: string; content: string; date: number };
+export type Message = { game: number; type: ChatType; user: string; content: string; date: number };
 
 export class Chat {
 
@@ -28,6 +28,10 @@ export class Chat {
 
     public getMembers(): Array<Player> {
         return this.members;
+    }
+
+    public hasMember(player: Player): boolean {
+        return !!this.getMembers().find((p) => p.getUser().getUsername() === player.getUser().getUsername());
     }
 
     public getMessages(): Array<Message> {
@@ -65,7 +69,7 @@ export class Chat {
             .ifNotExists()
             .addColumn("id", "integer", (col) => col.autoIncrement().primaryKey())
             .addColumn("game", "integer", (col) => col.notNull())
-            .addColumn("type", "integer", (col) => col.notNull())
+            .addColumn("type", "text", (col) => col.notNull())
             .addColumn("user", "text", (col) => col.notNull())
             .addColumn("content", "text", (col) => col.notNull())
             .addColumn("date", "integer", (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())

@@ -191,10 +191,10 @@ export default function Home(): React.ReactElement {
                                         </Button>
                                     ) : (
                                         <>
-                                            <Text fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
+                                            <Text key={1} fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
                                                 La partie n'a pas encore commencée
                                             </Text>
-                                            <Button key={1} size="md" fontSize="lg" width={"20"} colorScheme={"red"} onPress={(): void => leaveGame(informationPartie.id)}>
+                                            <Button key={2} size="md" fontSize="lg" width={"20"} colorScheme={"red"} onPress={(): void => leaveGame(informationPartie.id)}>
                                                 Quitter
                                             </Button>
                                         </>
