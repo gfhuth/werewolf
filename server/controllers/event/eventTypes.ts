@@ -1,4 +1,4 @@
-import { ChatType, Message } from "../../models/chatModel";
+import { ChatType } from "../../models/chatModel";
 import { Role } from "../../models/gameModel";
 import { VoteType } from "../../models/voteModel";
 
@@ -62,8 +62,15 @@ export type ServerToClientEvents = {
     GET_ALL_INFO_GAME: {
         status: number;
     };
+    GET_ALL_INFO_PLAYER: {
+        role: Role;
+        power: string;
+    };
+    GET_ALL_INFO_PLAYERS_LIST: {
+        players: Array<{ name: string, alive: boolean }>;
+    };
     GET_ALL_INFO_VOTE: {
-        [key: string]: { [key: string]: boolean | undefined };
+        [key: string]: { nbValidation: number; nbInvalidation: number };
     };
     LIST_PLAYERS: {
         players: Array<{ user: string; alive: boolean }>;

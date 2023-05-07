@@ -48,7 +48,7 @@ const voteRatification = (game: Game, player: Player, data: { vote_type: VoteTyp
 const getAllVotes = (game: Game, player: Player): void => {
     const vote: Vote = game.getVote();
     if (!vote.getParticipants().includes(player)) return;
-    player.sendMessage("GET_ALL_INFO_VOTE", vote.getVotes());
+    player.sendMessage("GET_ALL_INFO_VOTE", vote.countRatification());
 };
 
 // Liste des événements relatifs aux votes
