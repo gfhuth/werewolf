@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Game, GameParam, GameStatus } from "../models/gameModel";
+import { Game, GameParam, GameStatus, Role } from "../models/gameModel";
 import { Event } from "../controllers/eventController";
 import database from "../util/database";
 
@@ -247,13 +247,22 @@ export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promi
     }
 };
 
-/** Envoie une websocket a un user contenant le récapitulatif de la partie
- * @param {Game} game GameObject not null
- * @param {Player} player UserObject not null
- * @param {Json} data Data given by the message (unused here)
- */
-function getInfoGame(game: Game, player: Player, data: {}): void {
-    player.sendMessage("GET_ALL_INFO_GAME", { status: game.getStatus() });
+// function getInfoGame(game: Game, player: Player): void {
+//     player.sendMessage("GET_ALL_INFO_GAME", { status: game.getStatus() });
+// }
+
+function getInfoPlayersList(game: Game, player: Player): void {
+    player.sendMessage("GET_ALL_INFO_PLAYERS_LIST", {
+        players: game.getAllPlayers().map<{ name: string, alive: boolean }>((p) => ({ name: p.getUser().getUsername(), alive: !p.isDead() }))
+    });
 }
 
-Event.registerHandlers("GET_ALL_INFO", getInfoGame);
+function getInfoPlayer(game: Game, player: Player): void {
+    const role: Role = player.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
+    if (player.getPower()) player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: player.getPower().getName() });
+    else player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: "" });
+}
+
+// Event.registerHandlers("GET_ALL_INFO", getInfoGame);
+Event.registerHandlers("GET_ALL_INFO", getInfoPlayersList);
+Event.registerHandlers("GET_ALL_INFO", getInfoPlayer);
