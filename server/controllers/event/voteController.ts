@@ -1,6 +1,6 @@
 import { Game } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
-import { VoteType } from "../../models/voteModel";
+import { Vote, VoteType } from "../../models/voteModel";
 import { Event } from "../eventController";
 
 const voteVerification = (game: Game, player: Player, data: { vote_type: VoteType; playerVoted: string; ratification?: boolean }): boolean => {
@@ -45,6 +45,13 @@ const voteRatification = (game: Game, player: Player, data: { vote_type: VoteTyp
     game.getVote().ratifyProposition(player, game.getPlayer(data.playerVoted), data.ratification);
 };
 
+const getAllVotes = (game: Game, player: Player): void => {
+    const vote: Vote = game.getVote();
+    if (!vote.getParticipants().includes(player)) return;
+    player.sendMessage("GET_ALL_INFO_VOTE", vote.getVotes());
+};
+
 // Liste des événements relatifs aux votes
 Event.registerHandlers("VOTE_SENT", voteProposition);
 Event.registerHandlers("RESPONSE_RATIFICATION", voteRatification);
+Event.registerHandlers("GET_ALL_INFO", getAllVotes);

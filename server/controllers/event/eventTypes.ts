@@ -62,6 +62,9 @@ export type ServerToClientEvents = {
     GET_ALL_INFO_GAME: {
         status: number;
     };
+    GET_ALL_INFO_VOTE: {
+        [key: string]: { [key: string]: boolean | undefined };
+    };
     LIST_PLAYERS: {
         players: Array<{ user: string; alive: boolean }>;
     };

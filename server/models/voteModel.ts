@@ -31,6 +31,10 @@ export class Vote {
         return this.result;
     }
 
+    public getVotes(): { [key: string]: { [key: string]: boolean | undefined } } {
+        return this.votes;
+    }
+
     public isClosed(): boolean {
         return this.result !== null;
     }
