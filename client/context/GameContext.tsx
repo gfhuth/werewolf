@@ -1,9 +1,8 @@
 import { WS } from "@env";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import Logger from "../utils/Logger";
 import { useToast } from "native-base";
-import { UserContext, mortVivantEnum } from "./UserContext";
 
 export type EventHandlerCallback = (data: any) => void;
 
@@ -14,6 +13,24 @@ export enum jourOuNuit {
     nuit = 1,
 }
 
+export enum Role {
+    HUMAN = "HUMAN",
+    WEREWOLF = "WEREWOLF",
+}
+export enum Power {
+    NONE,
+    CONTAMINATION = "CONTAMINATION",
+    SPIRITISM = "SPIRITISM",
+    CLAIRVOYANCE = "CLAIRVOYANCE",
+    INSOMNIA = "INSOMNIA"
+}
+
+type SelfInfos = {
+    alive: boolean;
+    role: Role;
+    power: Power;
+};
+
 export const GameContext = React.createContext<{
     jourNuit: jourOuNuit;
     setJourNuit:(enumJourNuit: jourOuNuit) => void;
@@ -21,20 +38,34 @@ export const GameContext = React.createContext<{
     registerEventHandler: (event: string, callback: EventHandlerCallback) => void;
     sendJsonMessage: (event: string, data: any) => void;
     onMessage: (event: MessageEvent<any>) => void;
+    me: SelfInfos & {
+        setIsAlive: (isAlive: boolean) => void;
+        setRole: (role: Role) => void;
+        setPower: (power: Power) => void;
+    };
         }>({
             jourNuit: jourOuNuit.nuit,
             setJourNuit: () => null,
             eventHandlers: {},
             registerEventHandler: () => null,
             onMessage: () => null,
-            sendJsonMessage: () => null
+            sendJsonMessage: () => null,
+            me: {
+                alive: true,
+                role: Role.HUMAN,
+                power: Power.NONE,
+                setIsAlive: () => null,
+                setRole: () => null,
+                setPower: () => null
+            }
         });
 
 export function GameProvider(props: { children: React.ReactNode; gameId: number }): React.ReactElement {
+    const toast = useToast();
+
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
     const [jourNuit, setJourNuit] = useState<jourOuNuit>(jourOuNuit.nuit);
-    const toast = useToast();
-    const userContext = useContext(UserContext);
+    const [myInfos, setMyInfos] = useState<SelfInfos>({ alive: true, role: Role.HUMAN, power: Power.NONE });
 
     const setMessageErreur = (messageErreur: string): void => {
         toast.show({
@@ -96,18 +127,25 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         sendJsonMessage(result);
     };
 
-    /**
-     * Utilisé pour set vivant ou mort une personne
-     * @param data array des informations
-     */
-    const listeDesInfosDesJoueur = (data: { players: Array<{ user: string; alive: boolean }> }): void => {
-        LOGGER.log(`Liste des informations des joueurs`);
+    // User infos
 
-        const result = data.players.filter((info) => info.user == userContext.username);
-        if (result[1].alive == true) 
-            userContext.setEtatUser(mortVivantEnum.vivant);
-        else 
-            userContext.setEtatUser(mortVivantEnum.mort);
+    const setIsAlive = (isAlive: boolean): void => {
+        setMyInfos({ ...myInfos, alive: isAlive });
+    };
+    const setRole = (role: Role): void => {
+        setMyInfos({ ...myInfos, role: role });
+    };
+    const setPower = (power: Power): void => {
+        setMyInfos({ ...myInfos, power: power });
+    };
+
+    const onRole = (data: { role: Role; nbWerewolfs: number }): void => {
+        LOGGER.log(`Nouveau role: ${data.role}`);
+        setRole(data.role);
+    };
+    const onPouvoir = (data: { power: Power }): void => {
+        LOGGER.log(`Nouveau pouvoir: ${data.power}`);
+        setPower(data.power);
     };
 
     const setJour = (): void => {
@@ -123,10 +161,15 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         registerEventHandler("CHAT_ERROR", errorHandler);
         registerEventHandler("VOTE_ERROR", errorHandler);
         registerEventHandler("GAME_DELETED", errorHandler);
-        registerEventHandler("LIST_PLAYERS", listeDesInfosDesJoueur);
         registerEventHandler("NIGHT_STARTS", setNuit);
         registerEventHandler("DAY_STARTS", setJour);
+        registerEventHandler("SET_ROLE", onRole);
+        registerEventHandler("SET_POWER", onPouvoir);
     }, []);
 
-    return <GameContext.Provider value={{ jourNuit, setJourNuit, eventHandlers, registerEventHandler, onMessage, sendJsonMessage: sendMessage }}>{props.children}</GameContext.Provider>;
+    return (
+        <GameContext.Provider value={{ jourNuit, setJourNuit, eventHandlers, registerEventHandler, onMessage, sendJsonMessage: sendMessage, me: { ...myInfos, setIsAlive, setPower, setRole } }}>
+            {props.children}
+        </GameContext.Provider>
+    );
 }
