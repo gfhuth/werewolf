@@ -39,10 +39,9 @@ export class Vote {
         let nbVote: number;
         for (const player of this.participants) {
             if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()] === undefined) return;
-
             if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()]) nbVote++;
         }
-        if (nbVote <= this.participants.length / 2) {
+        if (nbVote <= (this.participants.length - 1) / 2) {
             this.participants.forEach((player) => player.sendMessage("VOTE_INVALID", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
             return;
         }
