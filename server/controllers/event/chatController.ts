@@ -78,13 +78,18 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
 };
 
 const getAllChats = async (game: Game, player: Player): Promise<void> => {
-    const res: { [key in ChatType]?: Array<Message> } = {};
+    const res: { [key in ChatType]?: Array<{ author: string; date: number; chat_type: ChatType; content: string; }> } = {};
     LOGGER.log(`CHAT ALL CHAT START`);
     const chatTypes = Object.keys(ChatType) as unknown as ChatType[];
     for (const chatType of chatTypes) {
         const chat = game.getChat(chatType);
         if (!chat || !chat.hasMember(player)) continue;
-        res[chatType] = chat.getMessages();
+        res[chatType] = chat.getMessages().map(message => ({
+            author: message.user,
+            date: message.date,
+            chat_type: chatType,
+            content: message.content
+        }));
     }
     // res[ChatType.CHAT_VILLAGE] = game.getChat(ChatType.CHAT_VILLAGE).getMessages();
     // res[ChatType.CHAT_WEREWOLF] = game.getChat(ChatType.CHAT_WEREWOLF).getMessages();
