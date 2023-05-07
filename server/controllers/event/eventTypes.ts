@@ -73,6 +73,15 @@ export type ServerToClientEvents = {
         role: Role;
         nbWerewolfs: number;
     };
+    UPDATE_PROPOSITION: {
+        vote_type: VoteType;
+        playerVoted: string;
+        nbValidation: number;
+        nbInvalidation: number;
+    };
+    USE_POWER_VALID: {
+        // Empty
+    };
     VOTE_INVALID: {
         vote_type: VoteType;
         playerVoted: string;
@@ -80,8 +89,5 @@ export type ServerToClientEvents = {
     VOTE_VALID: {
         vote_type: VoteType;
         playerVoted: string;
-    };
-    USE_POWER_VALID: {
-        // Empty
     };
 };

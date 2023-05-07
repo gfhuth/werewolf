@@ -64,6 +64,17 @@ export class Vote {
     public ratifyProposition(playerWhoRatify: Player, playerVoted: Player, ratification: boolean): void {
         this.votes[playerVoted.getUser().getUsername()][playerWhoRatify.getUser().getUsername()] = ratification;
 
+        // On envoie une mise à jour du vote à tous les participants
+        let nbValidation: number;
+        let nbInvalidation: number;
+        for (const playerName in this.votes[playerVoted.getUser().getUsername()]) {
+            if (this.votes[playerVoted.getUser().getUsername()][playerName] === true) nbValidation += 1;
+            else if (this.votes[playerVoted.getUser().getUsername()][playerName] === false) nbValidation += 1;
+        }
+        this.participants.forEach((player) =>
+            player.sendMessage("UPDATE_PROPOSITION", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername(), nbValidation: nbValidation, nbInvalidation: nbInvalidation })
+        );
+
         // On regarde si le vote est terminée et/ou valide
         this.voteValidation(playerVoted);
     }
