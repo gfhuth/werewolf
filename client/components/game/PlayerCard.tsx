@@ -1,23 +1,16 @@
-import { Actionsheet, Box, Center, Container, Image, Pressable, Text, Tooltip, View, useDisclose, useToast } from "native-base";
+import { Actionsheet, Box, Button, Center, Container, Heading, Image, Pressable, Text, Tooltip, View, useDisclose, useToast } from "native-base";
 import { images } from "./image";
-import { GameContext, Power, Role } from "../../context/GameContext";
-import { useContext, useEffect, useState } from "react";
+import { GameContext, Player } from "../../context/GameContext";
+import { useContext } from "react";
 import { UserContext } from "../../context/UserContext";
-
-export type Player = {
-    username: string;
-    roles: Array<Role>;
-    powers: Array<Power>;
-    alive: boolean
-};
+import { VoteContext } from "../../context/VoteContext";
 
 export default function PlayerCard(props: { player: Player }): React.ReactElement {
-    const [isOpenVote, setIsOpen] = useState(false);
     const gameContext = useContext(GameContext);
     const userContext = useContext(UserContext);
+    const voteContext = useContext(VoteContext);
 
     const { isOpen, onOpen, onClose } = useDisclose();
-    const [playerVote, setPlayerVote] = useState("");
 
     const toast = useToast();
 
@@ -31,28 +24,43 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
         });
     };
 
-    const sendVote = (): void => {
-        // TODO changer le type du vote
-        gameContext.sendJsonMessage("VOTE_SENT", { vote_type: "", vote: playerVote });
+    const suggestVote = (): void => {
+        voteContext.vote(props.player.username, true);
+        onClose();
+    };
+    const ratify = (shouldKill: boolean): void => {
+        voteContext.vote(props.player.username, shouldKill);
+        onClose();
     };
 
-    const receivedVote = (): void => {
-        setMessageToast("Le vote a bien été pris en compte");
-    };
+    const playerRatification = voteContext.ratifications.find((r) => r.target === props.player.username);
 
-    useEffect(() => {
-        gameContext.registerEventHandler("VOTE_RECEIVED", receivedVote);
-    }, []);
+    const getVoteElement = (): React.ReactNode => {
+        if (props.player.username === userContext.username) return undefined;
+        if (playerRatification) {
+            return (
+                <Actionsheet.Item display={"flex"} flexDirection={"row"}>
+                    <Button bg="green.400" onPress={(): void => ratify(false)}>
+                        VIVRE
+                    </Button>
+                    <Button bg="red.400" onPress={(): void => ratify(true)}>
+                        MOURIR
+                    </Button>
+                </Actionsheet.Item>
+            );
+        } else {
+            return <Actionsheet.Item onPress={suggestVote}>VOTE</Actionsheet.Item>;
+        }
+    };
 
     return (
         <Pressable
             onPress={(): void => {
-                if (gameContext.me.alive) {
-                    setPlayerVote(props.player.username);
-                    onOpen();
-                } else {
-                    setMessageToast("Vous êtes mort, vous ne pouvez pas voter");
+                if (!gameContext.me.alive) {
+                    setMessageToast("Vous ne pouvez pas interagir lorsque vous êtes mort");
+                    return;
                 }
+                onOpen();
             }}
         >
             <Box bg="light.100" borderRadius={5} p={2} overflow={"hidden"}>
@@ -76,27 +84,14 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
 
                     <Actionsheet isOpen={isOpen} onClose={onClose}>
                         <Actionsheet.Content>
-                            <Box w="100%" h={60} px={4} justifyContent="center">
-                                <Text
-                                    fontSize="16"
-                                    color="gray.500"
-                                    bold
-                                    _dark={{
-                                        color: "gray.300"
-                                    }}
-                                >
-                                    Actions possibles :
-                                </Text>
-                            </Box>
-                            <Actionsheet.Item onPress={sendVote}>VOTE</Actionsheet.Item>
-                            <Actionsheet.Item isDisabled>Share</Actionsheet.Item>
-                            <Actionsheet.Item>Play</Actionsheet.Item>
-                            <Actionsheet.Item>Favourite</Actionsheet.Item>
-                            <Actionsheet.Item onPress={onClose}>Close</Actionsheet.Item>
+                            <Heading w="100%" textAlign={"center"}>
+                                {props.player.username}
+                            </Heading>
+                            {getVoteElement()}
                         </Actionsheet.Content>
                     </Actionsheet>
                 </Center>
-                {!props.player.alive ? (
+                {!props.player.alive && (
                     <View backgroundColor={"rgba(56, 56, 56, 0.8)"} position={"absolute"} width={"100%"} height={"100%"} top={"0"} left={"0"}>
                         <View width={"100%"} position={"absolute"} backgroundColor={"white"} style={{ transform: [{ rotate: "-25deg" }, { translateX: -12 }, { translateY: -8 }] }}>
                             <Text paddingLeft={4} fontFamily={"pixel"} color={"red.700"} fontWeight={"900"} fontSize={"150%"}>
@@ -104,8 +99,12 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                             </Text>
                         </View>
                     </View>
-                ) : (
-                    ""
+                )}
+                {playerRatification && (
+                    <View position={"absolute"} width={"100%"} height={5} display={"flex"} justifyContent={"space-between"}>
+                        <View bg={"red.400"} width={`${(playerRatification.countForKilling / (gameContext.players.length - 1)) * 100}%`} height={"100%"} />
+                        <View bg={"green.400"} width={`${(playerRatification.countForLiving / (gameContext.players.length - 1)) * 100}%`} height={"100%"} />
+                    </View>
                 )}
             </Box>
         </Pressable>

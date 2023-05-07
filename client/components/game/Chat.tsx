@@ -13,11 +13,10 @@ type LocalMessage = {
 };
 
 type ServerMessage = {
-    game: number;
-    type: number;
-    username: string;
-    content: string;
+    author: string;
     date: number;
+    chat_type: ChatType;
+    content: string;
 };
 
 enum ChatType {
@@ -40,7 +39,7 @@ export default function ChatComponent(): React.ReactElement {
     const [selectedChat, setSelectedChat] = useState<ChatType>(ChatType.CHAT_VILLAGE);
 
     const sendMessage = (): void => {
-        console.log(gameContext.jourNuit);
+        console.log(gameContext.phase);
         gameContext.sendJsonMessage("CHAT_SENT", { date: new Date().getTime(), content: message, chat_type: selectedChat });
         setMessage("");
     };
@@ -53,7 +52,7 @@ export default function ChatComponent(): React.ReactElement {
             msgs.push(
                 ...data[key].map((msg) => ({
                     date: new Date(msg.date),
-                    author: msg.username,
+                    author: msg.author,
                     content: msg.content,
                     type: key
                 }))
@@ -64,11 +63,11 @@ export default function ChatComponent(): React.ReactElement {
         setMessages(msgs);
     };
 
-    const onMessage = useCallback((data: { date: number; author: string; chat_type: string; content: string }): void => {
+    const onMessage = useCallback((data: ServerMessage): void => {
         setMessages((currentMessages) => [
             ...currentMessages,
             {
-                type: data.chat_type as unknown as ChatType,
+                type: data.chat_type,
                 date: new Date(data.date),
                 author: data.author,
                 content: data.content
@@ -90,8 +89,8 @@ export default function ChatComponent(): React.ReactElement {
             </Select>
             <View>
                 <ScrollView bg={"light.300"} p={2}>
-                    {messages.length > 0 ? (
-                        messages.map((msg, i) => (
+                    {messages.filter(msg => msg.type === selectedChat).length > 0 ? (
+                        messages.filter(msg => msg.type === selectedChat).map((msg, i) => (
                             <View key={i}>
                                 <Text>
                                     {msg.author} : {msg.content}
