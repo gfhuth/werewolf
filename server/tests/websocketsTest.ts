@@ -2,7 +2,7 @@ import { Client } from "./main.test";
 
 export const testWebsockets = (client0: Client, client1: Client, client2: Client, client3: Client, client4: Client, client5: Client, client8: Client): void =>
     describe("Test websockets", () => {
-        test("Initialisation de la partie", async () => {
+        test("Setup roles and powers", async () => {
             await client0.controlStartGame(1);
             await client1.controlStartGame(1);
             await client2.controlStartGame(1);
