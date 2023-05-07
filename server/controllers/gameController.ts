@@ -15,7 +15,11 @@ export async function searchGame(req: Request, res: Response): Promise<void> {
     //game list from SQLdatabase;
     try {
         res.status(200).json({
-            games: Game.getAllGames().map((g) => ({
+            games: Game.getAllGames().filter(g => {
+                if (g.getGameParam().startDate < Date.now() && g.verifyEndGame()) return false;
+                if (g.getGameParam().startDate < Date.now() && g.getGameParam().nbPlayerMin > g.getAllPlayers().length) return false;
+                return true;
+            }).map((g) => ({
                 id: g.getGameId(),
                 startDate: g.getGameParam().startDate,
                 host: g.getHost().getUsername(),
