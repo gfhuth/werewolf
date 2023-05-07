@@ -70,8 +70,6 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     const { sendJsonMessage } = useWebSocket(WS, {
         onOpen: () => {
             LOGGER.log("Connection opened");
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            sendMessage("GET_ALL_INFO", {});
         },
         onMessage: onMessage,
         onError: onError,

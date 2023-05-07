@@ -64,16 +64,7 @@ export default function CreateGame(): React.ReactElement {
         })
             .then((res) => res.json())
             .then(() => {
-                toast.show({
-                    title: "Succès !",
-                    description: "Partie crée",
-                    variant: "subtle",
-                    borderColor: "green.700",
-                    borderLeftWidth: 3
-                });
-                setTimeout(() => {
-                    navigation.navigate("Home");
-                }, 3000);
+                navigation.navigate("Home");
             })
             .catch((e) => {
                 toast.show({

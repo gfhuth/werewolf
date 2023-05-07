@@ -1,6 +1,7 @@
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
 import { useState } from "react";
 import { Input, Pressable } from "native-base";
+import moment from "moment";
 
 export default function InputDate(props: { value: Date, onChange: (value: Date) => void }): React.ReactElement {
     const [dateOpen, setDateOpen] = useState(false);
@@ -31,7 +32,7 @@ export default function InputDate(props: { value: Date, onChange: (value: Date) 
     return (
         <>
             <Pressable mt={2} onPress={(): void => setDateOpen(true)}>
-                <Input value={props.value.toISOString()} />
+                <Input value={moment(props.value).format("DD/MM/YYYY HH:mm")} />
             </Pressable>
             <DatePickerModal visible={dateOpen} date={date} mode="single" onConfirm={onConfirmDate} onDismiss={onDismiss} locale="en" />
             <TimePickerModal visible={timeOpen} hours={hours} minutes={minutes} onConfirm={onConfirmTime} onDismiss={onDismiss} />
