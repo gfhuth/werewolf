@@ -43,6 +43,7 @@ export default function Login(): React.ReactElement {
             .then((res) => res.json())
             .then((res) => {
                 context.setToken(res.token);
+                context.setUsername(username);
                 navigation.navigate("Home");
             })
             .catch((e) => setMessageErreur(e.message));
