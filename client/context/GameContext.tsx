@@ -19,7 +19,8 @@ export enum Role {
     WEREWOLF = "WEREWOLF",
 }
 export enum Power {
-    NONE,
+    NO_POWER = "NO_POWER",
+    NONE = "",
     CONTAMINATION = "CONTAMINATION",
     SPIRITISM = "SPIRITISM",
     CLAIRVOYANCE = "CLAIRVOYANCE",
@@ -158,13 +159,23 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         setMyInfos({ ...myInfos, power: power });
     };
 
-    const onRoleSet = (data: { role: Role; nbWerewolfs: number }): void => {
-        LOGGER.log(`Nouveau role: ${data.role}`);
-        setRole(data.role);
-    };
-    const onPowerSet = (data: { power: Power }): void => {
-        LOGGER.log(`Nouveau pouvoir: ${data.power}`);
-        setPower(data.power);
+    const onPlayerInfo = (data: { role: Role; power: Power }): void => {
+        const newRole = data.role;
+        const newPower = data.power === Power.NO_POWER ? Power.NONE : data.power;
+        setRole(newRole);
+        setPower(newPower);
+        // Update players list
+        setPlayers((pl) => {
+            const me = pl.find((p) => p.username === userContext.username);
+            return [
+                ...pl.filter((p) => p.username !== userContext.username),
+                {
+                    ...me,
+                    roles: newRole ? [newRole] : [],
+                    powers: newPower ? [newPower] : []
+                }
+            ] as Player[];
+        });
     };
 
     const onDayStart = (): void => {
@@ -188,8 +199,8 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         setPlayers(
             data.players.map((player) => ({
                 username: player.user,
-                roles: player.user === userContext.username ? [myInfos.role] : [],
-                powers: player.user === userContext.username ? [myInfos.power] : [],
+                roles: player.user === userContext.username && myInfos.role ? [myInfos.role] : [],
+                powers: player.user === userContext.username && myInfos.power ? [myInfos.power] : [],
                 alive: player.alive
             }))
         );
@@ -201,8 +212,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         registerEventHandler("GAME_DELETED", errorHandler);
         registerEventHandler("NIGHT_STARTS", onNightStart);
         registerEventHandler("DAY_STARTS", onDayStart);
-        registerEventHandler("SET_ROLE", onRoleSet);
-        registerEventHandler("SET_POWER", onPowerSet);
+        registerEventHandler("GET_ALL_INFO_PLAYER", onPlayerInfo);
         registerEventHandler("LIST_PLAYERS", onPlayerListUpdate);
     }, []);
 
