@@ -4,7 +4,6 @@ import { Player } from "../../models/playerModel";
 import database from "../../util/database";
 import { Event } from "../eventController";
 import Logger from "../../util/Logger";
-import ClairvoyancePower from "../../models/powers/ClairvoyancePower";
 import InsomniaPower from "../../models/powers/InsomniaPower";
 
 const LOGGER = new Logger("WEBSOCKET");

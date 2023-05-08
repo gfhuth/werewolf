@@ -55,7 +55,7 @@ export class Vote {
     }
 
     private voteValidation(playerVoted: Player): void {
-        let nbVote: number;
+        let nbVote = 0;
         for (const player of this.participants) {
             if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()] === undefined) return;
             if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()]) nbVote++;
