@@ -120,14 +120,9 @@ export class Game {
         while (players.length > 0 && werewolfs.length < nbWerewolfs) {
             const werewolf: Player = players[Math.floor(Math.random() * players.length)];
             werewolf.setWerewolf(true);
-            werewolf.sendMessage("SET_ROLE", { role: Role.WEREWOLF, nbWerewolfs: nbWerewolfs });
             werewolfs.push(werewolf);
             players.splice(players.indexOf(werewolf), 1);
         }
-        players.forEach((player) => {
-            player.setWerewolf(false);
-            player.sendMessage("SET_ROLE", { role: Role.HUMAN, nbWerewolfs: nbWerewolfs });
-        });
         LOGGER.log(`${nbWerewolfs} werewolf(s) in this game`);
         werewolfs.forEach((player) => LOGGER.log(`${player.getUser().getUsername()} is a werewolf in this game`));
     }
@@ -139,26 +134,22 @@ export class Game {
         if (Math.random() <= this.gameParam.probaContamination) {
             const contamination: Player = werewolfs[Math.floor(Math.random() * werewolfs.length)];
             contamination.setPower(new ContaminationPower());
-            contamination.sendMessage("SET_POWER", { power: contamination.getPower().getName() });
         }
         if (humans.length > 0 && Math.random() <= this.gameParam.probaInsomnie) {
             const insomnie: Player = humans[Math.floor(Math.random() * humans.length)];
             insomnie.setPower(new InsomniaPower());
-            insomnie.sendMessage("SET_POWER", { power: insomnie.getPower().getName() });
         }
 
         let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getPower());
         if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaSpiritisme) {
             const spiritisme: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
             spiritisme.setPower(new SpiritismPower());
-            spiritisme.sendMessage("SET_POWER", { power: spiritisme.getPower().getName() });
         }
 
         playersWithoutPower = playersWithoutPower.filter((player) => !player.getPower());
         if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaVoyance) {
             const voyance: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
             voyance.setPower(new ClairvoyancePower());
-            voyance.sendMessage("SET_POWER", { power: voyance.getPower().getName() });
         }
     }
 
@@ -287,6 +278,11 @@ export class Game {
         this.setupRoles();
         LOGGER.log(`Initialisation des pouvoirs : ${this.gameId}`);
         this.setupPower();
+        this.getAllPlayers().forEach((player) => {
+            const role: Role = player.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
+            if (player.getPower()) player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: player.getPower().getName(), nbWerewolfs: this.getWerewolfs().length });
+            else player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: "NO_POWER", nbWerewolfs: this.getWerewolfs().length });
+        });
 
         // Initialisation des chats
         LOGGER.log(`Initialisation des chats : ${this.gameId}`);
@@ -319,7 +315,7 @@ export class Game {
     }
 
     public getChat(type: ChatType): Chat {
-        return this.chats.find(chat => chat.getType() === type);
+        return this.chats.find((chat) => chat.getType() === type);
     }
     public getAllPlayers(): Array<Player> {
         return Array.from(this.players.values());

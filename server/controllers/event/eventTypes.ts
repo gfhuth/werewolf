@@ -65,9 +65,10 @@ export type ServerToClientEvents = {
     GET_ALL_INFO_PLAYER: {
         role: Role;
         power: string;
+        nbWerewolfs: number;
     };
     GET_ALL_INFO_PLAYERS_LIST: {
-        players: Array<{ name: string, alive: boolean }>;
+        players: Array<{ name: string; alive: boolean }>;
     };
     GET_ALL_INFO_VOTE: {
         [key: string]: { nbValidation: number; nbInvalidation: number };
@@ -76,13 +77,6 @@ export type ServerToClientEvents = {
         players: Array<{ user: string; alive: boolean }>;
     };
     NIGHT_STARTS: {};
-    SET_POWER: {
-        power: string;
-    };
-    SET_ROLE: {
-        role: Role;
-        nbWerewolfs: number;
-    };
     UPDATE_PROPOSITION: {
         vote_type: VoteType;
         playerVoted: string;

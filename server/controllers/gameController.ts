@@ -259,8 +259,8 @@ function getInfoPlayersList(game: Game, player: Player): void {
 
 function getInfoPlayer(game: Game, player: Player): void {
     const role: Role = player.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
-    if (player.getPower()) player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: player.getPower().getName() });
-    else player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: "NO_POWER" });
+    if (player.getPower()) player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: player.getPower().getName(), nbWerewolfs: game.getWerewolfs().length });
+    else player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: "NO_POWER", nbWerewolfs: game.getWerewolfs().length });
 }
 
 // Event.registerHandlers("GET_ALL_INFO", getInfoGame);
