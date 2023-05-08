@@ -4,7 +4,7 @@ import { Player } from "../../models/playerModel";
 import database from "../../util/database";
 import { Event } from "../eventController";
 import Logger from "../../util/Logger";
-import ClairvoyancePower from "../../models/powers/ClairvoyancePower";
+import InsomniaPower from "../../models/powers/InsomniaPower";
 
 const LOGGER = new Logger("WEBSOCKET");
 
@@ -53,7 +53,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
     }
 
     if (player.getPower()) {
-        if (data.chat_type === ChatType.CHAT_WEREWOLF && player.getPower().getName() === ClairvoyancePower.POWERNAME) {
+        if (data.chat_type === ChatType.CHAT_WEREWOLF && player.getPower().getName() === InsomniaPower.POWERNAME) {
             player.sendError("CHAT_ERROR", 403, "Insomnia cannot send message into werewolfs chat");
             return;
         }
