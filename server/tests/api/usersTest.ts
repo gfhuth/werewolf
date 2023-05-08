@@ -1,6 +1,6 @@
 import request from "supertest";
 import jwt from "jsonwebtoken";
-import { Client, url } from "./main.test";
+import { Client, url } from "../main.test";
 
 const password0 = "cjbdzqbczkl";
 const password1 = "cjbzceada";

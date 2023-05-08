@@ -1,5 +1,5 @@
-import { VoteType } from "../models/voteModel";
-import { client1, client2 } from "./usersTest";
+import { VoteType } from "../../models/voteModel";
+import { client1, client2 } from "../api/usersTest";
 
 describe("Test votes", () => {
     beforeAll(async () => {

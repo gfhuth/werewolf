@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 import * as WebSocket from "ws";
 
-import { testUsers } from "./usersTest";
-import { testGames } from "./gamesTest";
+import { testUsers } from "./api/usersTest";
+import { testGames } from "./api/gamesTest";
 import { testWebsockets } from "./websocketsTest";
 import { testRunGame } from "./runGameTest";
 
@@ -31,6 +31,8 @@ export class Client {
     private role: Role;
     private power: Power;
 
+    private alive: boolean;
+
     private ws: WebSocket.WebSocket;
     private messages: Array<string>;
     private messageResolver: (msg: Record<string, any>) => void | null;
@@ -42,6 +44,7 @@ export class Client {
         this.token = "";
         this.role = Role.HUMAN;
         this.power = Power.NO_POWER;
+        this.alive = true;
 
         this.messages = [];
         this.ws = null;
@@ -66,6 +69,14 @@ export class Client {
         this.token = token;
     }
 
+    public isAlive(): boolean {
+        return this.alive;
+    }
+
+    public kill(): void {
+        this.alive = false;
+    }
+
     public getExpectedEvent(): Array<Record<string, any>> {
         return this.expectedEvents;
     }
@@ -85,6 +96,14 @@ export class Client {
     public closeSocket(): void {
         this.ws.close();
         this.ws = null;
+    }
+
+    public getRole(): Role {
+        return this.role;
+    }
+
+    public getPower(): Power {
+        return this.power;
     }
 
     public getNextMessage(): Promise<Record<string, any>> {
@@ -169,6 +188,13 @@ const client6 = new Client("luciel");
 const client7 = new Client("benoito");
 const client8 = new Client("clementp");
 const client9 = new Client("maried");
+
+let players: Array<Client>;
+
+let insomnia: Client;
+let spiritism: Client;
+let contamination: Client;
+let clairvoyance: Client;
 
 describe("Sequentially run tests", () => {
     testUsers(client0, client1, client2, client3, client4, client5, client6, client7, client8, client9);
@@ -259,7 +285,17 @@ describe("Sequentially run tests", () => {
 
     testGames(client0, client1, client2, client3, client4, client5, client6, client7, client8, client9);
     testWebsockets(client0, client1, client2, client3, client4, client5, client8);
-    // testRunGame();
+
+    describe("Roles and powers assignation", () => {
+        players = [client0, client1, client2, client3, client4, client5];
+
+        insomnia = players.find((p) => p.getPower() === Power.INSOMNIA);
+        spiritism = players.find((p) => p.getPower() === Power.SPIRITISM);
+        contamination = players.find((p) => p.getPower() === Power.CONTAMINATION);
+        clairvoyance = players.find((p) => p.getPower() === Power.CLAIRVOYANCE);
+    });
+
+    testRunGame(players, clairvoyance, contamination, insomnia, spiritism);
 
     test("Close websockets", () => {
         client0.closeSocket();

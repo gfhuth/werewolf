@@ -1,5 +1,5 @@
 import request from "supertest";
-import { Client, url } from "./main.test";
+import { Client, url } from "../main.test";
 
 const testTiming = 2;
 const date: Date = new Date();
