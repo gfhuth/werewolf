@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 import * as WebSocket from "ws";
+import colors from "colors";
+import { test, nbTests, nbSuccess } from "./test-api/testAPI";
 
 import { testUsers } from "./api/usersTest";
 import { testGames } from "./api/gamesTest";
@@ -11,8 +13,8 @@ const { PORT, HOST } = process.env;
 export const url = `http://${HOST}:${PORT}`;
 
 export enum Role {
-    HUMAN,
-    WEREWOLF,
+    HUMAN = "HUMAN",
+    WEREWOLF = "WEREWOLF",
 }
 
 export enum Power {
@@ -26,6 +28,7 @@ export enum Power {
 export class Client {
 
     private name: string;
+    private password: string;
     private token: string;
 
     private role: Role;
@@ -39,8 +42,9 @@ export class Client {
 
     private expectedEvents: Array<Record<string, any>>;
 
-    constructor(name: string) {
+    constructor(name: string, password: string) {
         this.name = name;
+        this.password = password;
         this.token = "";
         this.role = Role.HUMAN;
         this.power = Power.NO_POWER;
@@ -53,12 +57,16 @@ export class Client {
         this.expectedEvents = [];
     }
 
-    public log(): { name: string; role: Role; power: Power; messages: Array<Record<string, any>> } {
-        return { name: this.name, role: this.role, power: this.power, messages: this.messages.map<Record<string, any>>((msg) => JSON.parse(msg)) };
+    public log(): void {
+        console.log({ name: this.name, role: this.role, power: this.power, expectedEvents: this.expectedEvents, messages: this.messages.map<Record<string, any>>((msg) => JSON.parse(msg)) });
     }
 
     public getName(): string {
         return this.name;
+    }
+
+    public getPassword(): string {
+        return this.password;
     }
 
     public getToken(): string {
@@ -108,7 +116,6 @@ export class Client {
 
     public getNextMessage(): Promise<Record<string, any>> {
         return new Promise((resolve) => {
-            // console.log(this.messages);
             if (this.messages.length > 0) return resolve(JSON.parse(this.messages.shift()));
             else this.messageResolver = resolve;
         });
@@ -141,35 +148,26 @@ export class Client {
         });
     }
 
-    public async authenticate(): Promise<void> {
-        this.sendMessage(
-            JSON.stringify({
-                event: "AUTHENTICATION",
-                data: { token: this.token }
-            })
-        );
-        const res: Record<string, any> = await this.getNextMessage();
-        // LOGGER.log(JSON.stringify(res));
-        expect(res.status).toEqual(200);
-    }
-
-    public async verifyEvent(): Promise<void> {
+    public async verifyEvent(): Promise<boolean> {
         let message: Record<string, any> = await this.getNextMessage();
-        while (!this.expectedEvents.map<string>((res) => res.event).includes(message.event)) {
-            // console.log(message, this.expectedEvents);
+        console.log(message);
+        while (!this.expectedEvents.some(msg => msg.event === message.event)) {
             message = await this.getNextMessage();
+            console.log(message);
         }
-
-        expect(this.expectedEvents).toContainEqual(message);
+        const b: boolean = this.expectedEvents.some((msg) => JSON.stringify(msg) === JSON.stringify(message));
+        if (!b) console.log(message);
+        return b;
     }
 
-    public async controlStartGame(gameId: number): Promise<void> {
-        let message: Record<string, any> = await this.getNextEvent("SET_ROLE");
+    public async controlStartGame(gameId: number): Promise<boolean> {
+        const message: Record<string, any> = await this.getNextEvent("GET_ALL_INFO_PLAYER");
         this.role = message.data.role;
-        if ((message = await this.getNextMessage()).event === "SET_POWER") this.power = message.data.power;
+        this.power = message.data.power;
+
         this.reinitExpectedEvents();
         this.addExpectedEvent({ event: "NIGHT_STARTS", game_id: gameId, data: {} });
-        this.verifyEvent();
+        return await this.verifyEvent();
     }
 
     public reinitExpectedEvents(): void {
@@ -178,135 +176,45 @@ export class Client {
 
 }
 
-const client0 = new Client("erics");
-const client1 = new Client("pierreh");
-const client2 = new Client("jeant");
-const client3 = new Client("paulg");
-const client4 = new Client("yvesa");
-const client5 = new Client("margota");
-const client6 = new Client("luciel");
-const client7 = new Client("benoito");
-const client8 = new Client("clementp");
-const client9 = new Client("maried");
+const client0 = new Client("erics", "cjbdzqbczkl");
+const client1 = new Client("pierreh", "cjbzceada");
+const client2 = new Client("jeant", "ckldzcnùz");
+const client3 = new Client("paulg", "bcziebcz");
+const client4 = new Client("yvesa", "ncoacnaoĉ");
+const client5 = new Client("margota", "cbuizciq");
+const client6 = new Client("luciel", "copajvppa");
+const client7 = new Client("benoito", "ccjzbbvi");
+const client8 = new Client("clementp", "iabciiczc");
+const client9 = new Client("maried", "nfzofbpv");
 
-let players: Array<Client>;
+const allPlayers: Array<Client> = [client0, client1, client2, client3, client4, client5, client6, client7, client8, client9];
+const main = async (): Promise<void> => {
+    await testUsers(allPlayers);
 
-let insomnia: Client;
-let spiritism: Client;
-let contamination: Client;
-let clairvoyance: Client;
+    for (const player of allPlayers) {
+        player.setWebsocketConnection();
+        await player.connect();
+    }
 
-describe("Sequentially run tests", () => {
-    testUsers(client0, client1, client2, client3, client4, client5, client6, client7, client8, client9);
-
-    test("Open websockets", async () => {
-        client0.setWebsocketConnection();
-        await client0.connect();
-
-        client1.setWebsocketConnection();
-        await client1.connect();
-
-        client2.setWebsocketConnection();
-        await client2.connect();
-
-        client3.setWebsocketConnection();
-        await client3.connect();
-
-        client4.setWebsocketConnection();
-        await client4.connect();
-
-        client5.setWebsocketConnection();
-        await client5.connect();
-
-        client6.setWebsocketConnection();
-        await client6.connect();
-
-        client7.setWebsocketConnection();
-        await client7.connect();
-
-        client8.setWebsocketConnection();
-        await client8.connect();
-
-        client9.setWebsocketConnection();
-        await client9.connect();
+    await test("Clients' authentification", async (t) => {
+        allPlayers.forEach(async (p) => {
+            p.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: p.getToken() } }));
+            p.reinitExpectedEvents();
+            p.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
+            t.assert(await p.verifyEvent());
+        });
     });
 
-    test("Clients' authentification", async () => {
-        client0.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client0.getToken() } }));
-        client0.reinitExpectedEvents();
-        client0.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client0.verifyEvent();
+    await testGames(client0, client1, client2, client3, client4, client5, client6, client7, client8, client9);
+    await testWebsockets(client0, client1, client2, client3, client4, client5, client8);
+    await testRunGame([client0, client1, client2, client3, client4, client5]);
 
-        client1.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client1.getToken() } }));
-        client1.reinitExpectedEvents();
-        client1.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client1.verifyEvent();
+    allPlayers.forEach((p) => p.closeSocket());
 
-        client2.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client2.getToken() } }));
-        client2.reinitExpectedEvents();
-        client2.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client2.verifyEvent();
+    console.log();
+    console.log(colors.yellow(`Total : ${nbTests}`));
+    console.log(colors.green(`Succeed : ${nbSuccess}`));
+    console.log(colors.red(`Failed : ${nbTests - nbSuccess}`));
+};
 
-        client3.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client3.getToken() } }));
-        client3.reinitExpectedEvents();
-        client3.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client3.verifyEvent();
-
-        client4.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client4.getToken() } }));
-        client4.reinitExpectedEvents();
-        client4.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client4.verifyEvent();
-
-        client5.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client5.getToken() } }));
-        client5.reinitExpectedEvents();
-        client5.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client5.verifyEvent();
-
-        client6.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client6.getToken() } }));
-        client6.reinitExpectedEvents();
-        client6.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client6.verifyEvent();
-
-        client7.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client7.getToken() } }));
-        client7.reinitExpectedEvents();
-        client7.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client7.verifyEvent();
-
-        client8.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client8.getToken() } }));
-        client8.reinitExpectedEvents();
-        client8.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client8.verifyEvent();
-
-        client9.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: client9.getToken() } }));
-        client9.reinitExpectedEvents();
-        client9.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-        await client9.verifyEvent();
-    });
-
-    testGames(client0, client1, client2, client3, client4, client5, client6, client7, client8, client9);
-    testWebsockets(client0, client1, client2, client3, client4, client5, client8);
-
-    describe("Roles and powers assignation", () => {
-        players = [client0, client1, client2, client3, client4, client5];
-
-        insomnia = players.find((p) => p.getPower() === Power.INSOMNIA);
-        spiritism = players.find((p) => p.getPower() === Power.SPIRITISM);
-        contamination = players.find((p) => p.getPower() === Power.CONTAMINATION);
-        clairvoyance = players.find((p) => p.getPower() === Power.CLAIRVOYANCE);
-    });
-
-    testRunGame(players, clairvoyance, contamination, insomnia, spiritism);
-
-    test("Close websockets", () => {
-        client0.closeSocket();
-        client1.closeSocket();
-        client2.closeSocket();
-        client3.closeSocket();
-        client4.closeSocket();
-        client5.closeSocket();
-        client6.closeSocket();
-        client7.closeSocket();
-        client8.closeSocket();
-        client9.closeSocket();
-    });
-});
+main();

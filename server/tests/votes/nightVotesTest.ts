@@ -1,55 +1,31 @@
 import { VoteType } from "../../models/voteModel";
-import { client1, client2 } from "../api/usersTest";
+import { Client, Role } from "../main.test";
+import { test } from "../test-api/testAPI";
 
-describe("Test votes", () => {
-    beforeAll(async () => {
-        client1.setWebsocketConnection();
-        await client1.connect();
-        await client1.authenticate();
+export const testVoteNight = async (players: Array<Client>): Promise<void> => {
+    const werewolfs: Array<Client> = players.filter((p) => p.isAlive() && p.getRole() === Role.WEREWOLF);
+    const humans: Array<Client> = players.filter((p) => p.isAlive() && p.getRole() === Role.HUMAN);
+    if (werewolfs.length === 0) return;
+    if (humans.length === 0) return;
 
-        client2.setWebsocketConnection();
-        await client2.connect();
-        await client2.authenticate();
-    });
-
-    afterAll(() => {
-        client1.closeSocket();
-        client2.closeSocket();
-    });
-
-    test("Send vote", async () => {
-        client1.sendMessage(
+    await test("Werewolfs vote", async (t) => {
+        werewolfs[0].sendMessage(
             JSON.stringify({
                 game_id: 1,
                 event: "VOTE_SENT",
                 data: {
                     vote_type: VoteType.VOTE_WEREWOLF,
-                    playerVoted: client1.getName()
+                    playerVoted: humans[0].getName()
                 }
             })
         );
 
-        client2.sendMessage(
-            JSON.stringify({
-                game_id: 1,
-                event: "VOTE_SENT",
-                data: {
-                    vote_type: VoteType.VOTE_WEREWOLF,
-                    playerVoted: client1.getName()
-                }
-            })
-        );
-
-        client1.reinitExpectedEvents();
-        client1.addExpectedEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: client1.getName() } });
-        client1.addExpectedEvent({ event: "VOTE_VALID", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: client1.getName() } });
-        client1.addExpectedEvent({ event: "VOTE_ERROR", game_id: 1, data: { status: 403, message: "Player voted doesn't participate to this vote" } });
-        await client1.verifyEvent();
-
-        client2.reinitExpectedEvents();
-        client2.addExpectedEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: client1.getName() } });
-        client2.addExpectedEvent({ event: "VOTE_ERROR", game_id: 1, data: { status: 403, message: "Player voted doesn't participate to this vote" } });
-        client2.addExpectedEvent({ event: "VOTE_ERROR", game_id: 1, data: { status: 403, message: "Vote is closed" } });
-        await client2.verifyEvent();
+        werewolfs
+            .filter((p) => p !== werewolfs[0])
+            .forEach(async (player): Promise<void> => {
+                player.reinitExpectedEvents();
+                player.addExpectedEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: humans[0].getName() } });
+                t.assert(await player.verifyEvent());
+            });
     });
-});
+};
