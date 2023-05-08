@@ -1,6 +1,6 @@
 import { ImageSourcePropType } from "react-native";
 
-const images : {[key:string]: {uri:ImageSourcePropType}} = {
+const images: { [key: string]: { uri: ImageSourcePropType } } = {
     SPIRITISM: {
         uri: require("../../assets/images/powers/SPIRITISM.png")
     },
@@ -18,7 +18,16 @@ const images : {[key:string]: {uri:ImageSourcePropType}} = {
     },
     CLAIRVOYANCE: {
         uri: require("../../assets/images/powers/CLAIRVOYANCE.png")
+    },
+    UNKNOWN: {
+        uri: require("../../assets/images/UNKNOWN.png")
     }
 };
+
+export function getImageSource(name: string): { uri: ImageSourcePropType } {
+    if (images[name]) return images[name];
+    console.log(`Image ${name} not found`);
+    return images.UNKNOWN;
+}
 
 export { images };
