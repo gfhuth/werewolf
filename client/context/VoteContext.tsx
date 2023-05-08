@@ -34,7 +34,7 @@ export function VoteProvider(props: { children: React.ReactNode }): React.ReactE
 
     const gameContext = useContext(GameContext);
 
-    const isPlayerTargeted = (player: string): boolean => !!ratifications.find((r) => r.target === player);
+    const isPlayerTargeted = (player: string): boolean => ratifications.find((r) => r.target === player) != undefined;
 
     const vote = (player: string, shouldKill: boolean): void => {
         if (isPlayerTargeted(player)) {
@@ -58,24 +58,44 @@ export function VoteProvider(props: { children: React.ReactNode }): React.ReactE
     };
 
     const addTarget = (data: { vote_type: VoteType; playerVoted: string }): void => {
-        if (isPlayerTargeted(data.playerVoted)) {
-            // Update counts
-            // TODO
-        } else {
-            // Add new target
-            setRatifications([
-                ...ratifications,
-                {
-                    target: data.playerVoted,
-                    countForKilling: 1,
-                    countForLiving: 0
-                }
-            ]);
-        }
+        setRatifications((ratifs) => [
+            ...ratifs.map((r) => ({ ...r })),
+            {
+                target: data.playerVoted,
+                countForKilling: 1,
+                countForLiving: 0
+            }
+        ]);
+        LOGGER.log(`Vote ratification added for ${data.playerVoted}`);
+    };
+
+    const updateTarget = (data: { nbInvalidation: number; nbValidation: number; playerVoted: string; vote_type: VoteType }): void => {
+        const target = data.playerVoted;
+        setRatifications((ratifs) => [
+            ...ratifs.filter((r) => r.target !== target).map((r) => ({ ...r })),
+            {
+                target: target,
+                countForKilling: data.nbValidation,
+                countForLiving: data.nbInvalidation
+            }
+        ]);
+        LOGGER.log(`Vote ratification updated for ${target}`);
+    };
+
+    const onVoteInfo = (data: { [key: string]: { nbValidation: number; nbInvalidation: number } }): void => {
+        setRatifications(
+            Object.keys(data).map((target) => ({
+                target: target,
+                countForKilling: data[target].nbValidation,
+                countForLiving: data[target].nbInvalidation
+            }))
+        );
     };
 
     useEffect(() => {
         gameContext.registerEventHandler("ASK_RATIFICATION", addTarget);
+        gameContext.registerEventHandler("GET_ALL_INFO_VOTE", onVoteInfo);
+        gameContext.registerEventHandler("UPDATE_PROPOSITION", updateTarget);
     }, []);
 
     return <VoteContext.Provider value={{ active, type, ratifications, vote }}>{props.children}</VoteContext.Provider>;
