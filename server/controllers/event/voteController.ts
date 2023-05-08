@@ -5,31 +5,32 @@ import { Event } from "../eventController";
 
 const voteVerification = (game: Game, player: Player, data: { vote_type: VoteType; playerVoted: string; ratification?: boolean }): boolean => {
     if (!game.getVote()) {
-        player.sendError("VOTE_ERROR", 403, "Game hasn't started");
+        player.sendError("VOTE_ERROR", 403, "There isn't any vote yet");
         return false;
     }
     if (game.getVote().getType() !== data.vote_type) {
-        player.sendError("VOTE_ERROR", 403, `Vote type is ${game.getVote().getType()} but vote type ${data.vote_type}is expected`);
-        return false;
-    }
-    if (!game.getPlayer(data.playerVoted)) {
-        player.sendError("VOTE_ERROR", 403, "Player voted is not in the game");
+        player.sendError("VOTE_ERROR", 403, `Vote type is ${data.vote_type} but vote type ${game.getVote().getType()} is expected`);
         return false;
     }
     if (game.getVote().isClosed()) {
         player.sendError("VOTE_ERROR", 403, "Vote is closed");
         return false;
     }
-    if (!game.getVote().getParticipants().includes(game.getPlayer(data.playerVoted))) {
-        player.sendError("VOTE_ERROR", 403, "Player voted doesn't participate to this vote");
-        return false;
-    }
-    if (Player.alivePlayers(game.getVote().getParticipants()).length === 0) {
-        player.sendError("VOTE_ERROR", 403, "There is no alive player in this game");
-        return false;
-    }
     if (player.isDead()) {
         player.sendError("VOTE_ERROR", 403, "Dead player cannot participate to the vote");
+        return false;
+    }
+    if (!game.getVote().getParticipants().includes(player)) {
+        player.sendError("VOTE_ERROR", 403, "You're not a participant of this vote");
+        return false;
+    }
+    const target: Player = game.getPlayer(data.playerVoted);
+    if (!target) {
+        player.sendError("VOTE_ERROR", 403, "Target player is not in the game");
+        return false;
+    }
+    if (target.isDead()) {
+        player.sendError("VOTE_ERROR", 403, "Target player is already dead");
         return false;
     }
     return true;

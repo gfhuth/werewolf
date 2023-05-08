@@ -41,17 +41,33 @@ export class Vote {
 
     public countRatification(): { [key: string]: { nbValidation: number; nbInvalidation: number } } {
         const res: { [key: string]: { nbValidation: number; nbInvalidation: number } } = {};
-        let nbValidation, nbInvalidation: number;
-        for (const nameVoted of this.participants.map<string>((player) => player.getUser().getUsername())) {
-            nbValidation = 0;
-            nbInvalidation = 0;
-            for (const playerName in this.votes[nameVoted]) {
-                if (this.votes[nameVoted][playerName] === true) nbValidation += 1;
-                else if (this.votes[nameVoted][playerName] === false) nbInvalidation += 1;
-            }
-            res[nameVoted] = { nbValidation: nbValidation, nbInvalidation: nbInvalidation };
+
+        for (const target of Object.keys(this.votes)) {
+            const targetCounts = Object.values(this.votes[target])
+                .map((v) => ({ nbValidation: v ? 1 : 0, nbInvalidation: v ? 0 : 1 }))
+                .reduce(
+                    (a, b) => ({
+                        nbValidation: a.nbValidation + b.nbValidation,
+                        nbInvalidation: a.nbInvalidation + b.nbInvalidation
+                    }),
+                    { nbValidation: 0, nbInvalidation: 0 }
+                );
+            if (targetCounts.nbValidation > 0 || targetCounts.nbInvalidation > 0) res[target] = targetCounts;
         }
+
         return res;
+
+        // let nbValidation, nbInvalidation: number;
+        // for (const nameVoted of this.participants.map<string>((player) => player.getUser().getUsername())) {
+        //     nbValidation = 0;
+        //     nbInvalidation = 0;
+        //     for (const playerName in this.votes[nameVoted]) {
+        //         if (this.votes[nameVoted][playerName] === true) nbValidation += 1;
+        //         else if (this.votes[nameVoted][playerName] === false) nbInvalidation += 1;
+        //     }
+        //     res[nameVoted] = { nbValidation: nbValidation, nbInvalidation: nbInvalidation };
+        // }
+        // return res;
     }
 
     private voteValidation(playerVoted: Player): void {
@@ -71,6 +87,7 @@ export class Vote {
     }
 
     public addProposition(playerWhoVote: Player, playerVoted: Player): void {
+        if (!this.votes[playerVoted.getUser().getUsername()]) this.votes[playerVoted.getUser().getUsername()] = {};
         this.votes[playerVoted.getUser().getUsername()][playerWhoVote.getUser().getUsername()] = true;
         this.participants
             .filter((player) => player !== playerWhoVote)
