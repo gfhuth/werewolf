@@ -252,15 +252,15 @@ export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promi
 // }
 
 function getInfoPlayersList(game: Game, player: Player): void {
-    player.sendMessage("GET_ALL_INFO_PLAYERS_LIST", {
-        players: game.getAllPlayers().map<{ name: string, alive: boolean }>((p) => ({ name: p.getUser().getUsername(), alive: !p.isDead() }))
+    player.sendMessage("LIST_PLAYERS", {
+        players: game.getAllPlayers().map<{ user: string, alive: boolean }>((p) => ({ user: p.getUser().getUsername(), alive: !p.isDead() }))
     });
 }
 
 function getInfoPlayer(game: Game, player: Player): void {
     const role: Role = player.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
     if (player.getPower()) player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: player.getPower().getName() });
-    else player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: "" });
+    else player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: "NO_POWER" });
 }
 
 // Event.registerHandlers("GET_ALL_INFO", getInfoGame);
