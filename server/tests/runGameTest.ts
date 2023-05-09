@@ -2,8 +2,9 @@ import { Client, Power } from "./main.test";
 import { testChatNight } from "./chats/nightChatsTest";
 import { testVoteNight } from "./votes/nightVotesTest";
 import { clairvoyancePower } from "./powers/clairvoyanceTest";
+import { powersTest } from "./powers/powerTest";
 
-export const testRunGame = async (players: Array<Client>): Promise<void> => {
+export const testRunGame = async (players: Array<Client>, clientNotInGame: Client): Promise<void> => {
     const insomnia: Client | undefined = players.find((p) => p.getPower() === Power.INSOMNIA);
     const spiritism: Client | undefined = players.find((p) => p.getPower() === Power.SPIRITISM);
     const contamination: Client | undefined = players.find((p) => p.getPower() === Power.CONTAMINATION);
@@ -12,4 +13,5 @@ export const testRunGame = async (players: Array<Client>): Promise<void> => {
     await testChatNight(players, insomnia);
     await testVoteNight(players);
     await clairvoyancePower(clairvoyance, players);
+    await powersTest(players, clairvoyance, contamination, clientNotInGame);
 };

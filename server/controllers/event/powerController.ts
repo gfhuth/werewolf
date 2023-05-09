@@ -8,7 +8,7 @@ export const usePower = async (game: Game, player: Player, data: Record<string, 
         return;
     }
     if (player.isDead()) {
-        player.sendError("POWER_ERROR", 403, "Dead player cannot use power spiritism");
+        player.sendError("POWER_ERROR", 403, "Dead player cannot use power");
         return;
     }
     if (!player.getPower()) {
@@ -26,7 +26,7 @@ export const usePower = async (game: Game, player: Player, data: Record<string, 
         player.sendError("POWER_ERROR", 403, "Target player is not in the game");
         return;
     }
-    
+
     power.usePower(game, player, data);
     power.setAlreadyUsed(true);
 };
