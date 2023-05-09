@@ -11,6 +11,7 @@ import ClairvoyancePower from "./powers/ClairvoyancePower";
 import { toBoolean } from "../util/sql/schema";
 import { User } from "./userModel";
 import Power from "./powerModelBetter";
+import { unique } from "../util/Utils";
 
 const LOGGER = new Logger("GAME");
 
@@ -241,9 +242,8 @@ export class Game {
             // Réinitialisation des chats
             this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
             // this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(this.getWerewolfs().concat(this.getAllPlayers().filter((player) => !player.isWerewolf() && player.isDead())));
-            this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers([
-                ...new Set([...this.getWerewolfs(), ...this.getAllPlayers().filter((p) => p.isDead()), this.getPlayerWithPower(InsomniaPower.POWERNAME)])
-            ]);
+            this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(unique(...this.getWerewolfs(), ...this.getAllPlayers().filter((p) => p.isDead()), this.getPlayerWithPower(InsomniaPower.POWERNAME)));
+            
             this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
             this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
