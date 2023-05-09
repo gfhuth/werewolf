@@ -15,7 +15,6 @@ export class Vote {
     constructor(type: VoteType, players: Array<Player>) {
         this.type = type;
         this.participants = players;
-        players.forEach((player) => (this.votes[player.getUser().getUsername()] = {}));
         this.result = null;
     }
 
@@ -87,8 +86,10 @@ export class Vote {
     }
 
     public addProposition(playerWhoVote: Player, playerVoted: Player): void {
-        if (!this.votes[playerVoted.getUser().getUsername()]) this.votes[playerVoted.getUser().getUsername()] = {};
-        this.votes[playerVoted.getUser().getUsername()][playerWhoVote.getUser().getUsername()] = true;
+        this.votes[playerVoted.getUser().getUsername()] = {
+            [playerWhoVote.getUser().getUsername()]: true
+        };
+
         this.participants
             .filter((player) => player !== playerWhoVote)
             .forEach((player) => player.sendMessage("ASK_RATIFICATION", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
