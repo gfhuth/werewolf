@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import * as WebSocket from "ws";
 import colors from "colors";
-import { test, nbTests, nbSuccess } from "./test-api/testAPI";
+import { test, nbSuccess, nbFailed } from "./test-api/testAPI";
 
 import { testUsers } from "./api/usersTest";
 import { testGames } from "./api/gamesTest";
@@ -207,14 +207,14 @@ const main = async (): Promise<void> => {
 
     await testGames(client0, client1, client2, client3, client4, client5, client6, client7, client8, client9);
     await testWebsockets(client0, client1, client2, client3, client4, client5, client8);
-    await testRunGame([client0, client1, client2, client3, client4, client5]);
+    await testRunGame([client0, client1, client2, client3, client4, client5], client8);
 
     allPlayers.forEach((p) => p.closeSocket());
 
     console.log();
-    console.log(colors.yellow(`Total : ${nbTests}`));
+    console.log(colors.yellow(`Total : ${nbSuccess + nbFailed}`));
     console.log(colors.green(`Succeed : ${nbSuccess}`));
-    console.log(colors.red(`Failed : ${nbTests - nbSuccess}`));
+    console.log(colors.red(`Failed : ${nbFailed}`));
 };
 
 main();
