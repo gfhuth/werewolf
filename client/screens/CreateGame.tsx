@@ -36,10 +36,10 @@ export default function CreateGame(): React.ReactElement {
         nightLength: 60,
         startDate: new Date(Date.now() + 1000 * 60 * 60),
         percentageWerewolf: 50,
-        probaContamination: 30,
-        probaInsomnie: 30,
-        probaVoyance: 30,
-        probaSpiritisme: 30
+        probaContamination: 33,
+        probaInsomnie: 33,
+        probaVoyance: 33,
+        probaSpiritisme: 33
     });
 
     const submitCreateGame = (): void => {
