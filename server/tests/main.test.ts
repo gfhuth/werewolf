@@ -150,7 +150,10 @@ export class Client {
 
     public async verifyEvent(): Promise<boolean> {
         let message: Record<string, any> = await this.getNextMessage();
-        while (!this.expectedEvents.some((msg) => msg.event === message.event)) message = await this.getNextMessage();
+        while (!this.expectedEvents.some((msg) => msg.event === message.event)) {
+            // console.log(message);
+            message = await this.getNextMessage();
+        }
 
         const res: boolean = this.expectedEvents.some((msg) => JSON.stringify(msg) === JSON.stringify(message));
         if (!res) console.log(message);

@@ -29,7 +29,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
     const chat: Chat = game.getChat(data.chat_type);
 
     if (data.date < game.getGameParam().startDate) {
-        player.sendError("CHAT_ERROR", 403, "Game is not started");
+        player.sendError("CHAT_ERROR", 403, "Game has not started");
         return;
     }
     if (data.chat_type === ChatType.CHAT_VILLAGE && game.getStatus() !== GameStatus.DAY) {
