@@ -150,14 +150,11 @@ export class Client {
 
     public async verifyEvent(): Promise<boolean> {
         let message: Record<string, any> = await this.getNextMessage();
-        console.log(message);
-        while (!this.expectedEvents.some(msg => msg.event === message.event)) {
-            message = await this.getNextMessage();
-            console.log(message);
-        }
-        const b: boolean = this.expectedEvents.some((msg) => JSON.stringify(msg) === JSON.stringify(message));
-        if (!b) console.log(message);
-        return b;
+        while (!this.expectedEvents.some((msg) => msg.event === message.event)) message = await this.getNextMessage();
+
+        const res: boolean = this.expectedEvents.some((msg) => JSON.stringify(msg) === JSON.stringify(message));
+        if (!res) console.log(message);
+        return res;
     }
 
     public async controlStartGame(gameId: number): Promise<boolean> {

@@ -1,4 +1,4 @@
-import { Client, Power, Role } from "../main.test";
+import { Client, Role } from "../main.test";
 import { test } from "../test-api/testAPI";
 
 export enum ChatType {
@@ -14,15 +14,6 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
     await test("Werewolfs chat", async (t) => {
         const now: number = Date.now();
 
-        werewolfs.forEach((p) => {
-            p.reinitExpectedEvents();
-            p.addExpectedEvent({
-                event: "CHAT_RECEIVED",
-                game_id: 1,
-                data: { author: werewolfs[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
-            });
-        });
-
         werewolfs[0].sendMessage(
             JSON.stringify({
                 game_id: 1,
@@ -35,9 +26,15 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
             })
         );
 
-        console.log("messages : ");
-        werewolfs.forEach((p) => p.log());
-        for (const werewolf of werewolfs) t.assert(await werewolf.verifyEvent());
+        for (const werewolf of werewolfs) {
+            werewolf.reinitExpectedEvents();
+            werewolf.addExpectedEvent({
+                event: "CHAT_RECEIVED",
+                game_id: 1,
+                data: { author: werewolfs[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
+            });
+            await t.testOrTimeout(werewolf.verifyEvent());
+        }
 
         if (insomnia) {
             insomnia.reinitExpectedEvents();
@@ -46,7 +43,8 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
                 game_id: 1,
                 data: { author: werewolfs[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
             });
-            t.assert(await insomnia.verifyEvent());
+            insomnia.log();
+            await t.testOrTimeout(insomnia.verifyEvent());
         }
     });
 };
