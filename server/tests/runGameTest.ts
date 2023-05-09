@@ -1,6 +1,7 @@
 import { Client, Power } from "./main.test";
 import { testChatNight } from "./chats/nightChatsTest";
 import { testVoteNight } from "./votes/nightVotesTest";
+import { clairvoyancePower } from "./powers/clairvoyanceTest";
 
 export const testRunGame = async (players: Array<Client>): Promise<void> => {
     const insomnia: Client | undefined = players.find((p) => p.getPower() === Power.INSOMNIA);
@@ -10,4 +11,5 @@ export const testRunGame = async (players: Array<Client>): Promise<void> => {
 
     await testChatNight(players, insomnia);
     await testVoteNight(players);
+    await clairvoyancePower(clairvoyance, players);
 };
