@@ -208,11 +208,13 @@ export class Game {
             this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
 
             // Initialisation du vote
+            this.currentVote.endVote();
             this.setVote(new Vote(VoteType.VOTE_VILLAGE, Player.alivePlayers(this.getAllPlayers())));
+            this.currentVote.startVote();
 
             // Envoie à chaque joueur un recap de la nuit
             this.getAllPlayers().forEach((player) => {
-                player.sendMessage("DAY_STARTS", {});
+                player.sendMessage("DAY_START", {});
                 player.sendInfoAllPlayers();
             });
 
@@ -242,11 +244,13 @@ export class Game {
             this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
             // Initialisation du vote
+            if (this.currentVote) this.currentVote.endVote();
             this.setVote(new Vote(VoteType.VOTE_WEREWOLF, Player.alivePlayers(this.getWerewolfs())));
+            this.currentVote.startVote();
 
             // Envoie à chaque joueur un recap du jour
             this.getAllPlayers().forEach((player) => {
-                player.sendMessage("NIGHT_STARTS", {});
+                player.sendMessage("NIGHT_START", {});
                 player.sendInfoAllPlayers();
             });
 

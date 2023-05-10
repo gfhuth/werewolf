@@ -18,7 +18,7 @@ export const contaminationTest = async (contamination: Client, players: Array<Cl
             })
         );
 
-        await t.timeout(player.startPeriod("DAY_STARTS", 1, t), 10000);
+        await t.timeout(player.startPeriod("DAY_START", 1, t), 10000);
         t.equal(player.getRole(), Role.WEREWOLF);
     });
 };

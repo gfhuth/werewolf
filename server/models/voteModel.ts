@@ -1,8 +1,8 @@
 import { Player } from "./playerModel";
 
 export enum VoteType {
-    VOTE_VILLAGE,
-    VOTE_WEREWOLF,
+    VOTE_VILLAGE = "VOTE_VILLAGE",
+    VOTE_WEREWOLF = "VOTE_WEREWOLF",
 }
 
 export class Vote {
@@ -32,6 +32,18 @@ export class Vote {
 
     public getVotes(): { [key: string]: { [key: string]: boolean | undefined } } {
         return this.votes;
+    }
+
+    public startVote(): void {
+        this.participants.forEach((participant) => {
+            participant.sendMessage("VOTE_START", { vote_type: this.type });
+        });
+    }
+
+    public endVote(): void {
+        this.participants.forEach((participant) => {
+            participant.sendMessage("VOTE_END", { vote_type: this.type });
+        });
     }
 
     public isClosed(): boolean {
@@ -74,10 +86,6 @@ export class Vote {
         for (const player of this.participants) {
             if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()] === undefined) return;
             if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()]) nbVote++;
-        }
-        if (nbVote <= (this.participants.length - 1) / 2) {
-            this.participants.forEach((player) => player.sendMessage("VOTE_INVALID", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
-            return;
         }
 
         this.result = playerVoted;

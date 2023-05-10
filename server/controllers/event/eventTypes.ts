@@ -44,7 +44,7 @@ export type ServerToClientEvents = {
         role: Role;
         power: string;
     };
-    DAY_STARTS: {};
+    DAY_START: {};
     END_GAME: {
         winningRole: Role;
     };
@@ -71,7 +71,7 @@ export type ServerToClientEvents = {
     LIST_PLAYERS: {
         players: Array<{ user: string; alive: boolean; role: Role }>;
     };
-    NIGHT_STARTS: {};
+    NIGHT_START: {};
     UPDATE_PROPOSITION: {
         vote_type: VoteType;
         playerVoted: string;
@@ -81,10 +81,12 @@ export type ServerToClientEvents = {
     USE_POWER_VALID: {
         // Empty
     };
-    VOTE_INVALID: {
+    VOTE_START: {
         vote_type: VoteType;
-        playerVoted: string;
-    };
+    }
+    VOTE_END: {
+        vote_type: VoteType;
+    }
     VOTE_VALID: {
         vote_type: VoteType;
         playerVoted: string;
