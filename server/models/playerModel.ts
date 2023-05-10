@@ -37,6 +37,14 @@ export class Player {
         return this.user;
     }
 
+    public getRole(): Role {
+        return this.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
+    }
+
+    public getPowerName(): string {
+        return this.getPower() ? this.getPower().getName() : "NO_POWER";
+    }
+
     public getPower(): Power {
         return this.power;
     }
@@ -70,18 +78,24 @@ export class Player {
     }
 
     public sendInfoAllPlayers(): void {
-        const infoPlayers = this.game.getAllPlayers().map((player) => ({
-            user: player.getUser().getUsername(),
-            alive: !player.isDead()
-        }));
+        const infoPlayers = this.game.getAllPlayers().map((player) => {
+            const role: Role = (this.isWerewolf() && player.isWerewolf()) || player === this ? player.getRole() : null;
+            const power: string = player === this ? this.getPowerName() : null;
+            return {
+                user: player.getUser().getUsername(),
+                alive: !player.isDead(),
+                role: role,
+                power: power
+            };
+        });
         this.sendMessage("LIST_PLAYERS", { players: infoPlayers });
     }
 
-    public sendInfoPlayer(): void {
-        const role: Role = this.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
-        const power: string = this.getPower() ? this.getPower().getName() : "NO_POWER";
-        this.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: power, nbWerewolfs: this.game.getWerewolfs().length });
-    }
+    // public sendInfoPlayer(): void {
+    //     const role: Role = this.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
+    //     const power: string = this.getPower() ? this.getPower().getName() : "NO_POWER";
+    //     this.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: power, nbWerewolfs: this.game.getWerewolfs().length });
+    // }
 
     public static schema = async (): Promise<void> => {
         await database.schema

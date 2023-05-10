@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Game, GameParam, GameStatus, Role } from "../models/gameModel";
+import { Game, GameParam, GameStatus } from "../models/gameModel";
 import { Event } from "../controllers/eventController";
 import database from "../util/database";
 
@@ -252,17 +252,8 @@ export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promi
 // }
 
 function getInfoPlayersList(game: Game, player: Player): void {
-    player.sendMessage("LIST_PLAYERS", {
-        players: game.getAllPlayers().map<{ user: string, alive: boolean }>((p) => ({ user: p.getUser().getUsername(), alive: !p.isDead() }))
-    });
-}
-
-function getInfoPlayer(game: Game, player: Player): void {
-    const role: Role = player.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
-    if (player.getPower()) player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: player.getPower().getName(), nbWerewolfs: game.getWerewolfs().length });
-    else player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: "NO_POWER", nbWerewolfs: game.getWerewolfs().length });
+    player.sendInfoAllPlayers();
 }
 
 // Event.registerHandlers("GET_ALL_INFO", getInfoGame);
 Event.registerHandlers("GET_ALL_INFO", getInfoPlayersList);
-Event.registerHandlers("GET_ALL_INFO", getInfoPlayer);

@@ -15,8 +15,6 @@ export default abstract class Power {
         this.targets = [];
     }
 
-    public abstract isCompatibleWith(player: Player): boolean;
-
     public getName(): string {
         return this.name;
     }

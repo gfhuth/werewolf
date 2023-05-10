@@ -17,10 +17,6 @@ export default class SpiritismPower extends Power {
         super(SpiritismPower.POWERNAME, false);
     }
 
-    public isCompatibleWith(player: Player): boolean {
-        return true;
-    }
-
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_SPIRITISM"]): void {
         if (player.getPower().getName() !== SpiritismPower.POWERNAME) {
             player.sendError("POWER_ERROR", 403, "Player don't have spiritism power");

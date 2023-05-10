@@ -17,10 +17,6 @@ export default class ContaminationPower extends Power {
         super(ContaminationPower.POWERNAME, true);
     }
 
-    public isCompatibleWith(player: Player): boolean {
-        return player.isWerewolf();
-    }
-
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_CONTAMINATION"]): void {
         if (player.getPower().getName() !== ContaminationPower.POWERNAME) {
             player.sendError("POWER_ERROR", 403, "Player don't have contamination power");

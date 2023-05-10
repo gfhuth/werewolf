@@ -10,10 +10,6 @@ export default class InsomniaPower extends Power {
         super(InsomniaPower.POWERNAME, false);
     }
 
-    public isCompatibleWith(player: Player): boolean {
-        return !player.isWerewolf();
-    }
-
     public usePower(game: Game, player: Player, data: Record<string, any>): void {
         throw new Error("Method not implemented.");
     }

@@ -214,7 +214,6 @@ export class Game {
             this.getAllPlayers().forEach((player) => {
                 player.sendMessage("DAY_STARTS", {});
                 player.sendInfoAllPlayers();
-                player.sendInfoPlayer();
             });
 
             setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
@@ -249,7 +248,6 @@ export class Game {
             this.getAllPlayers().forEach((player) => {
                 player.sendMessage("NIGHT_STARTS", {});
                 player.sendInfoAllPlayers();
-                player.sendInfoPlayer();
             });
 
             setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
