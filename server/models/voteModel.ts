@@ -87,7 +87,6 @@ export class Vote {
         };
 
         this.participants
-            .filter((player) => player !== playerWhoVote)
             .forEach((player) => player.sendMessage("ASK_RATIFICATION", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
 
         // On regarde si le vote est terminée et/ou valide
