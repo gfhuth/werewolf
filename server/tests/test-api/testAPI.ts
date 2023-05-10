@@ -23,8 +23,11 @@ export class Assert {
 
     public equal(object1: any, object2: any, message = ""): void {
         this.nbTests += 1;
+        if (typeof object1 === "object" && typeof object2 === "object") {
+            object1 = JSON.stringify(object1);
+            object2 = JSON.stringify(object2);
+        }
         if (object1 === object2) return;
-        if (typeof object1 === "object" && typeof object2 === "object" && JSON.stringify(object1) === JSON.stringify(object2)) return;
         this.nbErrors += 1;
         console.log(colors.grey(`ERROR assertion: equal - ${object1} is different from ${object2} - ${message}`));
     }
