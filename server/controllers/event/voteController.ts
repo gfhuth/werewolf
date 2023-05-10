@@ -49,6 +49,7 @@ const voteRatification = (game: Game, player: Player, data: { vote_type: VoteTyp
 const getAllVotes = (game: Game, player: Player): void => {
     const vote: Vote = game.getVote();
     if (!vote.getParticipants().includes(player)) return;
+    player.sendMessage("VOTE_START", { vote_type: vote.getType() });
     player.sendMessage("GET_ALL_INFO_VOTE", { ratifications: vote.countRatification(), nbParticipants: vote.getParticipants().length });
     if (vote.isClosed()) player.sendMessage("VOTE_VALID", { vote_type: vote.getType(), playerVoted: vote.getResult().getUser().getUsername() });
 };
