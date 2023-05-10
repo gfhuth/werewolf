@@ -31,9 +31,9 @@ export default class ClairvoyancePower extends Power {
 
     public applyPower(game: Game, player: Player): void {
         const target: Player = this.getTargets()[0];
-        const roleVictim: Role = target.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
-        if (target.getPower()) player.sendMessage("CLAIRVOYANCE_RESPONSE", { role: roleVictim, power: target.getPower().getName() });
-        else player.sendMessage("CLAIRVOYANCE_RESPONSE", { role: roleVictim, power: "NO_POWER" });
+        const targetRole: Role = target.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
+        const targetPower: string = target.getPower() ? target.getPower().getName() : "NO_POWER";
+        player.sendMessage("CLAIRVOYANCE_RESPONSE", { role: targetRole, power: targetPower });
     }
 
 }
