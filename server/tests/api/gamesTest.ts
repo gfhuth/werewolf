@@ -192,14 +192,18 @@ export const testGames = async (
                     startDate: date.getTime(),
                     host: client0.getName(),
                     nbPlayerMax: 39,
-                    currentNumberOfPlayer: 6
+                    currentNumberOfPlayer: 6,
+                    ended: false,
+                    winningRole: null
                 },
                 {
                     id: 2,
                     startDate: date.getTime(),
                     host: client4.getName(),
                     nbPlayerMax: 5,
-                    currentNumberOfPlayer: 5
+                    currentNumberOfPlayer: 5,
+                    ended: false,
+                    winningRole: null
                 }
             ]
         });
@@ -271,7 +275,9 @@ export const testGames = async (
                     startDate: date.getTime(),
                     host: client0.getName(),
                     nbPlayerMax: 39,
-                    currentNumberOfPlayer: 6
+                    currentNumberOfPlayer: 6,
+                    ended: false,
+                    winningRole: null
                 }
             ]
         });

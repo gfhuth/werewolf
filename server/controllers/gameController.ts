@@ -17,8 +17,8 @@ export async function searchGame(req: Request, res: Response): Promise<void> {
         res.status(200).json({
             games: Game.getAllGames()
                 .filter((g) => {
-                    if (g.getGameParam().startDate < Date.now() && g.verifyEndGame()) return false;
-                    if (g.getGameParam().startDate < Date.now() && g.getGameParam().nbPlayerMin > g.getAllPlayers().length) return false;
+                    if (g.isStarted() && g.getWinningRole()) return false;
+                    if (g.isStarted() && g.getGameParam().nbPlayerMin > g.getAllPlayers().length) return false;
                     return true;
                 })
                 .map((g) => ({
@@ -81,8 +81,8 @@ export function searchGameByUsername(req: AuthenticatedRequest, res: Response): 
                     host: g.getHost().getUsername(),
                     nbPlayerMax: g.getGameParam().nbPlayerMax,
                     currentNumberOfPlayer: g.getAllPlayers().length,
-                    ended: g.verifyEndGame() != null,
-                    winningRole: g.verifyEndGame()
+                    ended: g.getWinningRole() != null,
+                    winningRole: g.getWinningRole()
                 }))
         });
     } catch (err) {
@@ -258,7 +258,7 @@ function getInfoPlayersList(game: Game, player: Player): void {
 }
 
 function endGame(game: Game, player: Player): void {
-    const winningRole: Role = game.verifyEndGame();
+    const winningRole: Role = game.getWinningRole();
     if (winningRole) player.sendMessage("END_GAME", { winningRole: winningRole });
 }
 

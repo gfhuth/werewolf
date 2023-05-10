@@ -114,6 +114,10 @@ export class Game {
         Game.games.delete(this.gameId);
     }
 
+    public isStarted(): boolean {
+        return this.getGameParam().startDate < Date.now();
+    }
+
     private setupRoles(): void {
         const nbWerewolfs: number = Math.max(1, Math.ceil(this.gameParam.percentageWerewolf * this.getAllPlayers().length));
         const players: Array<Player> = this.getAllPlayers();
@@ -154,16 +158,20 @@ export class Game {
         }
     }
 
-    public verifyEndGame(): Role {
-        let winningRole: Role;
-        if (this.getWerewolfs().filter((player) => !player.isDead()).length === 0) winningRole = Role.HUMAN;
-        else if (this.getAllPlayers().filter((player) => !player.isWerewolf() && !player.isDead()).length === 0) winningRole = Role.WEREWOLF;
-
-        if (winningRole === Role.HUMAN || winningRole === Role.WEREWOLF) {
-            this.getAllPlayers().forEach((player) => player.sendMessage("END_GAME", { winningRole: winningRole }));
-            return winningRole;
-        }
+    public getWinningRole(): Role | null {
+        if (!this.isStarted()) return null;
+        if (this.getWerewolfs().filter((player) => !player.isDead()).length === 0) return Role.HUMAN;
+        else if (this.getAllPlayers().filter((player) => !player.isWerewolf() && !player.isDead()).length === 0) return Role.WEREWOLF;
         return null;
+    }
+
+    private verifyEndGame(): boolean {
+        const winningRole: Role = this.getWinningRole();
+        if (winningRole) {
+            this.getAllPlayers().forEach((player) => player.sendMessage("END_GAME", { winningRole: winningRole }));
+            return true;
+        }
+        return false;
     }
 
     public applyPowers(): void {
@@ -200,7 +208,7 @@ export class Game {
         this.executionResultVote();
 
         // Vérification si fin de partie
-        const isEndGame: Role = this.verifyEndGame();
+        const isEndGame: boolean = this.verifyEndGame();
 
         if (!isEndGame) {
             // Réinitialisation du chat
@@ -228,7 +236,7 @@ export class Game {
         if (this.currentVote) this.executionResultVote();
 
         // Vérification si fin de partie
-        const isEndGame: Role = this.verifyEndGame();
+        const isEndGame: boolean = this.verifyEndGame();
 
         if (!isEndGame) {
             // Réinitialisation des pouvoirs
