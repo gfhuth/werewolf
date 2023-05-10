@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Game, GameParam, GameStatus } from "../models/gameModel";
+import { Game, GameParam, GameStatus, Role } from "../models/gameModel";
 import { Event } from "../controllers/eventController";
 import database from "../util/database";
 
@@ -257,5 +257,11 @@ function getInfoPlayersList(game: Game, player: Player): void {
     player.sendInfoAllPlayers();
 }
 
+function endGame(game: Game, player: Player): void {
+    const winningRole: Role = game.verifyEndGame();
+    if (winningRole) player.sendMessage("END_GAME", { winningRole: winningRole });
+}
+
 // Event.registerHandlers("GET_ALL_INFO", getInfoGame);
 Event.registerHandlers("GET_ALL_INFO", getInfoPlayersList);
+Event.registerHandlers("GET_ALL_INFO", endGame);
