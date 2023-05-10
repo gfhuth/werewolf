@@ -154,17 +154,16 @@ export class Game {
         }
     }
 
-    public verifyEndGame(): boolean {
+    public verifyEndGame(): Role {
         let winningRole: Role;
         if (this.getWerewolfs().filter((player) => !player.isDead()).length === 0) winningRole = Role.HUMAN;
         else if (this.getAllPlayers().filter((player) => !player.isWerewolf() && !player.isDead()).length === 0) winningRole = Role.WEREWOLF;
 
         if (winningRole === Role.HUMAN || winningRole === Role.WEREWOLF) {
             this.getAllPlayers().forEach((player) => player.sendMessage("END_GAME", { winningRole: winningRole }));
-            return true;
+            return winningRole;
         }
-
-        return false;
+        return null;
     }
 
     public applyPowers(): void {
@@ -201,7 +200,7 @@ export class Game {
         this.executionResultVote();
 
         // Vérification si fin de partie
-        const isEndGame: boolean = this.verifyEndGame();
+        const isEndGame: Role = this.verifyEndGame();
 
         if (!isEndGame) {
             // Réinitialisation du chat
@@ -229,7 +228,7 @@ export class Game {
         if (this.currentVote) this.executionResultVote();
 
         // Vérification si fin de partie
-        const isEndGame: boolean = this.verifyEndGame();
+        const isEndGame: Role = this.verifyEndGame();
 
         if (!isEndGame) {
             // Réinitialisation des pouvoirs

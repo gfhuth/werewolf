@@ -80,7 +80,9 @@ export function searchGameByUsername(req: AuthenticatedRequest, res: Response): 
                     startDate: g.getGameParam().startDate,
                     host: g.getHost().getUsername(),
                     nbPlayerMax: g.getGameParam().nbPlayerMax,
-                    currentNumberOfPlayer: g.getAllPlayers().length
+                    currentNumberOfPlayer: g.getAllPlayers().length,
+                    ended: g.verifyEndGame() != null,
+                    winningRole: g.verifyEndGame()
                 }))
         });
     } catch (err) {
