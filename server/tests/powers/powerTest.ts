@@ -14,16 +14,16 @@ export const powersTest = async (players: Array<Client>, clairvoyance: Client, c
             })
         );
 
-        player.reinitExpectedEvents();
-        player.addExpectedEvent({
-            event: "POWER_ERROR",
-            game_id: 1,
-            data: {
-                status: 403,
-                message: "Player don't have any power"
-            }
-        });
-        await t.testOrTimeout(player.verifyEvent());
+        await t.testOrTimeout(
+            player.verifyEvent({
+                event: "POWER_ERROR",
+                game_id: 1,
+                data: {
+                    status: 403,
+                    message: "Player don't have any power"
+                }
+            })
+        );
     });
 
     await test("Player has already used his power", async (t) => {
@@ -39,16 +39,16 @@ export const powersTest = async (players: Array<Client>, clairvoyance: Client, c
                 })
             );
 
-            clairvoyance.reinitExpectedEvents();
-            clairvoyance.addExpectedEvent({
-                event: "POWER_ERROR",
-                game_id: 1,
-                data: {
-                    status: 403,
-                    message: "Player has already used his power"
-                }
-            });
-            await t.testOrTimeout(clairvoyance.verifyEvent());
+            await t.testOrTimeout(
+                clairvoyance.verifyEvent({
+                    event: "POWER_ERROR",
+                    game_id: 1,
+                    data: {
+                        status: 403,
+                        message: "Player has already used his power"
+                    }
+                })
+            );
         }
     });
 
@@ -64,16 +64,16 @@ export const powersTest = async (players: Array<Client>, clairvoyance: Client, c
                 })
             );
 
-            contamination.reinitExpectedEvents();
-            contamination.addExpectedEvent({
-                event: "POWER_ERROR",
-                game_id: 1,
-                data: {
-                    status: 403,
-                    message: "Target player is not in the game"
-                }
-            });
-            await t.testOrTimeout(contamination.verifyEvent());
+            await t.testOrTimeout(
+                contamination.verifyEvent({
+                    event: "POWER_ERROR",
+                    game_id: 1,
+                    data: {
+                        status: 403,
+                        message: "Target player is not in the game"
+                    }
+                })
+            );
         }
     });
 };

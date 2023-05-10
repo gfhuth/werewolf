@@ -40,8 +40,6 @@ export class Client {
     private messages: Array<string>;
     private messageResolver: (msg: Record<string, any>) => void | null;
 
-    private expectedEvents: Array<Record<string, any>>;
-
     constructor(name: string, password: string) {
         this.name = name;
         this.password = password;
@@ -53,12 +51,10 @@ export class Client {
         this.messages = [];
         this.ws = null;
         this.messageResolver = null;
-
-        this.expectedEvents = [];
     }
 
     public log(): void {
-        console.log({ name: this.name, role: this.role, power: this.power, expectedEvents: this.expectedEvents, messages: this.messages.map<Record<string, any>>((msg) => JSON.parse(msg)) });
+        console.log({ name: this.name, role: this.role, power: this.power, messages: this.messages.map<Record<string, any>>((msg) => JSON.parse(msg)) });
     }
 
     public getName(): string {
@@ -83,14 +79,6 @@ export class Client {
 
     public kill(): void {
         this.alive = false;
-    }
-
-    public getExpectedEvent(): Array<Record<string, any>> {
-        return this.expectedEvents;
-    }
-
-    public addExpectedEvent(expectedEvent: Record<string, any>): void {
-        this.expectedEvents.push(expectedEvent);
     }
 
     public getWebSocket(): WebSocket.WebSocket {
@@ -148,14 +136,14 @@ export class Client {
         });
     }
 
-    public async verifyEvent(): Promise<boolean> {
+    public async verifyEvent(msg: Record<string, any>): Promise<boolean> {
         let message: Record<string, any> = await this.getNextMessage();
-        while (!this.expectedEvents.some((msg) => msg.event === message.event)) {
+        while (msg.event !== message.event) {
             // console.log(message);
             message = await this.getNextMessage();
         }
 
-        const res: boolean = this.expectedEvents.some((msg) => JSON.stringify(msg) === JSON.stringify(message));
+        const res: boolean = JSON.stringify(msg) === JSON.stringify(message);
         if (!res) console.log(message);
         return res;
     }
@@ -171,15 +159,9 @@ export class Client {
     }
 
     public async startPeriod(event: string, gameId: number, assert: Assert): Promise<void> {
-        this.reinitExpectedEvents();
-        this.addExpectedEvent({ event: event, game_id: gameId, data: {} });
-        await assert.testOrTimeout(this.verifyEvent(), 10000);
+        await assert.testOrTimeout(this.verifyEvent({ event: event, game_id: gameId, data: {} }), 10000);
 
         await this.setInfoPlayer();
-    }
-
-    public reinitExpectedEvents(): void {
-        this.expectedEvents.length = 0;
     }
 
 }
@@ -207,9 +189,7 @@ const main = async (): Promise<void> => {
     await test("Clients' authentification", async (t) => {
         allPlayers.forEach(async (p) => {
             p.sendMessage(JSON.stringify({ event: "AUTHENTICATION", data: { token: p.getToken() } }));
-            p.reinitExpectedEvents();
-            p.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" });
-            t.assert(await p.verifyEvent());
+            t.assert(await p.verifyEvent({ event: "AUTHENTICATION", status: 200, message: "User Authenticated" }));
         });
     });
 

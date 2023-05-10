@@ -15,16 +15,13 @@ export const clairvoyancePower = async (clairvoyance: Client, players: Array<Cli
                 }
             })
         );
-
-        clairvoyance.reinitExpectedEvents();
-        clairvoyance.addExpectedEvent({
+        await t.testOrTimeout(clairvoyance.verifyEvent({
             event: "CLAIRVOYANCE_RESPONSE",
             game_id: 1,
             data: {
                 role: player.getRole(),
                 power: player.getPower()
             }
-        });
-        await t.testOrTimeout(clairvoyance.verifyEvent());
+        }));
     });
 };

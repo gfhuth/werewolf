@@ -16,15 +16,15 @@ export const spiritismTest = async (spiritism: Client, players: Array<Client>): 
             })
         );
 
-        spiritism.reinitExpectedEvents();
-        spiritism.addExpectedEvent({
-            event: "POWER_ERROR",
-            game_id: 1,
-            data: {
-                status: 403,
-                message: "Dead player is not dead"
-            }
-        });
-        await t.testOrTimeout(spiritism.verifyEvent());
+        await t.testOrTimeout(
+            spiritism.verifyEvent({
+                event: "POWER_ERROR",
+                game_id: 1,
+                data: {
+                    status: 403,
+                    message: "Dead player is not dead"
+                }
+            })
+        );
     });
 };

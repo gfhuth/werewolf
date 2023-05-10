@@ -19,9 +19,7 @@ export const testWebsockets = async (client0: Client, client1: Client, client2: 
             })
         );
 
-        client1.reinitExpectedEvents();
-        client1.addExpectedEvent({ event: "AUTHENTICATION", status: 400, message: "Bad Request" });
-        await t.testOrTimeout(client1.verifyEvent());
+        await t.testOrTimeout(client1.verifyEvent({ event: "AUTHENTICATION", status: 400, message: "Bad Request" }));
     });
 
     await test("Utilisateur déjà authentifié", async (t) => {
@@ -32,9 +30,7 @@ export const testWebsockets = async (client0: Client, client1: Client, client2: 
             })
         );
 
-        client1.reinitExpectedEvents();
-        client1.addExpectedEvent({ event: "AUTHENTICATION", status: 200, message: "Already Authentified" });
-        await t.testOrTimeout(client1.verifyEvent());
+        await t.testOrTimeout(client1.verifyEvent({ event: "AUTHENTICATION", status: 200, message: "Already Authentified" }));
     });
 
     await test("Event where the game doesn't exist", async (t) => {
@@ -46,9 +42,7 @@ export const testWebsockets = async (client0: Client, client1: Client, client2: 
             })
         );
 
-        client1.reinitExpectedEvents();
-        client1.addExpectedEvent({ event: "GAME_VERIFICATION", status: 409, message: "Game doesn't exist" });
-        await t.testOrTimeout(client1.verifyEvent());
+        await t.testOrTimeout(client1.verifyEvent({ event: "GAME_VERIFICATION", status: 409, message: "Game doesn't exist" }));
     });
 
     await test("Event from wrong player", async (t) => {
@@ -60,9 +54,7 @@ export const testWebsockets = async (client0: Client, client1: Client, client2: 
             })
         );
 
-        client8.reinitExpectedEvents();
-        client8.addExpectedEvent({ event: "PLAYER_VERIFICATION", status: 409, message: "User doesn't exist in this game" });
-        await t.testOrTimeout(client8.verifyEvent());
+        await t.testOrTimeout(client8.verifyEvent({ event: "PLAYER_VERIFICATION", status: 409, message: "User doesn't exist in this game" }));
     });
 
     await test("Wrong event", async (t) => {
@@ -74,8 +66,6 @@ export const testWebsockets = async (client0: Client, client1: Client, client2: 
             })
         );
 
-        client1.reinitExpectedEvents();
-        client1.addExpectedEvent({ event: "EVENT_VERIFICATION", status: 500, message: "Event doesn't exist" });
-        await t.testOrTimeout(client1.verifyEvent());
+        await t.testOrTimeout(client1.verifyEvent({ event: "EVENT_VERIFICATION", status: 500, message: "Event doesn't exist" }));
     });
 };

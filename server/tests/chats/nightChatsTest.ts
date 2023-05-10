@@ -27,23 +27,23 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
         );
 
         for (const werewolf of werewolfs) {
-            werewolf.reinitExpectedEvents();
-            werewolf.addExpectedEvent({
-                event: "CHAT_RECEIVED",
-                game_id: 1,
-                data: { author: werewolfs[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
-            });
-            await t.testOrTimeout(werewolf.verifyEvent());
+            await t.testOrTimeout(
+                werewolf.verifyEvent({
+                    event: "CHAT_RECEIVED",
+                    game_id: 1,
+                    data: { author: werewolfs[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
+                })
+            );
         }
 
         if (insomnia) {
-            insomnia.reinitExpectedEvents();
-            insomnia.addExpectedEvent({
-                event: "CHAT_RECEIVED",
-                game_id: 1,
-                data: { author: werewolfs[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
-            });
-            await t.testOrTimeout(insomnia.verifyEvent());
+            await t.testOrTimeout(
+                insomnia.verifyEvent({
+                    event: "CHAT_RECEIVED",
+                    game_id: 1,
+                    data: { author: werewolfs[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
+                })
+            );
         }
     });
 
@@ -63,16 +63,16 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
             })
         );
 
-        werewolfs[0].reinitExpectedEvents();
-        werewolfs[0].addExpectedEvent({
-            event: "CHAT_ERROR",
-            game_id: 1,
-            data: {
-                status: 403,
-                message: "Game has not started"
-            }
-        });
-        await t.testOrTimeout(werewolfs[0].verifyEvent());
+        await t.testOrTimeout(
+            werewolfs[0].verifyEvent({
+                event: "CHAT_ERROR",
+                game_id: 1,
+                data: {
+                    status: 403,
+                    message: "Game has not started"
+                }
+            })
+        );
     });
 
     await test("Wrong chat", async (t) => {
@@ -89,16 +89,16 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
             })
         );
 
-        werewolfs[0].reinitExpectedEvents();
-        werewolfs[0].addExpectedEvent({
-            event: "CHAT_ERROR",
-            game_id: 1,
-            data: {
-                status: 403,
-                message: "Chat Village unavailable during the night"
-            }
-        });
-        await t.testOrTimeout(werewolfs[0].verifyEvent());
+        await t.testOrTimeout(
+            werewolfs[0].verifyEvent({
+                event: "CHAT_ERROR",
+                game_id: 1,
+                data: {
+                    status: 403,
+                    message: "Chat Village unavailable during the night"
+                }
+            })
+        );
     });
 
     await test("Insomnia send message", async (t) => {
@@ -117,15 +117,15 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
             })
         );
 
-        insomnia.reinitExpectedEvents();
-        insomnia.addExpectedEvent({
-            event: "CHAT_ERROR",
-            game_id: 1,
-            data: {
-                status: 403,
-                message: "Insomnia cannot send message into werewolfs chat"
-            }
-        });
-        await t.testOrTimeout(insomnia.verifyEvent());
+        await t.testOrTimeout(
+            insomnia.verifyEvent({
+                event: "CHAT_ERROR",
+                game_id: 1,
+                data: {
+                    status: 403,
+                    message: "Insomnia cannot send message into werewolfs chat"
+                }
+            })
+        );
     });
 };
