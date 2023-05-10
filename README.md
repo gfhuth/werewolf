@@ -11,7 +11,7 @@
 ### Description des acteurs
     
 <center>
-<img src="documentation/acteurs.png">
+    <img src="documentation/acteurs.png">
 </center>
 
     - User: ce sont les utilisateurs qui interagissent avec le système et jouent au jeu. Ils peuvent créer un compte, rejoindre une partie, effectuer des actions pendant la partie (comme voter ou effectuer des attaques), créer de nouvelles parties, afficher des informations sur le jeu et quitter la partie.
@@ -21,3 +21,9 @@
     - Data base: c'est le composant qui stocke les données du jeu, telles que les informations des joueurs, l'état du jeu e messages.
 
     - Client: Le client est responsable d'interagir avec l'utilisateur et de gérer l'interface utilisateur pour permettre l'interaction avec le système. En recevant les entrées de l'utilisateur, il les traite et envoie des demandes au serveur pour obtenir des informations ou effectuer des actions dans le système. De plus, le client est responsable de réaliser certaines vérifications basiques de validation des entrées.
+
+### Diagramme de cas d’utilisations
+
+<center>
+    <img src="documentation/client/out/use_case_client.svg">
+</center>
