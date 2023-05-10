@@ -66,7 +66,8 @@ export type ServerToClientEvents = {
         players: Array<{ name: string; alive: boolean }>;
     };
     GET_ALL_INFO_VOTE: {
-        [key: string]: { nbValidation: number; nbInvalidation: number };
+        ratifications: { [key: string]: { nbValidation: number; nbInvalidation: number } };
+        nbParticipants: number;
     };
     LIST_PLAYERS: {
         players: Array<{ user: string; alive: boolean; role: Role }>;
@@ -83,10 +84,10 @@ export type ServerToClientEvents = {
     };
     VOTE_START: {
         vote_type: VoteType;
-    }
+    };
     VOTE_END: {
         vote_type: VoteType;
-    }
+    };
     VOTE_VALID: {
         vote_type: VoteType;
         playerVoted: string;
