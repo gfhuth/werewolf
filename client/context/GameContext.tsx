@@ -103,6 +103,11 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         try {
             const data = JSON.parse(event.data);
             const eventName = data.event as string;
+            const gameId = data.game_id as number;
+            if (gameId !== props.gameId) {
+                LOGGER.log(`Ignoring event ${eventName} from game ${gameId}`);
+                return;
+            }
             const handler = eventHandlers[eventName];
             try {
                 if (handler) handler(data.data);
@@ -159,25 +164,6 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         setMyInfos({ ...myInfos, power: power });
     };
 
-    const onPlayerInfo = (data: { role: Role; power: Power }): void => {
-        const newRole = data.role;
-        const newPower = data.power === Power.NO_POWER ? Power.NONE : data.power;
-        setRole(newRole);
-        setPower(newPower);
-        // Update players list
-        setPlayers((pl) => {
-            const me = pl.find((p) => p.username === userContext.username);
-            return [
-                ...pl.filter((p) => p.username !== userContext.username),
-                {
-                    ...me,
-                    roles: newRole ? [newRole] : [],
-                    powers: newPower ? [newPower] : []
-                }
-            ] as Player[];
-        });
-    };
-
     const onDayStart = (): void => {
         LOGGER.log(`Day started`);
         setPhase(GamePhase.DAY);
@@ -214,8 +200,8 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         registerEventHandler("CHAT_ERROR", errorHandler);
         registerEventHandler("VOTE_ERROR", errorHandler);
         registerEventHandler("GAME_DELETED", errorHandler);
-        registerEventHandler("NIGHT_STARTS", onNightStart);
-        registerEventHandler("DAY_STARTS", onDayStart);
+        registerEventHandler("NIGHT_START", onNightStart);
+        registerEventHandler("DAY_START", onDayStart);
         registerEventHandler("LIST_PLAYERS", onPlayerListUpdate);
     }, []);
 

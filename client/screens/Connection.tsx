@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../App";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { API_BASE_URL } from "@env";
 import { Box, Button, Divider, Heading, Input, Text, useToast } from "native-base";
 import { UserContext } from "../context/UserContext";
@@ -44,35 +44,12 @@ export default function Login(): React.ReactElement {
             .then((res) => {
                 context.setToken(res.token);
                 context.setUsername(username);
+                setUsername("");
+                setPassword("");
                 navigation.navigate("Home");
             })
             .catch((e) => setMessageErreur(e.message));
     };
-
-    // BYPASS START
-
-    const byPass = (): void => {
-        request(`${API_BASE_URL}/user/login`, {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                username: "bat",
-                password: "man"
-            })
-        })
-            .then((res) => res.json())
-            .then((res) => {
-                context.setToken(res.token);
-                setTimeout(() => {
-                    navigation.navigate("Game", { gameId: 1 });
-                }, 100);
-            })
-            .catch((e) => setMessageErreur(e.message));
-    };
-    // BYPASS END
 
     const registerUser = (): void => {
         request(`${API_BASE_URL}/user/register`, {
@@ -89,6 +66,8 @@ export default function Login(): React.ReactElement {
             .then((res) => res.json())
             .then((res) => {
                 context.setToken(res.token);
+                setUsername("");
+                setPassword("");
                 navigation.navigate("Home");
             })
             .catch((e) => setMessageErreur(e.message));
@@ -96,7 +75,6 @@ export default function Login(): React.ReactElement {
 
     return (
         <Background>
-            <Button onPress={byPass}>Bypass</Button>
             <Box padding={10} bgColor={"light.100"} borderRadius={5}>
                 {isAchievingLogin ? (
                     <>
