@@ -187,7 +187,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         setPhase(GamePhase.NIGHT);
     };
 
-    const onPlayerListUpdate = (data: { players: Array<{ user: string; alive: boolean }> }): void => {
+    const onPlayerListUpdate = (data: { players: Array<{ user: string; alive: boolean; role: Role; power: Power }> }): void => {
         // Update myself
         const me = data.players.find((player) => player.user === userContext.username);
         if (!me) {
@@ -195,12 +195,16 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
             return;
         }
         setIsAlive(me.alive);
+        if (me.power === Power.NO_POWER) me.power = Power.NONE;
+        setRole(me.role);
+        setPower(me.power);
+
         // Players
         setPlayers(
             data.players.map((player) => ({
                 username: player.user,
-                roles: player.user === userContext.username && myInfos.role ? [myInfos.role] : [],
-                powers: player.user === userContext.username && myInfos.power ? [myInfos.power] : [],
+                roles: [player.role].filter(Boolean),
+                powers: [player.power].filter(Boolean),
                 alive: player.alive
             }))
         );
@@ -212,7 +216,6 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         registerEventHandler("GAME_DELETED", errorHandler);
         registerEventHandler("NIGHT_STARTS", onNightStart);
         registerEventHandler("DAY_STARTS", onDayStart);
-        registerEventHandler("GET_ALL_INFO_PLAYER", onPlayerInfo);
         registerEventHandler("LIST_PLAYERS", onPlayerListUpdate);
     }, []);
 

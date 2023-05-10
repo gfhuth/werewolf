@@ -63,7 +63,7 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                 onOpen();
             }}
         >
-            <Box bg="light.100" borderRadius={5} p={2} overflow={"hidden"}>
+            <Box bg={props.player.username === userContext.username ? "amber.200" : "light.100"} borderRadius={5} p={2} overflow={"hidden"}>
                 <Center display={"flex"} flexDirection={"row"}>
                     <Image alt="Player image" source={require("../../assets/images/player.png")} width={70} height={70} resizeMode="cover" />
                     <Container>
