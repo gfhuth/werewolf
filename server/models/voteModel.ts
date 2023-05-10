@@ -1,8 +1,8 @@
 import { Player } from "./playerModel";
 
 export enum VoteType {
-    VOTE_VILLAGE,
-    VOTE_WEREWOLF,
+    VOTE_VILLAGE = "VOTE_VILLAGE",
+    VOTE_WEREWOLF = "VOTE_WEREWOLF",
 }
 
 export class Vote {
@@ -34,6 +34,18 @@ export class Vote {
         return this.votes;
     }
 
+    public startVote(): void {
+        this.participants.forEach((participant) => {
+            participant.sendMessage("VOTE_START", { vote_type: this.type });
+        });
+    }
+
+    public endVote(): void {
+        this.participants.forEach((participant) => {
+            participant.sendMessage("VOTE_END", { vote_type: this.type });
+        });
+    }
+
     public isClosed(): boolean {
         return this.result !== null;
     }
@@ -55,34 +67,18 @@ export class Vote {
         }
 
         return res;
-
-        // let nbValidation, nbInvalidation: number;
-        // for (const nameVoted of this.participants.map<string>((player) => player.getUser().getUsername())) {
-        //     nbValidation = 0;
-        //     nbInvalidation = 0;
-        //     for (const playerName in this.votes[nameVoted]) {
-        //         if (this.votes[nameVoted][playerName] === true) nbValidation += 1;
-        //         else if (this.votes[nameVoted][playerName] === false) nbInvalidation += 1;
-        //     }
-        //     res[nameVoted] = { nbValidation: nbValidation, nbInvalidation: nbInvalidation };
-        // }
-        // return res;
     }
 
     private voteValidation(playerVoted: Player): void {
-        let nbVote = 0;
-        for (const player of this.participants) {
-            if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()] === undefined) return;
-            if (this.votes[playerVoted.getUser().getUsername()][player.getUser().getUsername()]) nbVote++;
-        }
-        if (nbVote <= (this.participants.length - 1) / 2) {
-            this.participants.forEach((player) => player.sendMessage("VOTE_INVALID", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
-            return;
-        }
+        const nbVote = Object.values(this.votes[playerVoted.getUser().getUsername()])
+            .map((val) => (val ? 1 : 0))
+            .reduce((a, b) => a + b, 0);
 
-        this.result = playerVoted;
-        // On annonce à tous les joueurs que le vote est validé
-        this.participants.forEach((player) => player.sendMessage("VOTE_VALID", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
+        if (nbVote > this.participants.length / 2) {
+            this.result = playerVoted;
+            // On annonce à tous les joueurs que le vote est validé
+            this.participants.forEach((player) => player.sendMessage("VOTE_VALID", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
+        }
     }
 
     public addProposition(playerWhoVote: Player, playerVoted: Player): void {
@@ -91,7 +87,6 @@ export class Vote {
         };
 
         this.participants
-            .filter((player) => player !== playerWhoVote)
             .forEach((player) => player.sendMessage("ASK_RATIFICATION", { vote_type: this.type, playerVoted: playerVoted.getUser().getUsername() }));
 
         // On regarde si le vote est terminée et/ou valide

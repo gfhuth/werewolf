@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import * as WebSocket from "ws";
 import colors from "colors";
-import { test, nbTests, nbSuccess } from "./test-api/testAPI";
+import { test, nbSuccess, nbFailed, Assert } from "./test-api/testAPI";
 
 import { testUsers } from "./api/usersTest";
 import { testGames } from "./api/gamesTest";
@@ -150,24 +150,32 @@ export class Client {
 
     public async verifyEvent(): Promise<boolean> {
         let message: Record<string, any> = await this.getNextMessage();
-        console.log(message);
-        while (!this.expectedEvents.some(msg => msg.event === message.event)) {
+        while (!this.expectedEvents.some((msg) => msg.event === message.event)) {
+            // console.log(message);
             message = await this.getNextMessage();
-            console.log(message);
         }
-        const b: boolean = this.expectedEvents.some((msg) => JSON.stringify(msg) === JSON.stringify(message));
-        if (!b) console.log(message);
-        return b;
+
+        const res: boolean = this.expectedEvents.some((msg) => JSON.stringify(msg) === JSON.stringify(message));
+        if (!res) console.log(message);
+        return res;
     }
 
-    public async controlStartGame(gameId: number): Promise<boolean> {
-        const message: Record<string, any> = await this.getNextEvent("GET_ALL_INFO_PLAYER");
-        this.role = message.data.role;
-        this.power = message.data.power;
+    public async setInfoPlayer(): Promise<void> {
+        const message: Record<string, any> = await this.getNextEvent("LIST_PLAYERS");
+        const infoPlayer: { user: string; alive: boolean; role: Role; power: Power } = message.data.players.find(
+            (info: { user: string; alive: boolean; role: Role; power: Power }) => info.user === this.name
+        );
+        this.alive = infoPlayer.alive;
+        this.role = infoPlayer.role;
+        this.power = infoPlayer.power;
+    }
 
+    public async startPeriod(event: string, gameId: number, assert: Assert): Promise<void> {
         this.reinitExpectedEvents();
-        this.addExpectedEvent({ event: "NIGHT_STARTS", game_id: gameId, data: {} });
-        return await this.verifyEvent();
+        this.addExpectedEvent({ event: event, game_id: gameId, data: {} });
+        await assert.testOrTimeout(this.verifyEvent(), 10000);
+
+        await this.setInfoPlayer();
     }
 
     public reinitExpectedEvents(): void {
@@ -207,14 +215,14 @@ const main = async (): Promise<void> => {
 
     await testGames(client0, client1, client2, client3, client4, client5, client6, client7, client8, client9);
     await testWebsockets(client0, client1, client2, client3, client4, client5, client8);
-    await testRunGame([client0, client1, client2, client3, client4, client5]);
+    await testRunGame([client0, client1, client2, client3, client4, client5], client8);
 
     allPlayers.forEach((p) => p.closeSocket());
 
     console.log();
-    console.log(colors.yellow(`Total : ${nbTests}`));
+    console.log(colors.yellow(`Total : ${nbSuccess + nbFailed}`));
     console.log(colors.green(`Succeed : ${nbSuccess}`));
-    console.log(colors.red(`Failed : ${nbTests - nbSuccess}`));
+    console.log(colors.red(`Failed : ${nbFailed}`));
 };
 
 main();

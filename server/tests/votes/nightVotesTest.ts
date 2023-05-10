@@ -25,7 +25,7 @@ export const testVoteNight = async (players: Array<Client>): Promise<void> => {
             .forEach(async (player): Promise<void> => {
                 player.reinitExpectedEvents();
                 player.addExpectedEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: humans[0].getName() } });
-                t.assert(await player.verifyEvent());
+                await t.testOrTimeout(player.verifyEvent());
             });
     });
 };

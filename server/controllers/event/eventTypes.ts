@@ -44,7 +44,7 @@ export type ServerToClientEvents = {
         role: Role;
         power: string;
     };
-    DAY_STARTS: {};
+    DAY_START: {};
     END_GAME: {
         winningRole: Role;
     };
@@ -62,21 +62,17 @@ export type ServerToClientEvents = {
     GET_ALL_INFO_GAME: {
         status: number;
     };
-    GET_ALL_INFO_PLAYER: {
-        role: Role;
-        power: string;
-        nbWerewolfs: number;
-    };
     GET_ALL_INFO_PLAYERS_LIST: {
         players: Array<{ name: string; alive: boolean }>;
     };
     GET_ALL_INFO_VOTE: {
-        [key: string]: { nbValidation: number; nbInvalidation: number };
+        ratifications: { [key: string]: { nbValidation: number; nbInvalidation: number } };
+        nbParticipants: number;
     };
     LIST_PLAYERS: {
-        players: Array<{ user: string; alive: boolean }>;
+        players: Array<{ user: string; alive: boolean; role: Role }>;
     };
-    NIGHT_STARTS: {};
+    NIGHT_START: {};
     UPDATE_PROPOSITION: {
         vote_type: VoteType;
         playerVoted: string;
@@ -86,9 +82,11 @@ export type ServerToClientEvents = {
     USE_POWER_VALID: {
         // Empty
     };
-    VOTE_INVALID: {
+    VOTE_START: {
         vote_type: VoteType;
-        playerVoted: string;
+    };
+    VOTE_END: {
+        vote_type: VoteType;
     };
     VOTE_VALID: {
         vote_type: VoteType;

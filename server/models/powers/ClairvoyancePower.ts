@@ -1,9 +1,12 @@
 import { ClientToServerEvents } from "../../controllers/event/eventTypes";
 import { usePower } from "../../controllers/event/powerController";
 import { Event } from "../../controllers/eventController";
-import { Game, Role } from "../gameModel";
+import Logger from "../../util/Logger";
+import { Game } from "../gameModel";
 import { Player } from "../playerModel";
 import Power from "../powerModelBetter";
+
+const LOGGER = new Logger("CLAIRVOYANCE");
 
 export default class ClairvoyancePower extends Power {
 
@@ -12,10 +15,6 @@ export default class ClairvoyancePower extends Power {
 
     public constructor() {
         super(ClairvoyancePower.POWERNAME, false);
-    }
-
-    public isCompatibleWith(player: Player): boolean {
-        return true;
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_CLAIRVOYANCE"]): void {
@@ -31,8 +30,8 @@ export default class ClairvoyancePower extends Power {
 
     public applyPower(game: Game, player: Player): void {
         const target: Player = this.getTargets()[0];
-        const roleVictim: Role = target.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
-        player.sendMessage("CLAIRVOYANCE_RESPONSE", { role: roleVictim, power: target.getPower().getName() });
+        player.sendMessage("CLAIRVOYANCE_RESPONSE", { role: target.getRole(), power: target.getPowerName() });
+        LOGGER.log(`Clairvoyance power applied (target : ${target.getRole()} AND ${target.getPowerName()})`);
     }
 
 }

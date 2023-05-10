@@ -103,6 +103,11 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         try {
             const data = JSON.parse(event.data);
             const eventName = data.event as string;
+            const gameId = data.game_id as number;
+            if (gameId !== props.gameId) {
+                LOGGER.log(`Ignoring event ${eventName} from game ${gameId}`);
+                return;
+            }
             const handler = eventHandlers[eventName];
             try {
                 if (handler) handler(data.data);
@@ -159,25 +164,6 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         setMyInfos({ ...myInfos, power: power });
     };
 
-    const onPlayerInfo = (data: { role: Role; power: Power }): void => {
-        const newRole = data.role;
-        const newPower = data.power === Power.NO_POWER ? Power.NONE : data.power;
-        setRole(newRole);
-        setPower(newPower);
-        // Update players list
-        setPlayers((pl) => {
-            const me = pl.find((p) => p.username === userContext.username);
-            return [
-                ...pl.filter((p) => p.username !== userContext.username),
-                {
-                    ...me,
-                    roles: newRole ? [newRole] : [],
-                    powers: newPower ? [newPower] : []
-                }
-            ] as Player[];
-        });
-    };
-
     const onDayStart = (): void => {
         LOGGER.log(`Day started`);
         setPhase(GamePhase.DAY);
@@ -187,7 +173,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         setPhase(GamePhase.NIGHT);
     };
 
-    const onPlayerListUpdate = (data: { players: Array<{ user: string; alive: boolean }> }): void => {
+    const onPlayerListUpdate = (data: { players: Array<{ user: string; alive: boolean; role: Role; power: Power }> }): void => {
         // Update myself
         const me = data.players.find((player) => player.user === userContext.username);
         if (!me) {
@@ -195,12 +181,16 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
             return;
         }
         setIsAlive(me.alive);
+        if (me.power === Power.NO_POWER) me.power = Power.NONE;
+        setRole(me.role);
+        setPower(me.power);
+
         // Players
         setPlayers(
             data.players.map((player) => ({
                 username: player.user,
-                roles: player.user === userContext.username && myInfos.role ? [myInfos.role] : [],
-                powers: player.user === userContext.username && myInfos.power ? [myInfos.power] : [],
+                roles: [player.role].filter(Boolean),
+                powers: [player.power].filter(Boolean),
                 alive: player.alive
             }))
         );
@@ -210,9 +200,8 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         registerEventHandler("CHAT_ERROR", errorHandler);
         registerEventHandler("VOTE_ERROR", errorHandler);
         registerEventHandler("GAME_DELETED", errorHandler);
-        registerEventHandler("NIGHT_STARTS", onNightStart);
-        registerEventHandler("DAY_STARTS", onDayStart);
-        registerEventHandler("GET_ALL_INFO_PLAYER", onPlayerInfo);
+        registerEventHandler("NIGHT_START", onNightStart);
+        registerEventHandler("DAY_START", onDayStart);
         registerEventHandler("LIST_PLAYERS", onPlayerListUpdate);
     }, []);
 

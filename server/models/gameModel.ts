@@ -10,7 +10,6 @@ import SpiritismPower from "./powers/SpiritismPower";
 import ClairvoyancePower from "./powers/ClairvoyancePower";
 import { toBoolean } from "../util/sql/schema";
 import { User } from "./userModel";
-import Power from "./powerModelBetter";
 import { unique } from "../util/Utils";
 
 const LOGGER = new Logger("GAME");
@@ -209,17 +208,14 @@ export class Game {
             this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
 
             // Initialisation du vote
+            this.currentVote.endVote();
             this.setVote(new Vote(VoteType.VOTE_VILLAGE, Player.alivePlayers(this.getAllPlayers())));
-
-            const infoPlayers = this.getAllPlayers().map((player) => ({
-                user: player.getUser().getUsername(),
-                alive: !player.isDead()
-            }));
+            this.currentVote.startVote();
 
             // Envoie à chaque joueur un recap de la nuit
             this.getAllPlayers().forEach((player) => {
-                player.sendMessage("DAY_STARTS", {});
-                player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
+                player.sendMessage("DAY_START", {});
+                player.sendInfoAllPlayers();
             });
 
             setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
@@ -243,33 +239,25 @@ export class Game {
             this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
             // this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(this.getWerewolfs().concat(this.getAllPlayers().filter((player) => !player.isWerewolf() && player.isDead())));
             this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(unique(...this.getWerewolfs(), ...this.getAllPlayers().filter((p) => p.isDead()), this.getPlayerWithPower(InsomniaPower.POWERNAME)));
-            
+
             this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
             this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
             // Initialisation du vote
+            if (this.currentVote) this.currentVote.endVote();
             this.setVote(new Vote(VoteType.VOTE_WEREWOLF, Player.alivePlayers(this.getWerewolfs())));
-
-            const infoPlayers = this.getAllPlayers().map((player) => ({
-                user: player.getUser().getUsername(),
-                alive: !player.isDead()
-            }));
+            this.currentVote.startVote();
 
             // Envoie à chaque joueur un recap du jour
             this.getAllPlayers().forEach((player) => {
-                player.sendMessage("NIGHT_STARTS", {});
-                player.sendMessage("LIST_PLAYERS", { players: infoPlayers });
+                player.sendMessage("NIGHT_START", {});
+                player.sendInfoAllPlayers();
             });
 
             setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
         }
     }
 
-    /** Function to add when a game is restored or start
-     * Setup the game (probability, role, ...)
-     * Add event call at each end of days (use interval or timeout), ...
-     * @param {number} gameId id of the starting game
-     * */
     public async initGame(): Promise<void> {
         // Vérification des conditions de lancement de la partie
         if (!Game.games.has(this.gameId)) return;
@@ -285,11 +273,6 @@ export class Game {
         this.setupRoles();
         LOGGER.log(`Initialisation des pouvoirs : ${this.gameId}`);
         this.setupPower();
-        this.getAllPlayers().forEach((player) => {
-            const role: Role = player.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
-            if (player.getPower()) player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: player.getPower().getName(), nbWerewolfs: this.getWerewolfs().length });
-            else player.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: "NO_POWER", nbWerewolfs: this.getWerewolfs().length });
-        });
 
         // Initialisation des chats
         LOGGER.log(`Initialisation des chats : ${this.gameId}`);

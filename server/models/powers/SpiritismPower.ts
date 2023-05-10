@@ -1,9 +1,12 @@
 import { ClientToServerEvents } from "../../controllers/event/eventTypes";
 import { usePower } from "../../controllers/event/powerController";
 import { Event } from "../../controllers/eventController";
+import Logger from "../../util/Logger";
 import { Game } from "../gameModel";
 import { Player } from "../playerModel";
 import Power from "../powerModelBetter";
+
+const LOGGER = new Logger("SPIRITISM");
 
 export default class SpiritismPower extends Power {
 
@@ -12,10 +15,6 @@ export default class SpiritismPower extends Power {
 
     public constructor() {
         super(SpiritismPower.POWERNAME, false);
-    }
-
-    public isCompatibleWith(player: Player): boolean {
-        return true;
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_SPIRITISM"]): void {
@@ -37,6 +36,7 @@ export default class SpiritismPower extends Power {
 
     public applyPower(game: Game, player: Player): void {
         game.setChatSpiritism(player, this.getTargets()[0]);
+        LOGGER.log(`Spiritism power applied (${player.getUser().getUsername()} and ${this.getTargets()[0].getUser().getUsername()} can now discuss in the spiritism chat`);
     }
 
 }

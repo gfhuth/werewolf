@@ -6,7 +6,7 @@ import { Event } from "../eventController";
 import Logger from "../../util/Logger";
 import InsomniaPower from "../../models/powers/InsomniaPower";
 
-const LOGGER = new Logger("WEBSOCKET");
+const LOGGER = new Logger("CHAT");
 
 /**
  * Enregistre un nouveau message dans la base de données et envoie le message sur le chat
@@ -23,14 +23,13 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
         content: data.content,
         date: data.date
     };
-    // TODO: vérifier que le message est sans erreurs
 
     LOGGER.log(`New message`);
     // On récupère le chat concerné
     const chat: Chat = game.getChat(data.chat_type);
 
     if (data.date < game.getGameParam().startDate) {
-        player.sendError("CHAT_ERROR", 403, "Game is not started");
+        player.sendError("CHAT_ERROR", 403, "Game has not started");
         return;
     }
     if (data.chat_type === ChatType.CHAT_VILLAGE && game.getStatus() !== GameStatus.DAY) {
@@ -45,6 +44,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
         player.sendError("CHAT_ERROR", 403, "Chat Spiritism unavailable during the day");
         return;
     }
+    if (data.content.replace(" ", "").length === 0) return;
     if (data.chat_type !== ChatType.CHAT_SPIRITISM) {
         if (player.isDead()) {
             player.sendError("CHAT_ERROR", 403, "Dead player cannot send message in the chat");
@@ -70,6 +70,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
             return;
         }
         await database.insertInto("messages").values(message).execute();
+        LOGGER.log(`New message from ${player.getUser().getUsername()}`);
         chat.addMessage(message);
     } else {
         player.sendError("CHAT_ERROR", 500, "Chat null");
@@ -78,13 +79,13 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
 };
 
 const getAllChats = async (game: Game, player: Player): Promise<void> => {
-    const res: { [key in ChatType]?: Array<{ author: string; date: number; chat_type: ChatType; content: string; }> } = {};
+    const res: { [key in ChatType]?: Array<{ author: string; date: number; chat_type: ChatType; content: string }> } = {};
     LOGGER.log(`CHAT ALL CHAT START`);
     const chatTypes = Object.keys(ChatType) as unknown as ChatType[];
     for (const chatType of chatTypes) {
         const chat = game.getChat(chatType);
         if (!chat || !chat.hasMember(player)) continue;
-        res[chatType] = chat.getMessages().map(message => ({
+        res[chatType] = chat.getMessages().map((message) => ({
             author: message.user,
             date: message.date,
             chat_type: chatType,
