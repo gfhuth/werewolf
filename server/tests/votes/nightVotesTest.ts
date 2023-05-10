@@ -20,12 +20,56 @@ export const testVoteNight = async (players: Array<Client>): Promise<void> => {
             })
         );
 
-        werewolfs
-            .filter((p) => p !== werewolfs[0])
-            .forEach(async (player): Promise<void> => {
-                player.reinitExpectedEvents();
-                player.addExpectedEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: humans[0].getName() } });
-                await t.testOrTimeout(player.verifyEvent());
+        for (const werewolf of werewolfs) {
+            werewolf.reinitExpectedEvents();
+            werewolf.addExpectedEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: humans[0].getName() } });
+            await t.testOrTimeout(werewolf.verifyEvent());
+        }
+    });
+
+    await test("Ratification of the proposition", async (t) => {
+        let nbValidation = 0;
+        for (const werewolf of werewolfs) {
+            werewolf.sendMessage(
+                JSON.stringify({
+                    event: "RESPONSE_RATIFICATION",
+                    game_id: 1,
+                    data: {
+                        vote_type: VoteType.VOTE_WEREWOLF,
+                        playerVoted: humans[0].getName(),
+                        ratification: true
+                    }
+                })
+            );
+            nbValidation += 1;
+
+            for (const w of werewolfs) {
+                w.reinitExpectedEvents();
+                w.addExpectedEvent({
+                    event: "UPDATE_PROPOSITION",
+                    game_id: 1,
+                    data: {
+                        vote_type: VoteType.VOTE_WEREWOLF,
+                        playerVoted: humans[0].getName(),
+                        nbValidation: nbValidation,
+                        nbInvalidation: 0
+                    }
+                });
+                await t.testOrTimeout(w.verifyEvent());
+            }
+        }
+
+        for (const werewolf of werewolfs) {
+            werewolf.reinitExpectedEvents();
+            werewolf.addExpectedEvent({
+                event: "VOTE_VALID",
+                game_id: 1,
+                data: {
+                    vote_type: VoteType.VOTE_WEREWOLF,
+                    playerVoted: humans[0].getName()
+                }
             });
+            await t.testOrTimeout(werewolf.verifyEvent());
+        }
     });
 };
