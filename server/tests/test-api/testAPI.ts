@@ -75,6 +75,16 @@ export class Assert {
         }
     }
 
+    public async timeout(func: Promise<void>, timeout = 5000): Promise<void> {
+        this.nbTests += 1;
+        try {
+            await Promise.race([new Promise((resolve, reject) => setTimeout(reject, timeout)), func]);
+        } catch (e) {
+            this.nbErrors += 1;
+            console.log(colors.grey(`ERROR timeout - ${timeout} ms`));
+        }
+    }
+
 }
 
 export const test = async (message: string, func: (assert: Assert) => Promise<void>): Promise<void> => {

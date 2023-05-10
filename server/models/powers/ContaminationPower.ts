@@ -1,9 +1,12 @@
 import { ClientToServerEvents } from "../../controllers/event/eventTypes";
 import { usePower } from "../../controllers/event/powerController";
 import { Event } from "../../controllers/eventController";
+import Logger from "../../util/Logger";
 import { Game } from "../gameModel";
 import { Player } from "../playerModel";
 import Power from "../powerModelBetter";
+
+const LOGGER = new Logger("CONTAMINATION");
 
 export default class ContaminationPower extends Power {
 
@@ -35,6 +38,7 @@ export default class ContaminationPower extends Power {
 
     public applyPower(game: Game, player: Player): void {
         this.getTargets()[0].setWerewolf(true);
+        LOGGER.log("Contamination power applied");
     }
 
 }

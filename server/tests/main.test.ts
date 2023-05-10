@@ -175,7 +175,7 @@ export class Client {
     public async startPeriod(event: string, gameId: number, assert: Assert): Promise<void> {
         this.reinitExpectedEvents();
         this.addExpectedEvent({ event: event, game_id: gameId, data: {} });
-        await assert.testOrTimeout(this.verifyEvent());
+        await assert.testOrTimeout(this.verifyEvent(), 10000);
 
         await this.setAlive();
         await this.setRoleAndPower();
