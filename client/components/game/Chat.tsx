@@ -83,8 +83,8 @@ export default function ChatComponent(): React.ReactElement {
     return (
         <Collapsible name="Chat" isDefaultOpen={false}>
             <Select selectedValue={selectedChat} onValueChange={(value): void => setSelectedChat(value as unknown as ChatType)}>
-                {chats.map((chat) => (
-                    <Select.Item label={ChatName[chat]} value={chat} />
+                {chats.map((chat, i) => (
+                    <Select.Item key={i} label={ChatName[chat]} value={chat} />
                 ))}
             </Select>
             <View>
