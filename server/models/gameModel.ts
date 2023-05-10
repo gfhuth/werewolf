@@ -15,9 +15,9 @@ import { unique } from "../util/Utils";
 const LOGGER = new Logger("GAME");
 
 export enum GameStatus {
-    NOT_STARTED = -1,
-    NIGHT = 0,
-    DAY = 1,
+    NOT_STARTED = "NOT_STARTED",
+    NIGHT = "NIGHT",
+    DAY = "DAY",
 }
 
 export enum Role {

@@ -262,6 +262,11 @@ function endGame(game: Game, player: Player): void {
     if (winningRole) player.sendMessage("END_GAME", { winningRole: winningRole });
 }
 
+function gameStatus(game: Game, player: Player): void {
+    player.sendMessage(game.getStatus() === GameStatus.DAY ? "DAY_START" : "NIGHT_START", {});
+}
+
 // Event.registerHandlers("GET_ALL_INFO", getInfoGame);
 Event.registerHandlers("GET_ALL_INFO", getInfoPlayersList);
 Event.registerHandlers("GET_ALL_INFO", endGame);
+Event.registerHandlers("GET_ALL_INFO", gameStatus);
