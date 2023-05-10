@@ -78,17 +78,18 @@ export class Assert {
 }
 
 export const test = async (message: string, func: (assert: Assert) => Promise<void>): Promise<void> => {
+    console.log();
+    console.log(colors.yellow(`#### ${message} ####`));
+
     const assert: Assert = new Assert();
     await func(assert);
     if (assert.getNbErrors() > 0) {
-        console.log();
-        console.log(colors.yellow(`#### ${message} ####`));
         console.log(colors.red("Failed"));
         nbFailed += 1;
     } else if (assert.getNbTests() > 0) {
-        console.log();
-        console.log(colors.yellow(`#### ${message} ####`));
         console.log(colors.green("Succeed"));
         nbSuccess += 1;
+    } else {
+        console.log(colors.blue("No test in this section"));
     }
 };
