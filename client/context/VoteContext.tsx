@@ -20,12 +20,14 @@ export const VoteContext = React.createContext<{
     type: VoteType;
     ratifications: Array<Ratification>;
     result: string | null;
+    participants: number;
     vote:(player: string, shouldKill: boolean) => void;
         }>({
             active: false,
             type: VoteType.VOTE_VILLAGE,
             ratifications: [],
             result: null,
+            participants: 0,
             vote: () => null
         });
 
@@ -34,6 +36,7 @@ export function VoteProvider(props: { children: React.ReactNode }): React.ReactE
     const [type, setType] = useState<VoteType>(VoteType.VOTE_VILLAGE);
     const [ratifications, setRatifications] = useState<Array<Ratification>>([]);
     const [result, setResult] = useState<string | null>(null);
+    const [participants, setParticipants] = useState(0);
 
     const gameContext = useContext(GameContext);
 
@@ -85,7 +88,7 @@ export function VoteProvider(props: { children: React.ReactNode }): React.ReactE
         LOGGER.log(`Vote ratification updated for ${target}`);
     };
 
-    const onVoteInfo = (data: { ratifications: { [key: string]: { nbValidation: number; nbInvalidation: number } }, nbParticipants: number }): void => {
+    const onVoteInfo = (data: { ratifications: { [key: string]: { nbValidation: number; nbInvalidation: number } }; nbParticipants: number }): void => {
         setRatifications(
             Object.keys(data.ratifications).map((target) => ({
                 target: target,
@@ -93,6 +96,7 @@ export function VoteProvider(props: { children: React.ReactNode }): React.ReactE
                 countForLiving: data.ratifications[target].nbInvalidation
             }))
         );
+        setParticipants(data.nbParticipants);
     };
 
     const onVoteStart = (data: { vote_type: VoteType }): void => {
@@ -117,5 +121,5 @@ export function VoteProvider(props: { children: React.ReactNode }): React.ReactE
         gameContext.registerEventHandler("VOTE_VALID", onVoteResult);
     }, []);
 
-    return <VoteContext.Provider value={{ active, type, ratifications, result, vote }}>{props.children}</VoteContext.Provider>;
+    return <VoteContext.Provider value={{ active, type, ratifications, result, participants, vote }}>{props.children}</VoteContext.Provider>;
 }

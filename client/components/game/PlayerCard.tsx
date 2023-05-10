@@ -95,8 +95,8 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                 {voteContext.active && voteContext.result === props.player.username && <Bandeau text="VOTÉ" textColor={"emerald.500"} />}
                 {voteContext.active && playerRatification && (
                     <View position={"absolute"} width={"100%"} height={2} display={"flex"} justifyContent={"space-between"} left={0} bottom={0} flexDirection={"row"}>
-                        <View bg={"red.400"} width={`${(playerRatification.countForKilling / (gameContext.players.length - 1)) * 100}%`} height={"100%"} />
-                        <View bg={"green.400"} width={`${(playerRatification.countForLiving / (gameContext.players.length - 1)) * 100}%`} height={"100%"} />
+                        <View bg={"red.400"} width={`${(playerRatification.countForKilling / (voteContext.participants)) * 100}%`} height={"100%"} />
+                        <View bg={"green.400"} width={`${(playerRatification.countForLiving / (voteContext.participants)) * 100}%`} height={"100%"} />
                     </View>
                 )}
             </Box>
