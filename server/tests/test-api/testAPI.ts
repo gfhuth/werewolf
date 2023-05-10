@@ -21,21 +21,19 @@ export class Assert {
         return this.nbTests;
     }
 
-    public equal(object1: any, object2: any): void {
+    public equal(object1: any, object2: any, message = ""): void {
         this.nbTests += 1;
         if (object1 === object2) return;
         if (typeof object1 === "object" && typeof object2 === "object" && JSON.stringify(object1) === JSON.stringify(object2)) return;
         this.nbErrors += 1;
-        console.log(colors.grey(`ERROR assertion: equal - ${object1} is different from ${object2}`));
-        console.log(colors.grey(JSON.stringify(object1)));
-        console.log(colors.grey(JSON.stringify(object2)));
+        console.log(colors.grey(`ERROR assertion: equal - ${object1} is different from ${object2} - ${message}`));
     }
 
-    public assert(object: any): void {
+    public assert(object: any, message = ""): void {
         this.nbTests += 1;
         if (object) return;
         this.nbErrors += 1;
-        console.log(colors.grey(`ERROR assertion: assert - ${object} is not true`));
+        console.log(colors.grey(`ERROR assertion: assert - ${object} is not true - ${message}`));
     }
 
     // public async testOrTimeout(func: Promise<boolean>, timeout = 5000): Promise<void> {
@@ -61,17 +59,17 @@ export class Assert {
     //     }
     // }
 
-    public async testOrTimeout(func: Promise<boolean>, timeout = 5000): Promise<void> {
+    public async testOrTimeout(func: Promise<boolean>, timeout = 5000, message?: string): Promise<void> {
         this.nbTests += 1;
         try {
             const result = await Promise.race([new Promise((resolve, reject) => setTimeout(reject, timeout)), func]);
             if (!result) {
                 this.nbErrors += 1;
-                console.log(colors.grey(`ERROR assertion: assert - return value is false`));
+                console.log(colors.grey(`ERROR assertion: assert - return value is false - ${message}`));
             }
         } catch (e) {
             this.nbErrors += 1;
-            console.log(colors.grey(`ERROR timeout - ${timeout} ms`));
+            console.log(colors.grey(`ERROR timeout - ${timeout} ms - ${message}`));
         }
     }
 
