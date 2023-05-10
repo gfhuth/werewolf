@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Game, GameParam, GameStatus } from "../models/gameModel";
+import { Game, GameParam, GameStatus, Role } from "../models/gameModel";
 import { Event } from "../controllers/eventController";
 import database from "../util/database";
 
@@ -80,7 +80,9 @@ export function searchGameByUsername(req: AuthenticatedRequest, res: Response): 
                     startDate: g.getGameParam().startDate,
                     host: g.getHost().getUsername(),
                     nbPlayerMax: g.getGameParam().nbPlayerMax,
-                    currentNumberOfPlayer: g.getAllPlayers().length
+                    currentNumberOfPlayer: g.getAllPlayers().length,
+                    ended: g.verifyEndGame() != null,
+                    winningRole: g.verifyEndGame()
                 }))
         });
     } catch (err) {
@@ -255,5 +257,16 @@ function getInfoPlayersList(game: Game, player: Player): void {
     player.sendInfoAllPlayers();
 }
 
+function endGame(game: Game, player: Player): void {
+    const winningRole: Role = game.verifyEndGame();
+    if (winningRole) player.sendMessage("END_GAME", { winningRole: winningRole });
+}
+
+function gameStatus(game: Game, player: Player): void {
+    player.sendMessage(game.getStatus() === GameStatus.DAY ? "DAY_START" : "NIGHT_START", {});
+}
+
 // Event.registerHandlers("GET_ALL_INFO", getInfoGame);
 Event.registerHandlers("GET_ALL_INFO", getInfoPlayersList);
+Event.registerHandlers("GET_ALL_INFO", endGame);
+Event.registerHandlers("GET_ALL_INFO", gameStatus);
