@@ -160,16 +160,14 @@ export class Client {
         return res;
     }
 
-    public async setAlive(): Promise<void> {
+    public async setInfoPlayer(): Promise<void> {
         const message: Record<string, any> = await this.getNextEvent("LIST_PLAYERS");
-        const infoPlayer: {user: string, alive: boolean} = message.data.players.find((info: {user: string, alive: boolean}) => info.user === this.name);
+        const infoPlayer: { user: string; alive: boolean; role: Role; power: Power } = message.data.players.find(
+            (info: { user: string; alive: boolean; role: Role; power: Power }) => info.user === this.name
+        );
         this.alive = infoPlayer.alive;
-    }
-
-    public async setRoleAndPower(): Promise<void> {
-        const message: Record<string, any> = await this.getNextEvent("GET_ALL_INFO_PLAYER");
-        this.role = message.data.role;
-        this.power = message.data.power;
+        this.role = infoPlayer.role;
+        this.power = infoPlayer.power;
     }
 
     public async startPeriod(event: string, gameId: number, assert: Assert): Promise<void> {
@@ -177,8 +175,7 @@ export class Client {
         this.addExpectedEvent({ event: event, game_id: gameId, data: {} });
         await assert.testOrTimeout(this.verifyEvent(), 10000);
 
-        await this.setAlive();
-        await this.setRoleAndPower();
+        await this.setInfoPlayer();
     }
 
     public reinitExpectedEvents(): void {
