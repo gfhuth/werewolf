@@ -214,8 +214,8 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         registerEventHandler("CHAT_ERROR", errorHandler);
         registerEventHandler("VOTE_ERROR", errorHandler);
         registerEventHandler("GAME_DELETED", errorHandler);
-        registerEventHandler("NIGHT_STARTS", onNightStart);
-        registerEventHandler("DAY_STARTS", onDayStart);
+        registerEventHandler("NIGHT_START", onNightStart);
+        registerEventHandler("DAY_START", onDayStart);
         registerEventHandler("LIST_PLAYERS", onPlayerListUpdate);
     }, []);
 

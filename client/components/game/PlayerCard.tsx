@@ -4,6 +4,7 @@ import { GameContext, Player } from "../../context/GameContext";
 import { useContext } from "react";
 import { UserContext } from "../../context/UserContext";
 import { VoteContext } from "../../context/VoteContext";
+import Bandeau from "./Bandeau";
 
 export default function PlayerCard(props: { player: Player }): React.ReactElement {
     const gameContext = useContext(GameContext);
@@ -36,7 +37,6 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
     const playerRatification = voteContext.ratifications.find((r) => r.target === props.player.username);
 
     const getVoteElement = (): React.ReactNode => {
-        if (props.player.username === userContext.username) return undefined;
         if (playerRatification) {
             return (
                 <Actionsheet.Item display={"flex"} flexDirection={"row"}>
@@ -87,20 +87,13 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                             <Heading w="100%" textAlign={"center"}>
                                 {props.player.username}
                             </Heading>
-                            {getVoteElement()}
+                            {voteContext.active && !voteContext.result && getVoteElement()}
                         </Actionsheet.Content>
                     </Actionsheet>
                 </Center>
-                {!props.player.alive && (
-                    <View backgroundColor={"rgba(56, 56, 56, 0.8)"} position={"absolute"} width={"100%"} height={"100%"} top={"0"} left={"0"}>
-                        <View width={"100%"} position={"absolute"} backgroundColor={"white"} style={{ transform: [{ rotate: "-25deg" }, { translateX: -12 }, { translateY: -8 }] }}>
-                            <Text paddingLeft={4} fontFamily={"pixel"} color={"red.700"} fontWeight={"900"} fontSize={"150%"}>
-                                MORT
-                            </Text>
-                        </View>
-                    </View>
-                )}
-                {playerRatification && (
+                {!props.player.alive && <Bandeau text="MORT" textColor={"red.700"} />}
+                {voteContext.active && voteContext.result === props.player.username && <Bandeau text="VOTÉ" textColor={"emerald.500"} />}
+                {voteContext.active && playerRatification && (
                     <View position={"absolute"} width={"100%"} height={2} display={"flex"} justifyContent={"space-between"} left={0} bottom={0} flexDirection={"row"}>
                         <View bg={"red.400"} width={`${(playerRatification.countForKilling / (gameContext.players.length - 1)) * 100}%`} height={"100%"} />
                         <View bg={"green.400"} width={`${(playerRatification.countForLiving / (gameContext.players.length - 1)) * 100}%`} height={"100%"} />

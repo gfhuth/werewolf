@@ -19,11 +19,13 @@ export const VoteContext = React.createContext<{
     active: boolean;
     type: VoteType;
     ratifications: Array<Ratification>;
+    result: string | null;
     vote:(player: string, shouldKill: boolean) => void;
         }>({
             active: false,
             type: VoteType.VOTE_VILLAGE,
             ratifications: [],
+            result: null,
             vote: () => null
         });
 
@@ -31,6 +33,7 @@ export function VoteProvider(props: { children: React.ReactNode }): React.ReactE
     const [active, setActive] = useState(false);
     const [type, setType] = useState<VoteType>(VoteType.VOTE_VILLAGE);
     const [ratifications, setRatifications] = useState<Array<Ratification>>([]);
+    const [result, setResult] = useState<string | null>(null);
 
     const gameContext = useContext(GameContext);
 
@@ -82,21 +85,37 @@ export function VoteProvider(props: { children: React.ReactNode }): React.ReactE
         LOGGER.log(`Vote ratification updated for ${target}`);
     };
 
-    const onVoteInfo = (data: { [key: string]: { nbValidation: number; nbInvalidation: number } }): void => {
+    const onVoteInfo = (data: { ratifications: { [key: string]: { nbValidation: number; nbInvalidation: number } }, nbParticipants: number }): void => {
         setRatifications(
-            Object.keys(data).map((target) => ({
+            Object.keys(data.ratifications).map((target) => ({
                 target: target,
-                countForKilling: data[target].nbValidation,
-                countForLiving: data[target].nbInvalidation
+                countForKilling: data.ratifications[target].nbValidation,
+                countForLiving: data.ratifications[target].nbInvalidation
             }))
         );
+    };
+
+    const onVoteStart = (data: { vote_type: VoteType }): void => {
+        setActive(true);
+        setType(data.vote_type);
+    };
+    const onVoteEnd = (): void => {
+        setActive(false);
+        setResult("");
+    };
+    const onVoteResult = (data: { vote_type: VoteType; playerVoted: string }): void => {
+        setResult(data.playerVoted);
+        setRatifications([]);
     };
 
     useEffect(() => {
         gameContext.registerEventHandler("ASK_RATIFICATION", addTarget);
         gameContext.registerEventHandler("GET_ALL_INFO_VOTE", onVoteInfo);
         gameContext.registerEventHandler("UPDATE_PROPOSITION", updateTarget);
+        gameContext.registerEventHandler("VOTE_START", onVoteStart);
+        gameContext.registerEventHandler("VOTE_END", onVoteEnd);
+        gameContext.registerEventHandler("VOTE_VALID", onVoteResult);
     }, []);
 
-    return <VoteContext.Provider value={{ active, type, ratifications, vote }}>{props.children}</VoteContext.Provider>;
+    return <VoteContext.Provider value={{ active, type, ratifications, result, vote }}>{props.children}</VoteContext.Provider>;
 }
