@@ -50,6 +50,7 @@ const getAllVotes = (game: Game, player: Player): void => {
     const vote: Vote = game.getVote();
     if (!vote.getParticipants().includes(player)) return;
     player.sendMessage("GET_ALL_INFO_VOTE", vote.countRatification());
+    if (vote.isClosed()) player.sendMessage("VOTE_VALID", { vote_type: vote.getType(), playerVoted: vote.getResult().getUser().getUsername() });
 };
 
 // Liste des événements relatifs aux votes
