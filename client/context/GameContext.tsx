@@ -104,7 +104,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
             const data = JSON.parse(event.data);
             const eventName = data.event as string;
             const gameId = data.game_id as number;
-            if (gameId !== props.gameId) {
+            if (Number.isInteger(gameId) && gameId !== props.gameId) {
                 LOGGER.log(`Ignoring event ${eventName} from game ${gameId}`);
                 return;
             }

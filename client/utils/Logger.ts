@@ -9,7 +9,7 @@ export default class Logger {
     }
 
     public log(message: string): void {
-        console.log(`[${moment().format("YYYY-MM-DD HH:MM:SS")}] [${this.name}] - ${message}`);
+        console.log(`[${moment().format("YYYY-MM-DD HH:mm:SS")}] [${this.name}] - ${message}`);
     }
 
 }
