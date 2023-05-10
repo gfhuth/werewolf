@@ -172,9 +172,9 @@ export class Client {
         this.power = message.data.power;
     }
 
-    public async startNight(gameId: number, assert: Assert): Promise<void> {
+    public async startPeriod(event: string, gameId: number, assert: Assert): Promise<void> {
         this.reinitExpectedEvents();
-        this.addExpectedEvent({ event: "NIGHT_STARTS", game_id: gameId, data: {} });
+        this.addExpectedEvent({ event: event, game_id: gameId, data: {} });
         await assert.testOrTimeout(this.verifyEvent());
 
         await this.setAlive();

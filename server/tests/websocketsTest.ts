@@ -4,7 +4,7 @@ import { test } from "./test-api/testAPI";
 export const testWebsockets = async (client0: Client, client1: Client, client2: Client, client3: Client, client4: Client, client5: Client, client8: Client): Promise<void> => {
     await test("Setup roles and powers", async (t) => {
         for (const client of [client0, client1, client2, client3, client4, client5]) {
-            await client.startNight(1, t);
+            await client.startPeriod("NIGHT_STARTS", 1, t);
             t.assert(client.getRole());
             t.assert(client.getPower());
         }
