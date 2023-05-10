@@ -3,12 +3,11 @@ import { test } from "./test-api/testAPI";
 
 export const testWebsockets = async (client0: Client, client1: Client, client2: Client, client3: Client, client4: Client, client5: Client, client8: Client): Promise<void> => {
     await test("Setup roles and powers", async (t) => {
-        await t.testOrTimeout(client0.controlStartGame(1));
-        await t.testOrTimeout(client1.controlStartGame(1));
-        await t.testOrTimeout(client2.controlStartGame(1));
-        await t.testOrTimeout(client3.controlStartGame(1));
-        await t.testOrTimeout(client4.controlStartGame(1));
-        await t.testOrTimeout(client5.controlStartGame(1));
+        for (const client of [client0, client1, client2, client3, client4, client5]) {
+            await client.startNight(1, t);
+            t.assert(client.getRole());
+            t.assert(client.getPower());
+        }
     });
 
     await test("Mauvais format des données envoyées", async (t) => {

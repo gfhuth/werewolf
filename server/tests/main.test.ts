@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import * as WebSocket from "ws";
 import colors from "colors";
-import { test, nbSuccess, nbFailed } from "./test-api/testAPI";
+import { test, nbSuccess, nbFailed, Assert } from "./test-api/testAPI";
 
 import { testUsers } from "./api/usersTest";
 import { testGames } from "./api/gamesTest";
@@ -160,14 +160,25 @@ export class Client {
         return res;
     }
 
-    public async controlStartGame(gameId: number): Promise<boolean> {
+    public async setAlive(): Promise<void> {
+        const message: Record<string, any> = await this.getNextEvent("LIST_PLAYERS");
+        const infoPlayer: {user: string, alive: boolean} = message.data.players.find((info: {user: string, alive: boolean}) => info.user === this.name);
+        this.alive = infoPlayer.alive;
+    }
+
+    public async setRoleAndPower(): Promise<void> {
         const message: Record<string, any> = await this.getNextEvent("GET_ALL_INFO_PLAYER");
         this.role = message.data.role;
         this.power = message.data.power;
+    }
 
+    public async startNight(gameId: number, assert: Assert): Promise<void> {
         this.reinitExpectedEvents();
         this.addExpectedEvent({ event: "NIGHT_STARTS", game_id: gameId, data: {} });
-        return await this.verifyEvent();
+        await assert.testOrTimeout(this.verifyEvent());
+
+        await this.setAlive();
+        await this.setRoleAndPower();
     }
 
     public reinitExpectedEvents(): void {
