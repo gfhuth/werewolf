@@ -14,7 +14,7 @@ export const testRunGame = async (players: Array<Client>, clientNotInGame: Clien
     const clairvoyance: Client | undefined = players.find((p) => p.getPower() === Power.CLAIRVOYANCE);
 
     await testChatNight(players, insomnia);
-    await testVoteNight(players);
+    await testVoteNight(players, clientNotInGame);
     await clairvoyancePower(clairvoyance, players);
     await powersTest(players, clairvoyance, contamination, clientNotInGame);
     await spiritismTest(spiritism, players);
