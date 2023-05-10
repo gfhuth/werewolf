@@ -3,13 +3,13 @@ import { Client, Role } from "../main.test";
 import { test } from "../test-api/testAPI";
 
 export const testVoteNight = async (players: Array<Client>, clientNotInGame: Client): Promise<void> => {
-    const werewolfs: Array<Client> = players.filter((p) => p.isAlive() && p.getRole() === Role.WEREWOLF);
-    const humans: Array<Client> = players.filter((p) => p.isAlive() && p.getRole() === Role.HUMAN);
-    if (werewolfs.length === 0) return;
+    const werewolves: Array<Client> = players.filter((p) => p.getRole() === Role.WEREWOLF);
+    const humans: Array<Client> = players.filter((p) => p.getRole() === Role.HUMAN);
+    if (werewolves.length === 0) return;
     if (humans.length === 0) return;
 
-    await test("Werewolfs vote", async (t) => {
-        werewolfs[0].sendMessage(
+    await test("Werewolves vote", async (t) => {
+        werewolves[0].sendMessage(
             JSON.stringify({
                 game_id: 1,
                 event: "VOTE_SENT",
@@ -20,12 +20,12 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
             })
         );
 
-        for (const werewolf of werewolfs)
+        for (const werewolf of werewolves)
             await t.testOrTimeout(werewolf.verifyEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: humans[0].getName() } }));
     });
 
     await test("Vote type error", async (t) => {
-        werewolfs[1].sendMessage(
+        werewolves[1].sendMessage(
             JSON.stringify({
                 event: "RESPONSE_RATIFICATION",
                 game_id: 1,
@@ -38,7 +38,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
         );
 
         await t.testOrTimeout(
-            werewolfs[1].verifyEvent({
+            werewolves[1].verifyEvent({
                 event: "VOTE_ERROR",
                 game_id: 1,
                 data: {
@@ -56,7 +56,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
                 game_id: 1,
                 data: {
                     vote_type: VoteType.VOTE_WEREWOLF,
-                    playerVoted: werewolfs[1].getName()
+                    playerVoted: werewolves[1].getName()
                 }
             })
         );
@@ -74,7 +74,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
     });
 
     await test("Player voted not in the game", async (t) => {
-        werewolfs[0].sendMessage(
+        werewolves[0].sendMessage(
             JSON.stringify({
                 event: "RESPONSE_RATIFICATION",
                 game_id: 1,
@@ -87,7 +87,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
         );
 
         await t.testOrTimeout(
-            werewolfs[0].verifyEvent({
+            werewolves[0].verifyEvent({
                 event: "VOTE_ERROR",
                 game_id: 1,
                 data: {
@@ -100,7 +100,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
 
     await test("Ratification of the proposition", async (t) => {
         let nbValidation = 0;
-        for (const werewolf of werewolfs) {
+        for (const werewolf of werewolves) {
             werewolf.sendMessage(
                 JSON.stringify({
                     event: "RESPONSE_RATIFICATION",
@@ -114,7 +114,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
             );
             nbValidation += 1;
 
-            for (const w of werewolfs) {
+            for (const w of werewolves) {
                 await t.testOrTimeout(
                     w.verifyEvent({
                         event: "UPDATE_PROPOSITION",
@@ -130,7 +130,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
             }
         }
 
-        for (const werewolf of werewolfs) {
+        for (const werewolf of werewolves) {
             await t.testOrTimeout(
                 werewolf.verifyEvent({
                     event: "VOTE_VALID",
@@ -145,7 +145,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
     });
 
     await test("Vote closed", async (t) => {
-        werewolfs[1].sendMessage(
+        werewolves[1].sendMessage(
             JSON.stringify({
                 event: "VOTE_SENT",
                 game_id: 1,
@@ -157,7 +157,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
         );
 
         await t.testOrTimeout(
-            werewolfs[1].verifyEvent({
+            werewolves[1].verifyEvent({
                 event: "VOTE_ERROR",
                 game_id: 1,
                 data: {

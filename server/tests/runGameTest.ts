@@ -1,23 +1,15 @@
-import { Client, Power } from "./main.test";
+import { Client } from "./main.test";
 import { testChatNight } from "./chats/nightChatsTest";
 import { testVoteNight } from "./votes/nightVotesTest";
-import { clairvoyancePower } from "./powers/clairvoyanceTest";
-import { powersTest } from "./powers/powerTest";
-import { contaminationTest } from "./powers/contaminationTest";
-import { insomniaTest } from "./powers/insomniaTest";
-import { spiritismTest } from "./powers/spiritismTest";
+import { testPowers } from "./powers/powerTest";
 
 export const testRunGame = async (players: Array<Client>, clientNotInGame: Client): Promise<void> => {
-    const insomnia: Client | undefined = players.find((p) => p.getPower() === Power.INSOMNIA);
-    const spiritism: Client | undefined = players.find((p) => p.getPower() === Power.SPIRITISM);
-    const contamination: Client | undefined = players.find((p) => p.getPower() === Power.CONTAMINATION);
-    const clairvoyance: Client | undefined = players.find((p) => p.getPower() === Power.CLAIRVOYANCE);
-
-    await testChatNight(players, insomnia);
+    // Première nuit
+    await testChatNight(players);
     await testVoteNight(players, clientNotInGame);
-    await clairvoyancePower(clairvoyance, players);
-    await powersTest(players, clairvoyance, contamination, clientNotInGame);
-    await spiritismTest(spiritism, players);
-    await insomniaTest(insomnia, players);
-    await contaminationTest(contamination, players);
+
+    // Test des pouvoirs
+    await testPowers(players, clientNotInGame);
+
+    // Premier jour
 };

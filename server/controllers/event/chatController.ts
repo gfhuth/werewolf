@@ -54,7 +54,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
 
     if (player.getPower()) {
         if (data.chat_type === ChatType.CHAT_WEREWOLF && player.getPower().getName() === InsomniaPower.POWERNAME) {
-            player.sendError("CHAT_ERROR", 403, "Insomnia cannot send message into werewolfs chat");
+            player.sendError("CHAT_ERROR", 403, "Insomnia cannot send message into werewolves chat");
             return;
         }
     }

@@ -1,7 +1,7 @@
 import { Client } from "../main.test";
 import { test } from "../test-api/testAPI";
 
-export const spiritismTest = async (spiritism: Client, players: Array<Client>): Promise<void> => {
+export const testSpiritism = async (spiritism: Client, players: Array<Client>): Promise<void> => {
     if (!spiritism) return;
 
     await test("Test spiritism", async (t) => {

@@ -74,7 +74,7 @@ export class Game {
         this.chats.push(
             new Chat(
                 ChatType.CHAT_WEREWOLF,
-                this.getWerewolfs().concat(
+                this.getWerewolves().concat(
                     this.getAllPlayers().filter((player) => {
                         if (!player.getPower()) return false;
                         else return player.getPower().getName() === ClairvoyancePower.POWERNAME;
@@ -119,25 +119,25 @@ export class Game {
     }
 
     private setupRoles(): void {
-        const nbWerewolfs: number = Math.max(1, Math.ceil(this.gameParam.percentageWerewolf * this.getAllPlayers().length));
+        const nbWerewolves: number = Math.max(1, Math.ceil(this.gameParam.percentageWerewolf * this.getAllPlayers().length));
         const players: Array<Player> = this.getAllPlayers();
-        const werewolfs: Array<Player> = [];
-        while (players.length > 0 && werewolfs.length < nbWerewolfs) {
+        const werewolves: Array<Player> = [];
+        while (players.length > 0 && werewolves.length < nbWerewolves) {
             const werewolf: Player = players[Math.floor(Math.random() * players.length)];
             werewolf.setWerewolf(true);
-            werewolfs.push(werewolf);
+            werewolves.push(werewolf);
             players.splice(players.indexOf(werewolf), 1);
         }
-        LOGGER.log(`${nbWerewolfs} werewolf(s) in this game`);
-        werewolfs.forEach((player) => LOGGER.log(`${player.getUser().getUsername()} is a werewolf in this game`));
+        LOGGER.log(`${nbWerewolves} werewolf(s) in this game`);
+        werewolves.forEach((player) => LOGGER.log(`${player.getUser().getUsername()} is a werewolf in this game`));
     }
 
     private setupPower(): void {
-        const werewolfs: Array<Player> = this.getWerewolfs();
+        const werewolves: Array<Player> = this.getWerewolves();
         const humans: Array<Player> = this.getAllPlayers().filter((player) => !player.isWerewolf());
 
         if (Math.random() <= this.gameParam.probaContamination) {
-            const contamination: Player = werewolfs[Math.floor(Math.random() * werewolfs.length)];
+            const contamination: Player = werewolves[Math.floor(Math.random() * werewolves.length)];
             contamination.setPower(new ContaminationPower());
         }
         if (humans.length > 0 && Math.random() <= this.gameParam.probaInsomnie) {
@@ -160,7 +160,7 @@ export class Game {
 
     public getWinningRole(): Role | null {
         if (!this.isStarted()) return null;
-        if (this.getWerewolfs().filter((player) => !player.isDead()).length === 0) return Role.HUMAN;
+        if (this.getWerewolves().filter((player) => !player.isDead()).length === 0) return Role.HUMAN;
         else if (this.getAllPlayers().filter((player) => !player.isWerewolf() && !player.isDead()).length === 0) return Role.WEREWOLF;
         return null;
     }
@@ -244,15 +244,15 @@ export class Game {
 
             // Réinitialisation des chats
             this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
-            // this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(this.getWerewolfs().concat(this.getAllPlayers().filter((player) => !player.isWerewolf() && player.isDead())));
-            this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(unique(...this.getWerewolfs(), ...this.getAllPlayers().filter((p) => p.isDead()), this.getPlayerWithPower(InsomniaPower.POWERNAME)));
+            // this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(this.getWerewolves().concat(this.getAllPlayers().filter((player) => !player.isWerewolf() && player.isDead())));
+            this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(unique(...this.getWerewolves(), ...this.getAllPlayers().filter((p) => p.isDead()), this.getPlayerWithPower(InsomniaPower.POWERNAME)));
 
             this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
             this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
             // Initialisation du vote
             if (this.currentVote) this.currentVote.endVote();
-            this.setVote(new Vote(VoteType.VOTE_WEREWOLF, Player.alivePlayers(this.getWerewolfs())));
+            this.setVote(new Vote(VoteType.VOTE_WEREWOLF, Player.alivePlayers(this.getWerewolves())));
             this.currentVote.startVote();
 
             // Envoie à chaque joueur un recap du jour
@@ -322,7 +322,7 @@ export class Game {
         return this.players.get(username);
     }
 
-    public getWerewolfs(): Array<Player> {
+    public getWerewolves(): Array<Player> {
         return this.getAllPlayers().filter((player: Player) => player.isWerewolf());
     }
 

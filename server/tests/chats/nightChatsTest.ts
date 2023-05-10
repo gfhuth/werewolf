@@ -1,20 +1,16 @@
-import { Client, Role } from "../main.test";
+import { ChatType } from "../../models/chatModel";
+import { Client, Power, Role } from "../main.test";
 import { test } from "../test-api/testAPI";
 
-export enum ChatType {
-    CHAT_VILLAGE = "CHAT_VILLAGE",
-    CHAT_WEREWOLF = "CHAT_WEREWOLF",
-    CHAT_SPIRITISM = "CHAT_SPIRITISM",
-}
+export const testChatNight = async (players: Array<Client>): Promise<void> => {
+    const werewolves: Array<Client> = players.filter((p) => p.getRole() === Role.WEREWOLF);
+    if (werewolves.length === 0) return;
+    const insomnia: Client | undefined = players.find((p) => p.getPower() === Power.INSOMNIA);
 
-export const testChatNight = async (players: Array<Client>, insomnia: Client): Promise<void> => {
-    const werewolfs: Array<Client> = players.filter((p) => p.isAlive() && p.getRole() === Role.WEREWOLF);
-    if (werewolfs.length === 0) return;
-
-    await test("Werewolfs chat", async (t) => {
+    await test("Werewolves chat", async (t) => {
         const now: number = Date.now();
 
-        werewolfs[0].sendMessage(
+        werewolves[0].sendMessage(
             JSON.stringify({
                 event: "CHAT_SENT",
                 game_id: 1,
@@ -26,12 +22,12 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
             })
         );
 
-        for (const werewolf of werewolfs) {
+        for (const werewolf of werewolves) {
             await t.testOrTimeout(
                 werewolf.verifyEvent({
                     event: "CHAT_RECEIVED",
                     game_id: 1,
-                    data: { author: werewolfs[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
+                    data: { author: werewolves[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
                 })
             );
         }
@@ -41,7 +37,7 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
                 insomnia.verifyEvent({
                     event: "CHAT_RECEIVED",
                     game_id: 1,
-                    data: { author: werewolfs[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
+                    data: { author: werewolves[0].getName(), date: now, chat_type: ChatType.CHAT_WEREWOLF, content: "On vote pour qui ?" }
                 })
             );
         }
@@ -51,7 +47,7 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
         const date: Date = new Date();
         date.setHours(date.getHours() - 1);
 
-        werewolfs[0].sendMessage(
+        werewolves[0].sendMessage(
             JSON.stringify({
                 event: "CHAT_SENT",
                 game_id: 1,
@@ -64,7 +60,7 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
         );
 
         await t.testOrTimeout(
-            werewolfs[0].verifyEvent({
+            werewolves[0].verifyEvent({
                 event: "CHAT_ERROR",
                 game_id: 1,
                 data: {
@@ -77,7 +73,7 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
 
     await test("Wrong chat", async (t) => {
         const now: number = Date.now();
-        werewolfs[0].sendMessage(
+        werewolves[0].sendMessage(
             JSON.stringify({
                 event: "CHAT_SENT",
                 game_id: 1,
@@ -90,7 +86,7 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
         );
 
         await t.testOrTimeout(
-            werewolfs[0].verifyEvent({
+            werewolves[0].verifyEvent({
                 event: "CHAT_ERROR",
                 game_id: 1,
                 data: {
@@ -123,7 +119,7 @@ export const testChatNight = async (players: Array<Client>, insomnia: Client): P
                 game_id: 1,
                 data: {
                     status: 403,
-                    message: "Insomnia cannot send message into werewolfs chat"
+                    message: "Insomnia cannot send message into werewolves chat"
                 }
             })
         );

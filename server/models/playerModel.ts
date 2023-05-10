@@ -94,7 +94,7 @@ export class Player {
     // public sendInfoPlayer(): void {
     //     const role: Role = this.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
     //     const power: string = this.getPower() ? this.getPower().getName() : "NO_POWER";
-    //     this.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: power, nbWerewolfs: this.game.getWerewolfs().length });
+    //     this.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: power, nbWerewolves: this.game.getWerewolves().length });
     // }
 
     public static schema = async (): Promise<void> => {
