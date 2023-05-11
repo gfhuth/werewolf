@@ -43,7 +43,9 @@ export class Chat {
     }
 
     public resetChatMembers(newMembers: Array<Player>): void {
+        this.members.filter((p) => !newMembers.includes(p)).forEach((p) => p.sendMessage("QUIT_CHAT", { chat_type: this.type }));
         this.members = newMembers;
+        this.members.forEach((p) => p.sendMessage("JOIN_CHAT", { chat_type: this.type }));
     }
 
     /**

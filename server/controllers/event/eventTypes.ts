@@ -69,6 +69,9 @@ export type ServerToClientEvents = {
         ratifications: { [key: string]: { nbValidation: number; nbInvalidation: number } };
         nbParticipants: number;
     };
+    JOIN_CHAT: {
+        chat_type: ChatType;
+    };
     LIST_PLAYERS: {
         players: Array<{ user: string; alive: boolean; role: Role }>;
     };
@@ -78,6 +81,9 @@ export type ServerToClientEvents = {
         playerVoted: string;
         nbValidation: number;
         nbInvalidation: number;
+    };
+    QUIT_CHAT: {
+        chat_type: ChatType;
     };
     USE_POWER_VALID: {
         // Empty
