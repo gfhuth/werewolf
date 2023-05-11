@@ -1,7 +1,6 @@
-import { Actionsheet, Button, View, Text, Image } from "native-base";
+import { Actionsheet, View, Text, Image } from "native-base";
 import { GameContext, Power, Role } from "../../../context/GameContext";
-import { PlayerActionsProps, PowerContext } from "../../../context/PowerContext";
-import { UserContext } from "../../../context/UserContext";
+import { PlayerActionsProps } from "../../../context/PowerContext";
 import PowerOverlay from "./PowerOverlay";
 import { useContext, useEffect, useState } from "react";
 import { getImageSource } from "../image";
