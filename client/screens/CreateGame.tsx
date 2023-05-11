@@ -104,7 +104,7 @@ export default function CreateGame(): React.ReactElement {
                     <Divider my={5} />
                     <FormControl>
                         <FormControl.Label>Date de début</FormControl.Label>
-                        <InputDate value={fieldsValue.startDate} onChange={(value): void => setFieldsValue((oldValue) => ({ ...oldValue, startDate: value }))} />
+                        <InputDate data-cy="DateDebut" value={fieldsValue.startDate} onChange={(value): void => setFieldsValue((oldValue) => ({ ...oldValue, startDate: value }))} />
                     </FormControl>
                     <Divider my={5} />
                     <FormControl>
