@@ -61,7 +61,7 @@ export async function searchGameById(req: Request, res: Response): Promise<void>
 
         res.status(200).json({
             ...game,
-            wereWolfCount: Math.floor(game.nbPlayerMax * game.percentageWerewolf)
+            wereWolfCount: Math.ceil(game.nbPlayerMax * game.percentageWerewolf)
         });
     } catch (err) {
         LOGGER.log(err.message);
