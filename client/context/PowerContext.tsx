@@ -21,13 +21,13 @@ export type PowerContextType = {
 };
 
 export const PowerContext = React.createContext<PowerContextType>({
-    active: true,
+    active: false,
     getOverlay: () => (): React.ReactElement => <></>,
     getPlayerActions: () => (): React.ReactElement => <></>
 });
 
 export function PowerProvider(props: { children: React.ReactNode }): React.ReactElement {
-    const [active, setActive] = useState(true);
+    const [active, setActive] = useState(false);
 
     const gameContext = useContext(GameContext);
 
