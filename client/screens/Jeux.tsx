@@ -6,9 +6,11 @@ import { GameContext, GamePhase } from "../context/GameContext";
 import ChatComponent from "../components/game/Chat";
 import { Box, Text, View } from "native-base";
 import PlayersList from "../components/game/PlayersList";
+import { PowerContext } from "../context/PowerContext";
 
 export default function Jeux(): React.ReactElement {
     const gameContext = useContext(GameContext);
+    const powerContext = useContext(PowerContext);
 
     const { token } = useContext(UserContext);
 
@@ -21,9 +23,12 @@ export default function Jeux(): React.ReactElement {
         gameContext.sendJsonMessage("AUTHENTICATION", { token: token });
     }, []);
 
+    const Overlay = powerContext.getOverlay();
+
     return (
         <Background>
             <NavigationUI allowBack />
+            <Overlay />
             <View>
                 {gameContext.phase == GamePhase.DAY ? (
                     <Text color={"white"} fontWeight={"900"} fontSize={"150%"}>
