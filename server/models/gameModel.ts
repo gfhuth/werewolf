@@ -169,8 +169,10 @@ export class Game {
         const winningRole: Role = this.getWinningRole();
         if (winningRole) {
             this.getAllPlayers().forEach((player) => player.sendMessage("END_GAME", { winningRole: winningRole }));
+            LOGGER.log("End game");
             return true;
         }
+        LOGGER.log("Game not still ended");
         return false;
     }
 
@@ -181,10 +183,10 @@ export class Game {
     }
 
     public executionResultVote(): void {
-        const resultWerewolfVote: Player = this.currentVote.getResult();
-        if (resultWerewolfVote) {
-            resultWerewolfVote.kill();
-            LOGGER.log(`player ${resultWerewolfVote.getUser().getUsername()} is dead`);
+        const resultVote: Player = this.currentVote.getResult();
+        if (resultVote) {
+            resultVote.kill();
+            LOGGER.log(`Player ${resultVote.getUser().getUsername()} is dead`);
         }
     }
 
@@ -207,8 +209,17 @@ export class Game {
         // Mort du résultat des votes
         this.executionResultVote();
 
+        LOGGER.log(`Alive humans number: ${this.getAllPlayers().filter((p) => !p.isWerewolf() && !p.isDead()).length}`);
+        LOGGER.log(`Alive werewolves number: ${this.getWerewolves().filter((p) => !p.isDead()).length}`);
+
         // Vérification si fin de partie
         const isEndGame: boolean = this.verifyEndGame();
+
+        // Envoie à chaque joueur un recap de la nuit
+        this.getAllPlayers().forEach((player) => {
+            player.sendMessage("DAY_START", {});
+            player.sendInfoAllPlayers();
+        });
 
         if (!isEndGame) {
             // Réinitialisation du chat
@@ -218,12 +229,6 @@ export class Game {
             this.currentVote.endVote();
             this.setVote(new Vote(VoteType.VOTE_VILLAGE, Player.alivePlayers(this.getAllPlayers())));
             this.currentVote.startVote();
-
-            // Envoie à chaque joueur un recap de la nuit
-            this.getAllPlayers().forEach((player) => {
-                player.sendMessage("DAY_START", {});
-                player.sendInfoAllPlayers();
-            });
 
             setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
         }
@@ -235,8 +240,17 @@ export class Game {
         // Mort du résultat des votes
         if (this.currentVote) this.executionResultVote();
 
+        LOGGER.log(`Alive humans number: ${this.getAllPlayers().filter((p) => !p.isWerewolf() && !p.isDead()).length}`);
+        LOGGER.log(`Alive werewolves number: ${this.getWerewolves().filter((p) => !p.isDead()).length}`);
+
         // Vérification si fin de partie
         const isEndGame: boolean = this.verifyEndGame();
+
+        // Envoie à chaque joueur un recap du jour
+        this.getAllPlayers().forEach((player) => {
+            player.sendMessage("NIGHT_START", {});
+            player.sendInfoAllPlayers();
+        });
 
         if (!isEndGame) {
             // Réinitialisation des pouvoirs
@@ -254,12 +268,6 @@ export class Game {
             if (this.currentVote) this.currentVote.endVote();
             this.setVote(new Vote(VoteType.VOTE_WEREWOLF, Player.alivePlayers(this.getWerewolves())));
             this.currentVote.startVote();
-
-            // Envoie à chaque joueur un recap du jour
-            this.getAllPlayers().forEach((player) => {
-                player.sendMessage("NIGHT_START", {});
-                player.sendInfoAllPlayers();
-            });
 
             setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
         }
