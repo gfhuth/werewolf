@@ -212,14 +212,14 @@ export class Game {
         LOGGER.log(`Alive humans number: ${this.getAllPlayers().filter((p) => !p.isWerewolf() && !p.isDead()).length}`);
         LOGGER.log(`Alive werewolves number: ${this.getWerewolves().filter((p) => !p.isDead()).length}`);
 
-        // Vérification si fin de partie
-        const isEndGame: boolean = this.verifyEndGame();
-
         // Envoie à chaque joueur un recap de la nuit
         this.getAllPlayers().forEach((player) => {
             player.sendMessage("DAY_START", {});
             player.sendInfoAllPlayers();
         });
+
+        // Vérification si fin de partie
+        const isEndGame: boolean = this.verifyEndGame();
 
         if (!isEndGame) {
             // Réinitialisation du chat
@@ -243,14 +243,14 @@ export class Game {
         LOGGER.log(`Alive humans number: ${this.getAllPlayers().filter((p) => !p.isWerewolf() && !p.isDead()).length}`);
         LOGGER.log(`Alive werewolves number: ${this.getWerewolves().filter((p) => !p.isDead()).length}`);
 
-        // Vérification si fin de partie
-        const isEndGame: boolean = this.verifyEndGame();
-
         // Envoie à chaque joueur un recap du jour
         this.getAllPlayers().forEach((player) => {
             player.sendMessage("NIGHT_START", {});
             player.sendInfoAllPlayers();
         });
+
+        // Vérification si fin de partie
+        const isEndGame: boolean = this.verifyEndGame();
 
         if (!isEndGame) {
             // Réinitialisation des pouvoirs

@@ -81,6 +81,5 @@ export const testVoteDay = async (players: Array<Client>): Promise<void> => {
 export const verifyDayVoteResult = async (): Promise<void> => {
     await test("Verify village vote result", async (t) => {
         t.assert(!resultVote.isAlive());
-        resultVote.log();
     });
 };

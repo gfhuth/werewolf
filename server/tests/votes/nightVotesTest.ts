@@ -178,6 +178,5 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
 export const verifyNightVoteResult = async (): Promise<void> => {
     await test("Verify werewolves vote result", async (t) => {
         t.assert(!resultVote.isAlive());
-        resultVote.log();
     });
 };

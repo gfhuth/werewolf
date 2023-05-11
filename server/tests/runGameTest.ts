@@ -37,7 +37,6 @@ export const testRunGame = async (players: Array<Client>, clientNotInGame: Clien
         const contamination: Client | undefined = players.find((p) => p.getPower() === Power.CONTAMINATION);
         const winningRole: Role = contamination ? Role.WEREWOLF : Role.HUMAN;
         for (const player of players) {
-            player.log();
             await t.testOrTimeout(
                 player.verifyEvent({
                     event: "END_GAME",
