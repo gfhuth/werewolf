@@ -40,9 +40,9 @@ export type Player = {
     alive: boolean;
 };
 
-export const GameContext = React.createContext<{
+export type GameContextType = {
     eventHandlers: { [key: string]: EventHandlerCallback };
-    registerEventHandler:(event: string, callback: EventHandlerCallback) => void;
+    registerEventHandler: (event: string, callback: EventHandlerCallback) => void;
     sendJsonMessage: (event: string, data: any) => void;
     onMessage: (event: MessageEvent<any>) => void;
     phase: GamePhase;
@@ -53,23 +53,25 @@ export const GameContext = React.createContext<{
         setPower: (power: Power) => void;
     };
     players: Array<Player>;
-        }>({
-            phase: GamePhase.NIGHT,
-            setPhase: () => null,
-            eventHandlers: {},
-            registerEventHandler: () => null,
-            onMessage: () => null,
-            sendJsonMessage: () => null,
-            me: {
-                alive: true,
-                role: Role.HUMAN,
-                power: Power.NONE,
-                setIsAlive: () => null,
-                setRole: () => null,
-                setPower: () => null
-            },
-            players: []
-        });
+};
+
+export const GameContext = React.createContext<GameContextType>({
+    phase: GamePhase.NIGHT,
+    setPhase: () => null,
+    eventHandlers: {},
+    registerEventHandler: () => null,
+    onMessage: () => null,
+    sendJsonMessage: () => null,
+    me: {
+        alive: true,
+        role: Role.HUMAN,
+        power: Power.NONE,
+        setIsAlive: () => null,
+        setRole: () => null,
+        setPower: () => null
+    },
+    players: []
+});
 
 export function GameProvider(props: { children: React.ReactNode; gameId: number }): React.ReactElement {
     const toast = useToast();

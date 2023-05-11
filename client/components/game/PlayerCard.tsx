@@ -5,11 +5,13 @@ import { useContext } from "react";
 import { UserContext } from "../../context/UserContext";
 import { VoteContext } from "../../context/VoteContext";
 import Bandeau from "./Bandeau";
+import { PowerContext } from "../../context/PowerContext";
 
 export default function PlayerCard(props: { player: Player }): React.ReactElement {
     const gameContext = useContext(GameContext);
     const userContext = useContext(UserContext);
     const voteContext = useContext(VoteContext);
+    const powerContext = useContext(PowerContext);
 
     const { isOpen, onOpen, onClose } = useDisclose();
 
@@ -53,6 +55,8 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
         }
     };
 
+    const PlayerActions = powerContext.getPlayerActions();
+
     return (
         <Pressable
             onPress={(): void => {
@@ -67,18 +71,18 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                 <Center display={"flex"} flexDirection={"row"}>
                     <Image alt="Player image" source={require("../../assets/images/player.png")} width={70} height={70} resizeMode="cover" />
                     <Container>
-                        <Container display={"flex"} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"} mb={2} style={{ gap: 3 }}>
+                        <View display={"flex"} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"} mb={2} style={{ gap: 3 }}>
                             {props.player.roles.map((role, i) => (
                                 <Tooltip key={i} label={role.toString()} placement="top">
-                                    <Image alt={`${role.toString()} role image`} source={getImageSource(role).uri} width={30} height={30} resizeMode="cover" />
+                                    <Image alt={`${role.toString()} role image`} source={getImageSource(role).uri} size={"xs"} resizeMode="cover" />
                                 </Tooltip>
                             ))}
                             {props.player.powers.map((power, i) => (
                                 <Tooltip key={i} label={power.toString()} placement="top">
-                                    <Image alt={`${power.toString()} role image`} source={getImageSource(power).uri} width={30} height={30} resizeMode="cover" />
+                                    <Image alt={`${power.toString()} role image`} source={getImageSource(power).uri} size={"xs"} resizeMode="cover" />
                                 </Tooltip>
                             ))}
-                        </Container>
+                        </View>
                         <Text>{props.player.username}</Text>
                     </Container>
 
@@ -88,6 +92,7 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
                                 {props.player.username}
                             </Heading>
                             {voteContext.active && !voteContext.result && getVoteElement()}
+                            <PlayerActions close={onClose} player={props.player.username} userContext={userContext} gameContext={gameContext} powerContext={powerContext} />
                         </Actionsheet.Content>
                     </Actionsheet>
                 </Center>

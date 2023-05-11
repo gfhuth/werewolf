@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 
-export const UserContext = React.createContext<{
+export type UserContextType = {
     token: string;
     setToken:(token: string) => void;
     username: string;
     setUsername: (username: string) => void;
-        }>({
+}
+
+export const UserContext = React.createContext<UserContextType>({
             token: "",
             setToken: () => null,
             username: "",
