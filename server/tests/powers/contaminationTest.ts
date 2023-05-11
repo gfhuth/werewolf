@@ -1,7 +1,7 @@
 import { Client, Power, Role } from "../main.test";
 import { test } from "../test-api/testAPI";
 
-let playerContaminated: Client;
+export let playerContaminated: Client;
 
 export const testContamination = async (contamination: Client, players: Array<Client>): Promise<void> => {
     if (!contamination) return;

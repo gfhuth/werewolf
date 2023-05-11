@@ -1,5 +1,6 @@
 import { VoteType } from "../../models/voteModel";
 import { Client, Power, Role } from "../main.test";
+import { playerContaminated } from "../powers/contaminationTest";
 import { test } from "../test-api/testAPI";
 
 let resultVote: Client;
@@ -8,10 +9,8 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
     const werewolves: Array<Client> = players.filter((p) => p.getRole() === Role.WEREWOLF);
     const humans: Array<Client> = players.filter((p) => p.getRole() === Role.HUMAN);
     const contamination: Client | undefined = players.find((p) => p.getPower() === Power.CONTAMINATION);
-    if (werewolves.length === 0) return;
-    if (humans.length === 0) return;
 
-    resultVote = contamination ? humans[0] : werewolves[0];
+    resultVote = contamination ? humans.filter(p => p !== playerContaminated)[0] : werewolves[0];
 
     await test("Werewolves vote", async (t) => {
         werewolves[0].sendMessage(
@@ -117,22 +116,24 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
                     }
                 })
             );
-            nbValidation += 1;
 
             for (const w of werewolves) {
-                await t.testOrTimeout(
-                    w.verifyEvent({
-                        event: "UPDATE_PROPOSITION",
-                        game_id: 1,
-                        data: {
-                            vote_type: VoteType.VOTE_WEREWOLF,
-                            playerVoted: resultVote.getName(),
-                            nbValidation: nbValidation,
-                            nbInvalidation: 0
-                        }
-                    })
-                );
+                if (nbValidation <= werewolves.length / 2) {
+                    await t.testOrTimeout(
+                        w.verifyEvent({
+                            event: "UPDATE_PROPOSITION",
+                            game_id: 1,
+                            data: {
+                                vote_type: VoteType.VOTE_WEREWOLF,
+                                playerVoted: resultVote.getName(),
+                                nbValidation: nbValidation + 1,
+                                nbInvalidation: 0
+                            }
+                        })
+                    );
+                }
             }
+            nbValidation += 1;
         }
 
         for (const werewolf of werewolves) {
@@ -174,8 +175,9 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
     });
 };
 
-export const verifyVoteResult = async (): Promise<void> => {
-    await test("Verify vote result", async (t) => {
+export const verifyNightVoteResult = async (): Promise<void> => {
+    await test("Verify werewolves vote result", async (t) => {
         t.assert(!resultVote.isAlive());
+        resultVote.log();
     });
 };
