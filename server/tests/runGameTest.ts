@@ -5,6 +5,7 @@ import { testPowers } from "./powers/powerTest";
 import { test } from "./test-api/testAPI";
 import { verifyContamination } from "./powers/contaminationTest";
 import { testVoteDay, verifyDayVoteResult } from "./votes/dayVotesTest";
+import { testChatDay } from "./chats/dayChatsTest";
 
 export const testRunGame = async (players: Array<Client>, clientNotInGame: Client): Promise<void> => {
     // Première nuit
@@ -23,6 +24,7 @@ export const testRunGame = async (players: Array<Client>, clientNotInGame: Clien
 
     // Chats, votes et pouvoirs
     await testVoteDay(players);
+    await testChatDay(players);
 
     // Deuxième nuit
     await test("Wait night", async (t) => {
