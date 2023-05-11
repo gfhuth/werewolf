@@ -5,7 +5,7 @@ import { testContamination } from "./contaminationTest";
 import { testInsomnia } from "./insomniaTest";
 import { testSpiritism } from "./spiritismTest";
 
-export const testPowers = async (players: Array<Client>, clientNotInGame: Client): Promise<void> => {
+export const testPowersNight = async (players: Array<Client>, clientNotInGame: Client): Promise<void> => {
     const insomnia: Client | undefined = players.find((p) => p.getPower() === Power.INSOMNIA);
     const spiritism: Client | undefined = players.find((p) => p.getPower() === Power.SPIRITISM);
     const contamination: Client | undefined = players.find((p) => p.getPower() === Power.CONTAMINATION);
@@ -97,6 +97,40 @@ export const testPowers = async (players: Array<Client>, clientNotInGame: Client
                 data: {
                     status: 403,
                     message: "Player has already used his power"
+                }
+            })
+        );
+    });
+};
+
+export const testPowersDay = async (players: Array<Client>): Promise<void> => {
+    const playerWithPower: Client = players.find((p) => p.getPower() !== Power.NO_POWER && p.getPower() !== Power.INSOMNIA);
+    if (!playerWithPower) return;
+
+    const target: Client = players[0];
+    let event: string;
+    if (playerWithPower.getPower() === Power.CLAIRVOYANCE) event = "USE_POWER_CLAIRVOYANCE";
+    else if (playerWithPower.getPower() === Power.CONTAMINATION) event = "USE_POWER_CONTAMINATION";
+    else if (playerWithPower.getPower() === Power.SPIRITISM) event = "USE_POWER_SPIRITISM";
+
+    await test("Use power during the day", async (t) => {
+        playerWithPower.sendMessage(
+            JSON.stringify({
+                event: event,
+                game_id: 1,
+                data: {
+                    target: target
+                }
+            })
+        );
+
+        await t.testOrTimeout(
+            playerWithPower.verifyEvent({
+                event: "POWER_ERROR",
+                game_id: 1,
+                data: {
+                    status: 403,
+                    message: "Power can be used only during the night"
                 }
             })
         );
