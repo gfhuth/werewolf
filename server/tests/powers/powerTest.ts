@@ -70,12 +70,11 @@ export const testPowers = async (players: Array<Client>, clientNotInGame: Client
     await testInsomnia(insomnia, players);
 
     await test("Player has already used his power", async (t) => {
-        const playerWithPower: Client = players.find((p) => p.getPower() !== "NO_POWER" && p.getPower() !== "CONTAMINATION");
+        const playerWithPower: Client = players.find((p) => p.getPower() !== "NO_POWER" && p.getPower() !== Power.INSOMNIA && p.getPower() !== Power.CONTAMINATION);
         if (playerWithPower) {
             const player: Client = players[Math.floor(Math.random() * players.length)];
             let event: string;
-            if (playerWithPower.getPower() === Power.INSOMNIA) event = "USE_POWER_INSOMNIA";
-            else if (playerWithPower.getPower() === Power.CLAIRVOYANCE) event = "USE_POWER_CLAIRVOYANCE";
+            if (playerWithPower.getPower() === Power.CLAIRVOYANCE) event = "USE_POWER_CLAIRVOYANCE";
             else if (playerWithPower.getPower() === Power.SPIRITISM) event = "USE_POWER_SPIRITISM";
             playerWithPower.sendMessage(
                 JSON.stringify({

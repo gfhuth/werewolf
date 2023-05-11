@@ -79,8 +79,8 @@ export class Player {
 
     public sendInfoAllPlayers(): void {
         const infoPlayers = this.game.getAllPlayers().map((player) => {
-            const role: Role = (this.isWerewolf() && player.isWerewolf()) || player === this ? player.getRole() : null;
-            const power: string = player === this ? this.getPowerName() : null;
+            const role: Role = (this.isWerewolf() && player.isWerewolf()) || player === this || player.isDead() ? player.getRole() : null;
+            const power: string = player === this || player.isDead() ? this.getPowerName() : null;
             return {
                 user: player.getUser().getUsername(),
                 alive: !player.isDead(),

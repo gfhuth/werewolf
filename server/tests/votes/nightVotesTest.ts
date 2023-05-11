@@ -1,12 +1,17 @@
 import { VoteType } from "../../models/voteModel";
-import { Client, Role } from "../main.test";
+import { Client, Power, Role } from "../main.test";
 import { test } from "../test-api/testAPI";
+
+let resultVote: Client;
 
 export const testVoteNight = async (players: Array<Client>, clientNotInGame: Client): Promise<void> => {
     const werewolves: Array<Client> = players.filter((p) => p.getRole() === Role.WEREWOLF);
     const humans: Array<Client> = players.filter((p) => p.getRole() === Role.HUMAN);
+    const contamination: Client | undefined = players.find((p) => p.getPower() === Power.CONTAMINATION);
     if (werewolves.length === 0) return;
     if (humans.length === 0) return;
+
+    resultVote = contamination ? humans[0] : werewolves[0];
 
     await test("Werewolves vote", async (t) => {
         werewolves[0].sendMessage(
@@ -15,13 +20,13 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
                 event: "VOTE_SENT",
                 data: {
                     vote_type: VoteType.VOTE_WEREWOLF,
-                    playerVoted: humans[0].getName()
+                    playerVoted: resultVote.getName()
                 }
             })
         );
 
         for (const werewolf of werewolves)
-            await t.testOrTimeout(werewolf.verifyEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: humans[0].getName() } }));
+            await t.testOrTimeout(werewolf.verifyEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_WEREWOLF, playerVoted: resultVote.getName() } }));
     });
 
     await test("Vote type error", async (t) => {
@@ -31,7 +36,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
                 game_id: 1,
                 data: {
                     vote_type: VoteType.VOTE_VILLAGE,
-                    playerVoted: humans[0].getName(),
+                    playerVoted: resultVote.getName(),
                     ratification: true
                 }
             })
@@ -107,7 +112,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
                     game_id: 1,
                     data: {
                         vote_type: VoteType.VOTE_WEREWOLF,
-                        playerVoted: humans[0].getName(),
+                        playerVoted: resultVote.getName(),
                         ratification: true
                     }
                 })
@@ -121,7 +126,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
                         game_id: 1,
                         data: {
                             vote_type: VoteType.VOTE_WEREWOLF,
-                            playerVoted: humans[0].getName(),
+                            playerVoted: resultVote.getName(),
                             nbValidation: nbValidation,
                             nbInvalidation: 0
                         }
@@ -137,7 +142,7 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
                     game_id: 1,
                     data: {
                         vote_type: VoteType.VOTE_WEREWOLF,
-                        playerVoted: humans[0].getName()
+                        playerVoted: resultVote.getName()
                     }
                 })
             );
@@ -166,5 +171,11 @@ export const testVoteNight = async (players: Array<Client>, clientNotInGame: Cli
                 }
             })
         );
+    });
+};
+
+export const verifyVoteResult = async (): Promise<void> => {
+    await test("Verify vote result", async (t) => {
+        t.assert(!resultVote.isAlive());
     });
 };
