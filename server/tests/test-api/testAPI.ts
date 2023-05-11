@@ -62,7 +62,7 @@ export class Assert {
     //     }
     // }
 
-    public async testOrTimeout(func: Promise<boolean>, timeout = 5000, message?: string): Promise<void> {
+    public async testOrTimeout(func: Promise<boolean>, timeout = 5000, message = ""): Promise<void> {
         this.nbTests += 1;
         try {
             const result = await Promise.race([new Promise((resolve, reject) => setTimeout(reject, timeout)), func]);
@@ -76,13 +76,13 @@ export class Assert {
         }
     }
 
-    public async timeout(func: Promise<void>, timeout = 5000): Promise<void> {
+    public async timeout(func: Promise<void>, timeout = 5000, message = ""): Promise<void> {
         this.nbTests += 1;
         try {
             await Promise.race([new Promise((resolve, reject) => setTimeout(reject, timeout)), func]);
         } catch (e) {
             this.nbErrors += 1;
-            console.log(colors.grey(`ERROR timeout - ${timeout} ms`));
+            console.log(colors.grey(`ERROR timeout - ${timeout} ms - ${message}`));
         }
     }
 
