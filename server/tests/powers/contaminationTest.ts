@@ -1,13 +1,15 @@
 import { Client, Role } from "../main.test";
 import { test } from "../test-api/testAPI";
 
+let player: Client;
+
 export const testContamination = async (contamination: Client, players: Array<Client>): Promise<void> => {
     if (!contamination) return;
+    player = players.filter((p) => p.getRole() === Role.HUMAN)[0];
 
     await test("Test contamination", async (t) => {
         t.equal(contamination.getRole(), Role.WEREWOLF);
 
-        const player: Client = players.filter((p) => p.getRole() === Role.HUMAN)[0];
         contamination.sendMessage(
             JSON.stringify({
                 event: "USE_POWER_CONTAMINATION",
@@ -17,8 +19,12 @@ export const testContamination = async (contamination: Client, players: Array<Cl
                 }
             })
         );
+        player.log();
+    });
+};
 
-        await t.timeout(player.startPeriod("DAY_START", 1, t), 10000);
+export const verifyContamination = async (): Promise<void> => {
+    await test("Verify contamination applied", async (t) => {
         t.equal(player.getRole(), Role.WEREWOLF);
     });
 };
