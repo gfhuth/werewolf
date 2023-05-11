@@ -1,18 +1,16 @@
 import { Actionsheet } from "native-base";
-import { GameContext, Power } from "../../../context/GameContext";
-import { PowerContext } from "../../../context/PowerContext";
-import { UserContext } from "../../../context/UserContext";
+import { Power, Role } from "../../../context/GameContext";
+import { PlayerActionsProps } from "../../../context/PowerContext";
 import PowerOverlay from "./PowerOverlay";
-import { useContext, useEffect, useState } from "react";
 
 export function Overlay(): React.ReactElement {
     return <PowerOverlay power={Power.CONTAMINATION}></PowerOverlay>;
 }
 
-export function PlayerActions(props: { player: string }): React.ReactElement {
-    const gameContext = useContext(GameContext);
-    const userContext = useContext(UserContext);
-    const powerContext = useContext(PowerContext);
+export function PlayerActions(props: PlayerActionsProps): React.ReactElement {
+    const gameContext = props.gameContext;
+    const userContext = props.userContext;
+    const powerContext = props.powerContext;
 
     const onUse = (): void => {
         gameContext.sendJsonMessage("USE_POWER_CLAIRVOYANCE", {
@@ -24,5 +22,9 @@ export function PlayerActions(props: { player: string }): React.ReactElement {
 
     if (userContext.username === props.player) return <></>;
 
-    return <Actionsheet.Item onPress={onUse}>[Voyance] Voir le rôle</Actionsheet.Item>;
+    const playerInfos = gameContext.players.find((p) => p.username === props.player);
+
+    if (!playerInfos || playerInfos.roles.includes(Role.WEREWOLF)) return <></>;
+
+    return <Actionsheet.Item onPress={onUse}>[Contamination] Transformer le villageois en loup garou</Actionsheet.Item>;
 }
