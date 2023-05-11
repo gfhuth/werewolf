@@ -96,7 +96,9 @@ export const testPowers = async (players: Array<Client>, clientNotInGame: Client
                         status: 403,
                         message: "Player has already used his power"
                     }
-                })
+                }),
+                5000,
+                `${player.getName()}, ${player.getRole()}, ${player.getPower()}`
             );
         }
     });
