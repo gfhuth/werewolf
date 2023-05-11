@@ -36,7 +36,7 @@ export const testPowers = async (players: Array<Client>, clientNotInGame: Client
     });
 
     await test("Target not in the game", async (t) => {
-        const playerWithPower: Client = players.find((p) => p.getPower() !== "NO_POWER" && p.getPower() !== "INSOMNIA");
+        const playerWithPower: Client = players.find((p) => p.getPower() !== Power.NO_POWER && p.getPower() !== Power.INSOMNIA);
         if (playerWithPower) {
             let event: string;
             if (playerWithPower.getPower() === Power.CONTAMINATION) event = "USE_POWER_CONTAMINATION";
@@ -71,35 +71,34 @@ export const testPowers = async (players: Array<Client>, clientNotInGame: Client
     await testContamination(contamination, players);
 
     await test("Player has already used his power", async (t) => {
-        const playerWithPower: Client = players.find((p) => p.getPower() !== "NO_POWER" && p.getPower() !== Power.INSOMNIA);
-        if (playerWithPower) {
-            const player: Client = players[Math.floor(Math.random() * players.length)];
-            let event: string;
-            if (playerWithPower.getPower() === Power.CLAIRVOYANCE) event = "USE_POWER_CLAIRVOYANCE";
-            else if (playerWithPower.getPower() === Power.CLAIRVOYANCE) event = "USE_POWER_CONTAMINATION";
-            else if (playerWithPower.getPower() === Power.SPIRITISM) event = "USE_POWER_SPIRITISM";
-            playerWithPower.sendMessage(
-                JSON.stringify({
-                    event: event,
-                    game_id: 1,
-                    data: {
-                        target: player.getName()
-                    }
-                })
-            );
+        const playerWithPower: Client = players.find((p) => p.getPower() !== Power.NO_POWER && p.getPower() !== Power.INSOMNIA);
+        if (!playerWithPower) return;
 
-            await t.testOrTimeout(
-                playerWithPower.verifyEvent({
-                    event: "POWER_ERROR",
-                    game_id: 1,
-                    data: {
-                        status: 403,
-                        message: "Player has already used his power"
-                    }
-                }),
-                5000,
-                `${player.getName()}, ${player.getRole()}, ${player.getPower()}`
-            );
-        }
+        const player: Client = players[Math.floor(Math.random() * players.length)];
+        let event: string;
+        if (playerWithPower.getPower() === Power.CLAIRVOYANCE) event = "USE_POWER_CLAIRVOYANCE";
+        else if (playerWithPower.getPower() === Power.CONTAMINATION) event = "USE_POWER_CONTAMINATION";
+        else if (playerWithPower.getPower() === Power.SPIRITISM) event = "USE_POWER_SPIRITISM";
+
+        playerWithPower.sendMessage(
+            JSON.stringify({
+                event: event,
+                game_id: 1,
+                data: {
+                    target: player.getName()
+                }
+            })
+        );
+
+        await t.testOrTimeout(
+            playerWithPower.verifyEvent({
+                event: "POWER_ERROR",
+                game_id: 1,
+                data: {
+                    status: 403,
+                    message: "Player has already used his power"
+                }
+            })
+        );
     });
 };
