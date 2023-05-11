@@ -1,11 +1,11 @@
 import { Client, Power, Role } from "../main.test";
 import { test } from "../test-api/testAPI";
 
-let player: Client;
+let playerContaminated: Client;
 
 export const testContamination = async (contamination: Client, players: Array<Client>): Promise<void> => {
     if (!contamination) return;
-    player = players.filter((p) => p.getRole() === Role.HUMAN)[0];
+    playerContaminated = players.filter((p) => p.getRole() === Role.HUMAN)[0];
 
     await test("Test contamination", async (t) => {
         t.equal(contamination.getRole(), Role.WEREWOLF);
@@ -15,7 +15,7 @@ export const testContamination = async (contamination: Client, players: Array<Cl
                 event: "USE_POWER_CONTAMINATION",
                 game_id: 1,
                 data: {
-                    target: player.getName()
+                    target: playerContaminated.getName()
                 }
             })
         );
@@ -27,6 +27,6 @@ export const verifyContamination = async (players: Array<Client>): Promise<void>
     if (!contamination) return;
 
     await test("Verify contamination applied", async (t) => {
-        t.equal(player.getRole(), Role.WEREWOLF);
+        t.equal(playerContaminated.getRole(), Role.WEREWOLF);
     });
 };
