@@ -15,10 +15,7 @@ export const testRunGame = async (players: Array<Client>, clientNotInGame: Clien
 
     // Premier jour
     await test("Attente du jour", async (t) => {
-        for (const player of players) {
-            player.log();
-            await t.timeout(player.startPeriod("DAY_START", 1, t), 10000);
-        }
+        for (const player of players) await t.timeout(player.startPeriod("DAY_START", 1, t), 10000);
     });
-    await verifyContamination();
+    await verifyContamination(players);
 };

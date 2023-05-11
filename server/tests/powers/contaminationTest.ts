@@ -1,4 +1,4 @@
-import { Client, Role } from "../main.test";
+import { Client, Power, Role } from "../main.test";
 import { test } from "../test-api/testAPI";
 
 let player: Client;
@@ -19,11 +19,13 @@ export const testContamination = async (contamination: Client, players: Array<Cl
                 }
             })
         );
-        player.log();
     });
 };
 
-export const verifyContamination = async (): Promise<void> => {
+export const verifyContamination = async (players: Array<Client>): Promise<void> => {
+    const contamination: Client | undefined = players.find((p) => p.getPower() === Power.CONTAMINATION);
+    if (!contamination) return;
+
     await test("Verify contamination applied", async (t) => {
         t.equal(player.getRole(), Role.WEREWOLF);
     });

@@ -36,7 +36,7 @@ export const testPowers = async (players: Array<Client>, clientNotInGame: Client
     });
 
     await test("Target not in the game", async (t) => {
-        const playerWithPower: Client = players.find((p) => p.getPower() !== "NO_POWER" && p.getPower() !== "CONTAMINATION");
+        const playerWithPower: Client = players.find((p) => p.getPower() !== "NO_POWER" && p.getPower() !== "INSOMNIA");
         if (playerWithPower) {
             let event: string;
             if (playerWithPower.getPower() === Power.CONTAMINATION) event = "USE_POWER_CONTAMINATION";
@@ -88,7 +88,7 @@ export const testPowers = async (players: Array<Client>, clientNotInGame: Client
             );
 
             await t.testOrTimeout(
-                clairvoyance.verifyEvent({
+                playerWithPower.verifyEvent({
                     event: "POWER_ERROR",
                     game_id: 1,
                     data: {
