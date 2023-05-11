@@ -1,6 +1,7 @@
 import { Game, GameStatus } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
 import Power from "../../models/powerModelBetter";
+import { Event } from "../eventController";
 
 export const usePower = async (game: Game, player: Player, data: Record<string, any>): Promise<void> => {
     if (game.getStatus() !== GameStatus.NIGHT) {
@@ -29,4 +30,13 @@ export const usePower = async (game: Game, player: Player, data: Record<string, 
 
     power.usePower(game, player, data);
     power.setAlreadyUsed(true);
+    player.sendMessage("POWER_END", {});
 };
+
+function getInfoPower(game: Game, player: Player): void {
+    if (!player.getPower()) return;
+    if (game.getStatus() === GameStatus.DAY || player.getPower().getAlreadyUsed()) player.sendMessage("POWER_END", {});
+    else player.sendMessage("POWER_START", {});
+}
+
+Event.registerHandlers("GET_ALL_INFO", getInfoPower);

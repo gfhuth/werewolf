@@ -76,6 +76,8 @@ export type ServerToClientEvents = {
         players: Array<{ user: string; alive: boolean; role: Role }>;
     };
     NIGHT_START: {};
+    POWER_END: {};
+    POWER_START: {};
     UPDATE_PROPOSITION: {
         vote_type: VoteType;
         playerVoted: string;

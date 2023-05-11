@@ -193,7 +193,10 @@ export class Game {
     private resetPowers(): void {
         this.getAllPlayers()
             .filter((player) => player.getPower())
-            .forEach((player) => player.getPower().setAlreadyUsed(false));
+            .forEach((player) => {
+                player.getPower().setAlreadyUsed(false);
+                player.sendMessage("POWER_START", {});
+            });
     }
 
     private getPlayerWithPower(power: string): Player | undefined {
