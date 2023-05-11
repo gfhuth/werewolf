@@ -16,8 +16,8 @@ export const testVoteDay = async (players: Array<Client>): Promise<void> => {
     await test("Village vote", async (t) => {
         alivePlayers[0].sendMessage(
             JSON.stringify({
-                game_id: 1,
                 event: "VOTE_SENT",
+                game_id: 1,
                 data: {
                     vote_type: VoteType.VOTE_VILLAGE,
                     playerVoted: resultVote.getName()
@@ -27,6 +27,56 @@ export const testVoteDay = async (players: Array<Client>): Promise<void> => {
 
         for (const player of alivePlayers)
             await t.testOrTimeout(player.verifyEvent({ event: "ASK_RATIFICATION", game_id: 1, data: { vote_type: VoteType.VOTE_VILLAGE, playerVoted: resultVote.getName() } }));
+    });
+
+    await test("Ratification of a dead player", async (t) => {
+        deadPlayer.sendMessage(
+            JSON.stringify({
+                event: "RESPONSE_RATIFICATION",
+                game_id: 1,
+                data: {
+                    vote_type: VoteType.VOTE_VILLAGE,
+                    playerVoted: resultVote.getName(),
+                    ratification: true
+                }
+            })
+        );
+
+        await t.testOrTimeout(
+            deadPlayer.verifyEvent({
+                event: "VOTE_ERROR",
+                game_id: 1,
+                data: {
+                    status: 403,
+                    message: "Dead player cannot participate to the vote"
+                }
+            })
+        );
+    });
+
+    await test("Dead player voted", async (t) => {
+        alivePlayers[0].sendMessage(
+            JSON.stringify({
+                event: "RESPONSE_RATIFICATION",
+                game_id: 1,
+                data: {
+                    vote_type: VoteType.VOTE_VILLAGE,
+                    playerVoted: deadPlayer.getName(),
+                    ratification: false
+                }
+            })
+        );
+
+        await t.testOrTimeout(
+            alivePlayers[0].verifyEvent({
+                event: "VOTE_ERROR",
+                game_id: 1,
+                data: {
+                    status: 403,
+                    message: "Target player is already dead"
+                }
+            })
+        );
     });
 
     await test("Ratification of the proposition", async (t) => {
