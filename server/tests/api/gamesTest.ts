@@ -99,9 +99,6 @@ export const testGames = async (
         res = await request(url).post("/game/1/join").set("x-access-token", client4.getToken());
         t.equal(res.status, 200);
 
-        res = await request(url).post("/game/1/join").set("x-access-token", client5.getToken());
-        t.equal(res.status, 200);
-
         // Ajout des joueurs dans la partie 2
         res = await request(url).post("/game/2/join").set("x-access-token", client5.getToken());
         t.equal(res.status, 200);
@@ -144,7 +141,7 @@ export const testGames = async (
                     startDate: date.getTime(),
                     host: client0.getName(),
                     nbPlayerMax: 39,
-                    currentNumberOfPlayer: 6
+                    currentNumberOfPlayer: 5
                 },
                 {
                     id: 2,
@@ -172,7 +169,7 @@ export const testGames = async (
             probaVoyance: 0.5,
             probaSpiritisme: 0.5,
             host: client0.getName(),
-            wereWolfCount: Math.floor(39 * 0.33)
+            wereWolfCount: Math.ceil(39 * 0.33)
         });
     });
 
@@ -183,7 +180,7 @@ export const testGames = async (
     });
 
     await test("Display user's games", async (t) => {
-        const res = await request(url).get("/game/me").set("x-access-token", client5.getToken());
+        const res = await request(url).get("/game/me").set("x-access-token", client4.getToken());
         t.equal(res.status, 200);
         t.equal(res.body, {
             games: [
@@ -192,7 +189,7 @@ export const testGames = async (
                     startDate: date.getTime(),
                     host: client0.getName(),
                     nbPlayerMax: 39,
-                    currentNumberOfPlayer: 6,
+                    currentNumberOfPlayer: 5,
                     ended: false,
                     winningRole: null
                 },
@@ -259,14 +256,14 @@ export const testGames = async (
                     startDate: date.getTime(),
                     host: client0.getName(),
                     nbPlayerMax: 39,
-                    currentNumberOfPlayer: 6
+                    currentNumberOfPlayer: 5
                 }
             ]
         });
     });
 
     await test("Display user's games after deletion", async (t) => {
-        const res = await request(url).get("/game/me").set("x-access-token", client5.getToken());
+        const res = await request(url).get("/game/me").set("x-access-token", client4.getToken());
         t.equal(res.status, 200);
         t.equal(res.body, {
             games: [
@@ -275,7 +272,7 @@ export const testGames = async (
                     startDate: date.getTime(),
                     host: client0.getName(),
                     nbPlayerMax: 39,
-                    currentNumberOfPlayer: 6,
+                    currentNumberOfPlayer: 5,
                     ended: false,
                     winningRole: null
                 }

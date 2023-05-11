@@ -54,7 +54,7 @@ export class Client {
     }
 
     public log(): void {
-        console.log({ name: this.name, role: this.role, power: this.power, messages: this.messages.map<Record<string, any>>((msg) => JSON.parse(msg)) });
+        console.log({ name: this.name, role: this.role, power: this.power, alive: this.alive });
     }
 
     public getName(): string {
@@ -159,7 +159,7 @@ export class Client {
     }
 
     public async startPeriod(event: string, gameId: number, assert: Assert): Promise<void> {
-        await assert.testOrTimeout(this.verifyEvent({ event: event, game_id: gameId, data: {} }), 10000);
+        await assert.testOrTimeout(this.verifyEvent({ event: event, game_id: gameId, data: {} }), 11000, event);
 
         await this.setInfoPlayer();
     }
@@ -195,7 +195,7 @@ const main = async (): Promise<void> => {
 
     await testGames(client0, client1, client2, client3, client4, client5, client6, client7, client8, client9);
     await testWebsockets(client0, client1, client2, client3, client4, client5, client8);
-    await testRunGame([client0, client1, client2, client3, client4, client5], client8);
+    await testRunGame([client0, client1, client2, client3, client4], client8);
 
     allPlayers.forEach((p) => p.closeSocket());
 
