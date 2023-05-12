@@ -9,6 +9,7 @@ import request from "../utils/request";
 import { Box, Divider, FormControl, Button, ScrollView, Heading, useToast } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../App";
+import { GameContext } from "../context/GameContext";
 
 type FormFieldsValue = {
     nbPlayerMin: number;
@@ -25,6 +26,7 @@ type FormFieldsValue = {
 
 export default function CreateGame(): React.ReactElement {
     const { token } = useContext(UserContext);
+    const gameContext = useContext(GameContext);
     const navigation = useNavigation<StackNavigation>();
 
     const toast = useToast();
@@ -95,11 +97,17 @@ export default function CreateGame(): React.ReactElement {
                     <Divider my={5} />
                     <FormControl>
                         <FormControl.Label>Durée du jour (minutes)</FormControl.Label>
-                        <InputNumber value={fieldsValue.dayLength} onChange={(value): void => setFieldsValue((oldValue) => ({ ...oldValue, dayLength: value }))} />
+                        <InputNumber value={fieldsValue.dayLength} onChange={(value): void => {
+                            setFieldsValue((oldValue) => ({ ...oldValue, dayLength: value })); 
+                            gameContext.setDayDuration(value);
+                        }} />
                     </FormControl>
                     <FormControl>
                         <FormControl.Label>Durée de la nuit (minutes)</FormControl.Label>
-                        <InputNumber value={fieldsValue.nightLength} onChange={(value): void => setFieldsValue((oldValue) => ({ ...oldValue, nightLength: value }))} />
+                        <InputNumber value={fieldsValue.nightLength} onChange={(value): void => {
+                            setFieldsValue((oldValue) => ({ ...oldValue, nightLength: value })); 
+                            gameContext.setNightDuration(value);
+                        }} />
                     </FormControl>
                     <Divider my={5} />
                     <FormControl>

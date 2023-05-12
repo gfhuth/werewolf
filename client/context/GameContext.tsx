@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { WS } from "@env";
 import React, { useContext, useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
@@ -47,6 +48,10 @@ export type GameContextType = {
     onMessage: (event: MessageEvent<any>) => void;
     phase: GamePhase;
     setPhase: (phase: GamePhase) => void;
+    DayDuration: number;
+    setDayDuration: (DayDuration: number) => void;
+    NightDuration: number;
+    setNightDuration: (NightDuration: number) => void;
     me: SelfInfos & {
         setIsAlive: (isAlive: boolean) => void;
         setRole: (role: Role) => void;
@@ -57,11 +62,15 @@ export type GameContextType = {
 
 export const GameContext = React.createContext<GameContextType>({
     phase: GamePhase.NIGHT,
+    NightDuration: 60,
+    DayDuration: 60,
     setPhase: () => null,
     eventHandlers: {},
     registerEventHandler: () => null,
     onMessage: () => null,
     sendJsonMessage: () => null,
+    setDayDuration: () => null,
+    setNightDuration: () => null,
     me: {
         alive: true,
         role: Role.HUMAN,
@@ -79,6 +88,8 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
 
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
     const [phase, setPhase] = useState<GamePhase>(GamePhase.NIGHT);
+    const [DayDuration, setDayDuration] = useState<number>(60);
+    const [NightDuration, setNightDuration] = useState<number>(60);
     const [myInfos, setMyInfos] = useState<SelfInfos>({ alive: true, role: Role.HUMAN, power: Power.NONE });
     const [players, setPlayers] = useState<Array<Player>>([
         {
@@ -209,7 +220,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
 
     return (
         <GameContext.Provider
-            value={{ phase: phase, setPhase: setPhase, eventHandlers, registerEventHandler, onMessage, sendJsonMessage: sendMessage, me: { ...myInfos, setIsAlive, setPower, setRole }, players }}
+            value={{ NightDuration, DayDuration, setDayDuration: setDayDuration, setNightDuration: setNightDuration, phase: phase, setPhase: setPhase, eventHandlers, registerEventHandler, onMessage, sendJsonMessage: sendMessage, me: { ...myInfos, setIsAlive, setPower, setRole }, players }}
         >
             {props.children}
         </GameContext.Provider>
