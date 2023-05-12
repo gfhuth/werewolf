@@ -75,9 +75,19 @@ export default function ChatComponent(): React.ReactElement {
         ]);
     }, []);
 
+    const onChatJoin = (data: { chat_type: ChatType }): void => {
+        setChats([...chats, data.chat_type]);
+    };
+    const onChatQuit = (data: { chat_type: ChatType }): void => {
+        setChats([...chats.filter((c) => c !== data.chat_type)]);
+        setMessages([...messages.filter((msg) => msg.type !== data.chat_type)]);
+    };
+
     useEffect(() => {
         gameContext.registerEventHandler("CHAT_RECEIVED", onMessage);
         gameContext.registerEventHandler("GET_ALL_INFO_CHAT", infoChat);
+        gameContext.registerEventHandler("QUIT_CHAT", onChatQuit);
+        gameContext.registerEventHandler("JOIN_CHAT", onChatJoin);
     }, []);
 
     return (
@@ -89,19 +99,21 @@ export default function ChatComponent(): React.ReactElement {
             </Select>
             <View>
                 <ScrollView bg={"light.300"} p={2}>
-                    {messages.filter(msg => msg.type === selectedChat).length > 0 ? (
-                        messages.filter(msg => msg.type === selectedChat).map((msg, i) => (
-                            <View key={i}>
-                                <Text>
-                                    {msg.author} : {msg.content}
-                                </Text>
-                            </View>
-                        ))
+                    {messages.filter((msg) => msg.type === selectedChat).length > 0 ? (
+                        messages
+                            .filter((msg) => msg.type === selectedChat)
+                            .map((msg, i) => (
+                                <View key={i}>
+                                    <Text>
+                                        {msg.author} : {msg.content}
+                                    </Text>
+                                </View>
+                            ))
                     ) : (
                         <Text>Aucun message</Text>
                     )}
                 </ScrollView>
-                <InputText value={message} onChange={setMessage} InputRightElement={<IconButton icon={<Ionicons name="send" />} onPress={sendMessage} />} />
+                <InputText value={message} onChange={setMessage} InputRightElement={<IconButton icon={<Ionicons name="send" />} onPress={sendMessage} color={"primary.600"} />} />
             </View>
         </Collapsible>
     );

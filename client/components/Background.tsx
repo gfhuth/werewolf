@@ -14,9 +14,9 @@ enum PHASE_ANCHOR {
 export default function Background(props: { children: React.ReactNode; page?: string }): React.ReactElement {
     const gameContext = useContext(GameContext);
 
-    const [last2Frame, setLast2Frame] = useState(0);
-    const [last1Frame, setLast1Frame] = useState(1);
-    const [currentFrame, setCurrentFrame] = useState(2);
+    const [last2Frame, setLast2Frame] = useState(PHASE_ANCHOR.NIGHT_START - 2);
+    const [last1Frame, setLast1Frame] = useState(PHASE_ANCHOR.NIGHT_START - 1);
+    const [currentFrame, setCurrentFrame] = useState(PHASE_ANCHOR.NIGHT_START);
 
     const updateFrame = (): void => {
         const diffSeconds = (new Date().getTime() - gameContext.phaseAnchorDate.getTime()) / 1000;
@@ -44,20 +44,19 @@ export default function Background(props: { children: React.ReactNode; page?: st
     };
 
     useEffect(() => {
+        updateFrame();
         const interval = setInterval(updateFrame, 1000);
         return () => clearInterval(interval);
     });
 
     return (
-        <>
-            <Container minHeight={"100%"} minWidth={"100%"} position={"relative"} display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"} overflow={"hidden"}>
-                {last2Frame !== last1Frame && <Image key={last2Frame} source={frames[last2Frame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />}
-                {last1Frame !== currentFrame && <Image key={last1Frame} source={frames[last1Frame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />}
-                <Image key={currentFrame} source={frames[currentFrame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />
+        <Container minHeight={"100%"} minWidth={"100%"} position={"relative"} display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"} overflow={"hidden"}>
+            {last2Frame !== last1Frame && <Image key={last2Frame} source={frames[last2Frame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />}
+            {last1Frame !== currentFrame && <Image key={last1Frame} source={frames[last1Frame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />}
+            <Image key={currentFrame} source={frames[currentFrame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />
 
-                <Container pt={50} />
-                {props.children}
-            </Container>
-        </>
+            <Container pt={50} />
+            {props.children}
+        </Container>
     );
 }

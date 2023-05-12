@@ -11,6 +11,7 @@ import CreateGame from "./screens/CreateGame";
 import Game from "./screens/Game";
 import { NativeBaseProvider } from "native-base";
 import Background from "./components/Background";
+import { GameProvider } from "./context/GameContext";
 
 export type StackParamList = {
     Home: undefined;
@@ -44,9 +45,11 @@ export default function App(): React.ReactElement {
             <NativeBaseProvider>
                 <SettingsProvider>
                     <UserProvider>
-                        <NavigationContainer>
-                            <MyStack />
-                        </NavigationContainer>
+                        <GameProvider gameId={0}>
+                            <NavigationContainer>
+                                <MyStack />
+                            </NavigationContainer>
+                        </GameProvider>
                     </UserProvider>
                 </SettingsProvider>
             </NativeBaseProvider>

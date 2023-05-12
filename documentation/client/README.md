@@ -1,1 +1,0 @@
-Diagrams UML pour le client

@@ -46,6 +46,7 @@ export type GameContextType = {
     registerEventHandler: (event: string, callback: EventHandlerCallback) => void;
     sendJsonMessage: (event: string, data: any) => void;
     onMessage: (event: MessageEvent<any>) => void;
+    closeConnection: () => void;
     phase: GamePhase;
     phaseDuration: number;
     phaseProgression: number;
@@ -61,12 +62,13 @@ export type GameContextType = {
 export const GameContext = React.createContext<GameContextType>({
     phase: GamePhase.NIGHT,
     phaseDuration: 60 * 5,
-    phaseProgression: 10,
+    phaseProgression: 0,
     phaseAnchorDate: new Date(),
     eventHandlers: {},
     registerEventHandler: () => null,
     onMessage: () => null,
     sendJsonMessage: () => null,
+    closeConnection: () => null,
     me: {
         alive: true,
         role: Role.HUMAN,
@@ -83,19 +85,13 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     const userContext = useContext(UserContext);
 
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
+    const [shouldClose, setShouldClose] = useState(false);
     const [phase, setPhase] = useState<GamePhase>(GamePhase.NIGHT);
-    const [phaseDuration, setPhaseDuration] = useState<number>(60);
+    const [phaseDuration, setPhaseDuration] = useState<number>(60 * 5);
     const [phaseProgression, setPhaseProgression] = useState<number>(0);
     const [phaseAnchorDate, setPhaseAnchorDate] = useState<Date>(new Date());
     const [myInfos, setMyInfos] = useState<SelfInfos>({ alive: true, role: Role.HUMAN, power: Power.NONE });
-    const [players, setPlayers] = useState<Array<Player>>([
-        {
-            alive: true,
-            roles: [],
-            powers: [],
-            username: "bat"
-        }
-    ]);
+    const [players, setPlayers] = useState<Array<Player>>([]);
 
     const setMessageErreur = (messageErreur: string): void => {
         toast.show({
@@ -133,15 +129,22 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         LOGGER.log(`Error : ${event}`);
     };
 
-    const { sendJsonMessage } = useWebSocket(WS, {
+    const { sendJsonMessage, getWebSocket } = useWebSocket(WS, {
         onOpen: () => {
             LOGGER.log("Connection opened");
         },
         onMessage: onMessage,
         onError: onError,
         //Will attempt to reconnect on all close events, such as server shutting down
-        shouldReconnect: () => true
+        shouldReconnect: () => shouldClose
     });
+
+    const closeConnection = (): void => {
+        setShouldClose(true);
+    };
+    useEffect(() => {
+        if (shouldClose) getWebSocket()?.close();
+    }, [shouldClose]);
 
     const errorHandler = (data: { status: number; message: string }): void => {
         LOGGER.log(`Websocket error : ${data.message}`);
@@ -232,6 +235,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
                 registerEventHandler,
                 onMessage,
                 sendJsonMessage: sendMessage,
+                closeConnection,
                 me: { ...myInfos, setIsAlive, setPower, setRole },
                 players
             }}

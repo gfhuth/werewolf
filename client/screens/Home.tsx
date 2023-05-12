@@ -2,58 +2,13 @@ import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../App";
 import Background from "../components/Background";
 import NavigationUI from "../components/NavigationUI";
-import { Fab, Icon, ScrollView, View, Text, Box, Heading, Center, Divider, Button, HStack } from "native-base";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Fab, Icon, ScrollView, View, Text, Heading, Button, Box } from "native-base";
+import { AntDesign } from "@expo/vector-icons";
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import request from "../utils/request";
 import { API_BASE_URL } from "@env";
-import moment from "moment";
-moment.locale("fr");
-
-type Partie = {
-    currentNumberOfPlayer: number;
-    host: string;
-    id: number;
-    nbPlayerMax: number;
-    startDate: number;
-    date: Date;
-};
-
-function capitalize(text: string): string {
-    return text.charAt(0).toUpperCase() + text.toLocaleLowerCase().substring(1);
-}
-
-function GameCard(props: { game: Partie; buttons?: Array<React.ReactNode> }): React.ReactElement {
-    const game = props.game;
-    return (
-        <View key={game.id}>
-            <Box padding={2} bgColor={"light.100"} borderRadius={5}>
-                <HStack justifyContent={"space-between"}>
-                    <Text fontSize={"lg"} fontWeight={"bold"} color={"black"}>
-                        # {game.id}
-                    </Text>
-                    <HStack alignItems={"center"} p={1} bg={"primary.100"} borderRadius={5}>
-                        <Icon mr={2} name="people" as={<Ionicons />} fontSize={"lg"} fontWeight={"bold"} color={"black"} />
-                        <Text fontSize={"lg"} fontWeight={"bold"} color={"black"}>
-                            {game.currentNumberOfPlayer} / {game.nbPlayerMax}
-                        </Text>
-                    </HStack>
-                </HStack>
-                <Text fontSize={"105%"}>
-                    Créateur : <Text fontWeight={"500"}>{game.host}</Text>
-                </Text>
-                <HStack justifyContent={"space-between"} alignItems={"end"}>
-                    <Text fontSize={"105%"}>{capitalize(game.date < new Date() ? moment(game.date).from(moment()) : moment().to(moment(game.date)))}</Text>
-                    <View display={"flex"} alignItems={"end"}>
-                        {props.buttons}
-                    </View>
-                </HStack>
-            </Box>
-            <Divider my={5} thickness="0" />
-        </View>
-    );
-}
+import GameCard, { Partie } from "../components/game/GameCard";
 
 export default function Home(): React.ReactElement {
     const navigation = useNavigation<StackNavigation>();
@@ -80,7 +35,6 @@ export default function Home(): React.ReactElement {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res.games);
                 res.games.map((info: Partie) => {
                     info.date = new Date(info.startDate);
                 });
@@ -100,7 +54,6 @@ export default function Home(): React.ReactElement {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res.games);
                 res.games.map((info: Partie) => {
                     info.date = new Date(info.startDate);
                 });
@@ -118,7 +71,7 @@ export default function Home(): React.ReactElement {
                 "x-access-token": context.token
             }
         })
-            .then((res) => {
+            .then(() => {
                 requestListeDesParties();
                 requestListeDesPartiesUser();
             })
@@ -134,7 +87,7 @@ export default function Home(): React.ReactElement {
                 "x-access-token": context.token
             }
         })
-            .then((res) => {
+            .then(() => {
                 requestListeDesParties();
                 requestListeDesPartiesUser();
             })
@@ -156,62 +109,80 @@ export default function Home(): React.ReactElement {
         return () => clearInterval(interval);
     }, []);
 
+    const listePartiesNonUser = listeParties.filter((partie) => !listePartiesUser.find((p) => p.id === partie.id));
+
     return (
         <Background>
             <NavigationUI allowBack={false} />
 
             <ScrollView>
                 <View>
-                    <Heading color={"light.100"} mt={5}>
+                    <Heading color={"light.100"} m={4}>
                         Liste des parties existantes:
                     </Heading>
-                    {listeParties &&
-                        listeParties
-                            .filter((partie) => !listePartiesUser || !listePartiesUser.find((p) => p.id === partie.id))
-                            .map((informationPartie) => (
-                                <GameCard
-                                    key={informationPartie.id}
-                                    game={informationPartie}
-                                    buttons={[
-                                        informationPartie.date > new Date() ? (
-                                            <Button key={1} size="md" fontSize="lg" width={"130"} onPress={(): void => joinGame(informationPartie.id)}>
-                                                Rejoindre la partie
-                                            </Button>
-                                        ) : (
-                                            <Text fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
-                                                La partie a déjà commencée
-                                            </Text>
-                                        )
-                                    ]}
-                                />
-                            ))}
+                    {listePartiesNonUser.map((informationPartie) => (
+                        <GameCard
+                            key={informationPartie.id}
+                            game={informationPartie}
+                            buttons={
+                                informationPartie.ended ? (
+                                    <Text fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
+                                        La partie est terminée
+                                    </Text>
+                                ) : informationPartie.date > new Date() ? (
+                                    <Button key={1} size="md" fontSize="lg" width={"130"} onPress={(): void => joinGame(informationPartie.id)}>
+                                        Rejoindre la partie
+                                    </Button>
+                                ) : (
+                                    <Text fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
+                                        La partie a déjà commencée
+                                    </Text>
+                                )
+                            }
+                        />
+                    ))}
+                    {listePartiesNonUser.length === 0 && (
+                        <Box padding={2} bgColor={"light.100"} borderRadius={5}>
+                            <Text textAlign={"center"}>Aucune partie</Text>
+                        </Box>
+                    )}
                 </View>
 
                 <View>
-                    <Heading color={"light.100"}>Liste de vos parties:</Heading>
-                    {listePartiesUser &&
-                        listePartiesUser.map((informationPartie) => (
-                            <GameCard
-                                key={informationPartie.id}
-                                game={informationPartie}
-                                buttons={
-                                    informationPartie.date < new Date() ?
-                                        [
-                                            <Button key={1} size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
-                                                  Go to game
-                                            </Button>
-                                        ] :
-                                        [
-                                            <Text key={1} fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
-                                                  La partie n'a pas encore commencée
-                                            </Text>,
-                                            <Button key={2} size="md" fontSize="lg" width={"20"} colorScheme={"red"} onPress={(): void => leaveGame(informationPartie.id)}>
-                                                  Quitter
-                                            </Button>
-                                        ]
-                                }
-                            />
-                        ))}
+                    <Heading color={"light.100"} m={4}>
+                        Liste de vos parties:
+                    </Heading>
+                    {listePartiesUser.map((informationPartie) => (
+                        <GameCard
+                            key={informationPartie.id}
+                            game={informationPartie}
+                            buttons={
+                                informationPartie.ended ? (
+                                    <Text fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
+                                        La partie est terminée
+                                    </Text>
+                                ) : informationPartie.date < new Date() ? (
+                                    <Button key={1} size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
+                                        Go to game
+                                    </Button>
+                                ) : (
+                                    <>
+                                        <Text key={1} fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
+                                            La partie n'a pas encore commencée
+                                        </Text>
+                                        <Button key={2} size="md" fontSize="lg" width={"20"} colorScheme={"red"} onPress={(): void => leaveGame(informationPartie.id)}>
+                                            Quitter
+                                        </Button>
+                                    </>
+                                )
+                            }
+                        />
+                    ))}
+                    {listePartiesUser.length === 0 && (
+                        <Box padding={2} bgColor={"light.100"} borderRadius={5}>
+                            <Text textAlign={"center"}>Aucune partie</Text>
+                        </Box>
+                    )}
                 </View>
             </ScrollView>
             <Fab onPress={createGame} renderInPortal={false} shadow={2} size="sm" icon={<Icon color="white" as={AntDesign} name="plus" size="sm" />} />
