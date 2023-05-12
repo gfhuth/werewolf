@@ -1,6 +1,7 @@
 stages:          # List of stages for jobs, and their order of execution
   - buildAndTest
   - lint
+  - cypress
   - drawio
   - deploy
 
@@ -28,7 +29,13 @@ eslint:
     - node_modules/eslint/bin/eslint.js ./client/
     - node_modules/eslint/bin/eslint.js ./server/
 
-
+cypress:
+  stage: lint
+  image: node:latest
+  script:
+    - npm ci
+    - npm run start:ci &
+    - npm run e2e
 drawio:on-schedule:
   stage: drawio
   image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
