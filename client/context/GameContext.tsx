@@ -11,8 +11,8 @@ export type EventHandlerCallback = (data: any) => void;
 const LOGGER = new Logger("WEBSOCKET");
 
 export enum GamePhase {
-    DAY,
-    NIGHT,
+    DAY = "DAY",
+    NIGHT = "NIGHT",
 }
 
 export enum Role {
@@ -47,11 +47,9 @@ export type GameContextType = {
     sendJsonMessage: (event: string, data: any) => void;
     onMessage: (event: MessageEvent<any>) => void;
     phase: GamePhase;
-    setPhase: (phase: GamePhase) => void;
-    DayDuration: number;
-    setDayDuration: (DayDuration: number) => void;
-    NightDuration: number;
-    setNightDuration: (NightDuration: number) => void;
+    phaseDuration: number;
+    phaseProgression: number;
+    phaseAnchorDate: Date;
     me: SelfInfos & {
         setIsAlive: (isAlive: boolean) => void;
         setRole: (role: Role) => void;
@@ -62,15 +60,13 @@ export type GameContextType = {
 
 export const GameContext = React.createContext<GameContextType>({
     phase: GamePhase.NIGHT,
-    NightDuration: 60,
-    DayDuration: 60,
-    setPhase: () => null,
+    phaseDuration: 60 * 5,
+    phaseProgression: 10,
+    phaseAnchorDate: new Date(),
     eventHandlers: {},
     registerEventHandler: () => null,
     onMessage: () => null,
     sendJsonMessage: () => null,
-    setDayDuration: () => null,
-    setNightDuration: () => null,
     me: {
         alive: true,
         role: Role.HUMAN,
@@ -88,8 +84,9 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
 
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
     const [phase, setPhase] = useState<GamePhase>(GamePhase.NIGHT);
-    const [DayDuration, setDayDuration] = useState<number>(60);
-    const [NightDuration, setNightDuration] = useState<number>(60);
+    const [phaseDuration, setPhaseDuration] = useState<number>(60);
+    const [phaseProgression, setPhaseProgression] = useState<number>(0);
+    const [phaseAnchorDate, setPhaseAnchorDate] = useState<Date>(new Date());
     const [myInfos, setMyInfos] = useState<SelfInfos>({ alive: true, role: Role.HUMAN, power: Power.NONE });
     const [players, setPlayers] = useState<Array<Player>>([
         {
@@ -177,13 +174,19 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
         setMyInfos({ ...myInfos, power: power });
     };
 
-    const onDayStart = (): void => {
+    const onDayStart = (data: { phaseLength: number; elapsedTime: number }): void => {
         LOGGER.log(`Day started`);
         setPhase(GamePhase.DAY);
+        setPhaseAnchorDate(new Date());
+        setPhaseDuration(data.phaseLength / 1000);
+        setPhaseProgression(data.elapsedTime / 1000);
     };
-    const onNightStart = (): void => {
+    const onNightStart = (data: { phaseLength: number; elapsedTime: number }): void => {
         LOGGER.log(`Night started`);
         setPhase(GamePhase.NIGHT);
+        setPhaseAnchorDate(new Date());
+        setPhaseDuration(data.phaseLength / 1000);
+        setPhaseProgression(data.elapsedTime / 1000);
     };
 
     const onPlayerListUpdate = (data: { players: Array<{ user: string; alive: boolean; role: Role; power: Power }> }): void => {
@@ -220,7 +223,18 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
 
     return (
         <GameContext.Provider
-            value={{ NightDuration, DayDuration, setDayDuration: setDayDuration, setNightDuration: setNightDuration, phase: phase, setPhase: setPhase, eventHandlers, registerEventHandler, onMessage, sendJsonMessage: sendMessage, me: { ...myInfos, setIsAlive, setPower, setRole }, players }}
+            value={{
+                phase,
+                phaseDuration,
+                phaseProgression,
+                phaseAnchorDate,
+                eventHandlers,
+                registerEventHandler,
+                onMessage,
+                sendJsonMessage: sendMessage,
+                me: { ...myInfos, setIsAlive, setPower, setRole },
+                players
+            }}
         >
             {props.children}
         </GameContext.Provider>

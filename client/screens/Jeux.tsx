@@ -26,7 +26,7 @@ export default function Jeux(): React.ReactElement {
     const Overlay = powerContext.getOverlay();
 
     return (
-        <Background>
+        <Background page="Game">
             <NavigationUI allowBack />
             <Overlay />
             <View>
