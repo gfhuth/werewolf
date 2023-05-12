@@ -45,7 +45,9 @@ function GameCard(props: { game: Partie; buttons?: Array<React.ReactNode> }): Re
                 </Text>
                 <HStack justifyContent={"space-between"} alignItems={"end"}>
                     <Text fontSize={"105%"}>{capitalize(game.date < new Date() ? moment(game.date).from(moment()) : moment().to(moment(game.date)))}</Text>
-                    <View display={"flex"} alignItems={"end"}>{props.buttons}</View>
+                    <View display={"flex"} alignItems={"end"}>
+                        {props.buttons}
+                    </View>
                 </HStack>
             </Box>
             <Divider my={5} thickness="0" />
@@ -146,12 +148,12 @@ export default function Home(): React.ReactElement {
         }
     }, [isFocused]);
 
-
     useEffect(() => {
-        setInterval(() => {
+        const interval = setInterval(() => {
             requestListeDesParties();
             requestListeDesPartiesUser();
         }, 30000);
+        return () => clearInterval(interval);
     }, []);
 
     return (
@@ -192,22 +194,22 @@ export default function Home(): React.ReactElement {
                             <GameCard
                                 key={informationPartie.id}
                                 game={informationPartie}
-                                buttons={[
-                                    informationPartie.date < new Date() ? (
-                                        <Button key={1} size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
-                                            Go to game
-                                        </Button>
-                                    ) : (
-                                        <>
-                                            <Text key={1} fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
-                                                La partie n'a pas encore commencée
-                                            </Text>
-                                            <Button key={2} size="md" fontSize="lg" width={"20"} colorScheme={"red"} onPress={(): void => leaveGame(informationPartie.id)}>
-                                                Quitter
+                                buttons={
+                                    informationPartie.date < new Date() ?
+                                        [
+                                            <Button key={1} size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
+                                                  Go to game
                                             </Button>
-                                        </>
-                                    )
-                                ]}
+                                        ] :
+                                        [
+                                            <Text key={1} fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
+                                                  La partie n'a pas encore commencée
+                                            </Text>,
+                                            <Button key={2} size="md" fontSize="lg" width={"20"} colorScheme={"red"} onPress={(): void => leaveGame(informationPartie.id)}>
+                                                  Quitter
+                                            </Button>
+                                        ]
+                                }
                             />
                         ))}
                 </View>
