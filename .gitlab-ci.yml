@@ -52,6 +52,7 @@ test_unit_backend:
     - fi;   
 
     
+    
 drawio:on-schedule:
   stage: drawio
   image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
