@@ -136,8 +136,6 @@ export class Player {
         else if (data.power === ClairvoyancePower.POWERNAME) player.setPower(new ClairvoyancePower());
         else if (data.power === SpiritismPower.POWERNAME) player.setPower(new SpiritismPower());
 
-        // TODO load power
-
         return player;
     }
 
