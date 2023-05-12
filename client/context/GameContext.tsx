@@ -91,14 +91,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
     const [phaseProgression, setPhaseProgression] = useState<number>(0);
     const [phaseAnchorDate, setPhaseAnchorDate] = useState<Date>(new Date());
     const [myInfos, setMyInfos] = useState<SelfInfos>({ alive: true, role: Role.HUMAN, power: Power.NONE });
-    const [players, setPlayers] = useState<Array<Player>>([
-        {
-            alive: true,
-            roles: [],
-            powers: [],
-            username: "bat"
-        }
-    ]);
+    const [players, setPlayers] = useState<Array<Player>>([]);
 
     const setMessageErreur = (messageErreur: string): void => {
         toast.show({
