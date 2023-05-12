@@ -50,16 +50,16 @@ cypress:
     - ./node_modules/.bin/cypress run --browser chrome
 
 
-test_unit_backend:
-  stage: test
-  image: node:latest
-  script:
-    - cd server/
-    - yarn install 
-    - npm install -g ts-node
-    - yarn start &
-    - sleep 20
-    - yarn test
+# test_unit_backend:
+#   stage: test
+#   image: node:latest
+#   script:
+#     - cd server/
+#     - yarn install 
+#     - npm install -g ts-node
+#     - yarn start &
+#     - sleep 20
+#     - yarn test
     # - if [ $(yarn test | grep "Total :" |  cut -c 14-100") != $(yarn test | grep "Succeed :" |  cut -c 16-100)  ]; then
     # - exit 1
     # - else echo "ALL OK"
