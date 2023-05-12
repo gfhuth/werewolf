@@ -44,6 +44,7 @@ export default function Background(props: { children: React.ReactNode; page?: st
     };
 
     useEffect(() => {
+        updateFrame();
         const interval = setInterval(updateFrame, 1000);
         return () => clearInterval(interval);
     });
