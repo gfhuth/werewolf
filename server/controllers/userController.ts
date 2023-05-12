@@ -4,8 +4,11 @@ import bcrypt from "bcrypt";
 import database from "../util/database";
 import { User } from "../models/userModel";
 import { AuthenticatedRequest } from "./authenticationController";
+import Logger from "../util/Logger";
 
 const { JWT_SECRET } = process.env;
+
+const LOGGER = new Logger("AUTHENTICATION");
 
 export const getTokenContent = (token: string): { username: string } => {
     if (!jwt.verify(token, JWT_SECRET)) throw new Error("Invalid Token !");
@@ -19,6 +22,8 @@ export const getTokenContent = (token: string): { username: string } => {
 export const login = async (req: Request, res: Response): Promise<void> => {
     const username: string = req.body.username;
     const password: string = req.body.password;
+
+    LOGGER.log("Authentification de l'utilisateur");
 
     if (!username) {
         res.status(400).send("Missing username");
