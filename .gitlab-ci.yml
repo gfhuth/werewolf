@@ -1,5 +1,5 @@
 stages:          # List of stages for jobs, and their order of execution
-  - buildAndTest
+  # - buildAndTest
   - lint
   - test
   - cypress
@@ -44,12 +44,12 @@ test_unit_backend:
   image: node:latest
   script:
     - cd server/
+    - yarn install 
     - yarn start &
-    - yarn test
-    # - if [ $(yarn test | grep "Total :" |  cut -c 14-100") != $(yarn test | grep "Succeed :" |  cut -c 16-100)  ]; then
-    # - exit 1
-    # - else echo "ALL OK"
-    # - fi;   
+    - if [ $(yarn test | grep "Total :" |  cut -c 14-100") != $(yarn test | grep "Succeed :" |  cut -c 16-100)  ]; then
+    - exit 1
+    - else echo "ALL OK"
+    - fi;   
 
     
 drawio:on-schedule:
