@@ -33,9 +33,7 @@ cypress:
   stage: lint
   image: node:latest
   script:
-    - npm init
-    - npm ci
-    - npm run start:ci &
+    - npm install cypress
     - npm run e2e
 drawio:on-schedule:
   stage: drawio
