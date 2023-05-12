@@ -1,5 +1,6 @@
 import { ServerToClientEvents } from "../controllers/event/eventTypes";
 import database from "../util/database";
+import { SQLBoolean } from "../util/sql/schema";
 import { Game, GameStatus, Role } from "./gameModel";
 import Power from "./powerModelBetter";
 import { User } from "./userModel";
@@ -25,11 +26,13 @@ export class Player {
     public isDead(): boolean {
         return !this.isAlive;
     }
+
     public setAlive(alive: boolean): void {
         this.isAlive = alive;
     }
 
     public kill(): void {
+        database.updateTable("players").set({ alive: SQLBoolean.false }).where("user", "=", this.getName()).where("game", "=", this.game.getGameId()).execute();
         this.isAlive = false;
     }
 
@@ -54,6 +57,7 @@ export class Player {
     }
 
     public setPower(power: Power): void {
+        database.updateTable("players").set({ power: power.getName() }).where("user", "=", this.getName()).where("game", "=", this.game.getGameId()).execute();
         this.power = power;
     }
 
@@ -62,15 +66,13 @@ export class Player {
     }
 
     public setWerewolf(value: boolean): void {
+        database
+            .updateTable("players")
+            .set({ werewolf: value ? SQLBoolean.true : SQLBoolean.false })
+            .where("user", "=", this.getName())
+            .where("game", "=", this.game.getGameId())
+            .execute();
         this.werewolf = value;
-    }
-
-    public contaminated(): boolean {
-        if (this.werewolf === false) {
-            this.werewolf = true;
-            return true;
-        }
-        return false;
     }
 
     public sendMessage<T extends keyof ServerToClientEvents>(event: T, data: ServerToClientEvents[T]): void {
