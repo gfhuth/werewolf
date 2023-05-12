@@ -1,9 +1,9 @@
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
 import { useState } from "react";
-import { Input, Pressable } from "native-base";
+import { Button, Input, Pressable } from "native-base";
 import moment from "moment";
 
-export default function InputDate(props: { value: Date, onChange: (value: Date) => void }): React.ReactElement {
+export default function InputDate(props: { value: Date; onChange: (value: Date) => void }): React.ReactElement {
     const [dateOpen, setDateOpen] = useState(false);
     const [timeOpen, setTimeOpen] = useState(false);
 
@@ -11,7 +11,7 @@ export default function InputDate(props: { value: Date, onChange: (value: Date) 
     const [hours, setHours] = useState(new Date(props.value).getHours());
     const [minutes, setMinutes] = useState(new Date(props.value).getMinutes());
 
-    const onConfirmDate = (params: { date: any & { getDate: () => number} }): void => {
+    const onConfirmDate = (params: { date: any & { getDate: () => number } }): void => {
         if (!params.date) return;
         setDate(new Date(params.date.getFullYear(), params.date.getMonth(), params.date.getDate()));
         setDateOpen(false);
@@ -31,8 +31,9 @@ export default function InputDate(props: { value: Date, onChange: (value: Date) 
 
     return (
         <>
-            <Pressable mt={2} onPress={(): void => setDateOpen(true)} onFocus={(): void => setDateOpen(true)}>
-                <Input value={moment(props.value).format("DD/MM/YYYY HH:mm")} />
+            <Pressable mt={2} onPress={(): void => setDateOpen(true)} onFocus={(): void => setDateOpen(true)} display={"flex"} flexDirection={"row"} style={{ gap: 2 }}>
+                <Input value={moment(props.value).format("DD/MM/YYYY HH:mm")} flexGrow={1} isReadOnly={true} />
+                <Button onPress={(): void => setDateOpen(true)}>Edit</Button>
             </Pressable>
             <DatePickerModal visible={dateOpen} date={date} mode="single" onConfirm={onConfirmDate} onDismiss={onDismiss} locale="en" />
             <TimePickerModal visible={timeOpen} hours={hours} minutes={minutes} onConfirm={onConfirmTime} onDismiss={onDismiss} />
