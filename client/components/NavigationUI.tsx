@@ -6,7 +6,7 @@ import ImageButton from "./ImageButton";
 
 const iconPadding = 30;
 
-export default function NavigationUI(props: { allowBack?: boolean }): React.ReactElement {
+export default function NavigationUI(props: { allowBack?: boolean, onBack?: () => void }): React.ReactElement {
     const navigation = useNavigation<StackNavigation>();
 
     return (
