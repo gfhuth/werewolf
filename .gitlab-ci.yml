@@ -30,14 +30,17 @@ eslint:
     - node_modules/eslint/bin/eslint.js ./client/
     - node_modules/eslint/bin/eslint.js ./server/
 
+#modification du gitlab ci -> cypress
 cypress:
   stage: test
   image: cypress/browsers:node12.14.1-chrome85-ff81
   script:
     - cd server/
     - yarn start &
+    - sleep 10
     - cd ..
     - cd client/
+    - npm install -g ts-node
     - yarn install cypress
     - ./node_modules/.bin/cypress run --browser chrome
 
