@@ -142,10 +142,7 @@ export class Client {
             // console.log(message);
             message = await this.getNextMessage();
         }
-
-        const res: boolean = JSON.stringify(msg) === JSON.stringify(message);
-        if (!res) console.log(message);
-        return res;
+        return JSON.stringify(msg) === JSON.stringify(message);
     }
 
     public async setInfoPlayer(): Promise<void> {
@@ -159,9 +156,8 @@ export class Client {
     }
 
     public async startPeriod(event: string, gameId: number, assert: Assert): Promise<void> {
-        await assert.testOrTimeout(this.verifyEvent({ event: event, game_id: gameId, data: {} }), 11000, event);
-
-        await this.setInfoPlayer();
+        await this.verifyEvent({ event: event, game_id: gameId, data: {} });
+        await assert.timeout(this.setInfoPlayer(), 11000);
     }
 
 }

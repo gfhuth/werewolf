@@ -263,7 +263,13 @@ function endGame(game: Game, player: Player): void {
 }
 
 function gameStatus(game: Game, player: Player): void {
-    player.sendMessage(game.getStatus() === GameStatus.DAY ? "DAY_START" : "NIGHT_START", {});
+    player.sendMessage(game.getStatus() === GameStatus.DAY ? "DAY_START" : "NIGHT_START", {
+        phaseLength: game.getStatus() === GameStatus.DAY ? game.getGameParam().dayLength : game.getGameParam().nightLength,
+        elapsedTime:
+            game.getStatus() === GameStatus.DAY ?
+                ((Date.now() - game.getGameParam().startDate) % (game.getGameParam().dayLength + game.getGameParam().nightLength)) - game.getGameParam().nightLength :
+                (Date.now() - game.getGameParam().startDate) % (game.getGameParam().dayLength + game.getGameParam().nightLength)
+    });
 }
 
 // Event.registerHandlers("GET_ALL_INFO", getInfoGame);

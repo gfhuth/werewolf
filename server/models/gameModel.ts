@@ -217,7 +217,8 @@ export class Game {
 
         // Envoie à chaque joueur un recap de la nuit
         this.getAllPlayers().forEach((player) => {
-            player.sendMessage("DAY_START", {});
+            const elapsedTime: number = ((Date.now() - this.getGameParam().startDate) % (this.getGameParam().dayLength + this.getGameParam().nightLength)) - this.getGameParam().nightLength;
+            player.sendMessage("DAY_START", { phaseLength: this.getGameParam().dayLength, elapsedTime: elapsedTime });
             player.sendInfoAllPlayers();
         });
 
@@ -248,7 +249,8 @@ export class Game {
 
         // Envoie à chaque joueur un recap du jour
         this.getAllPlayers().forEach((player) => {
-            player.sendMessage("NIGHT_START", {});
+            const elapsedTime: number = (Date.now() - this.getGameParam().startDate) % (this.getGameParam().dayLength + this.getGameParam().nightLength);
+            player.sendMessage("NIGHT_START", { phaseLength: this.getGameParam().nightLength, elapsedTime: elapsedTime });
             player.sendInfoAllPlayers();
         });
 
