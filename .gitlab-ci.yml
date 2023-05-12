@@ -47,7 +47,7 @@ test_unit_backend:
   stage: test
   image: node:latest
   script:
-    - cd serveur/
+    - cd server/
     - yarn start &
     - yarn test   
 
