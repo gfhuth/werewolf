@@ -3,7 +3,7 @@
 import moment from "moment";
 
 Cypress.Commands.add('logout', () => {
-    cy.get('#root > div > div > div > div > div.css-view-175oi2r.r-flex-13awgt0 > div:nth-child(2) > div.css-view-175oi2r.r-bottom-1p0dtai.r-left-1d2f490.r-position-u8s1d.r-right-zchlnj.r-top-ipm5af.r-pointerEvents-12vffkv > div:nth-child(2) > div > div > div > div.css-view-175oi2r.r-flex-13awgt0 > div > div:nth-child(3) > div').click();
+    cy.get('#root > div > div > div > div > div.css-view-175oi2r.r-flex-13awgt0 > div:nth-child(2) > div.css-view-175oi2r.r-bottom-1p0dtai.r-left-1d2f490.r-position-u8s1d.r-right-zchlnj.r-top-ipm5af.r-pointerEvents-12vffkv > div:nth-child(2) > div > div > div > div.css-view-175oi2r.r-flex-13awgt0 > div > div:nth-child(5) > div > div > img').click();
     cy.get('.r-transitionProperty-1i6wzkk > .css-text-1rynq56').click();
     cy.title().should('not.equal', 'Home');
 });
@@ -44,7 +44,8 @@ describe('Test 1', () => {
         cy.title().should('eq', 'Home');
 
         //Logout
-        cy.get('#root > div > div > div > div > div.css-view-175oi2r.r-flex-13awgt0 > div:nth-child(2) > div.css-view-175oi2r.r-bottom-1p0dtai.r-left-1d2f490.r-position-u8s1d.r-right-zchlnj.r-top-ipm5af.r-pointerEvents-12vffkv > div:nth-child(2) > div > div > div > div.css-view-175oi2r.r-flex-13awgt0 > div > div:nth-child(3) > div').click();
+        cy.get('#root > div > div > div > div > div.css-view-175oi2r.r-flex-13awgt0 > div:nth-child(2) > div.css-view-175oi2r.r-bottom-1p0dtai.r-left-1d2f490.r-position-u8s1d.r-right-zchlnj.r-top-ipm5af.r-pointerEvents-12vffkv > div:nth-child(2) > div > div > div > div.css-view-175oi2r.r-flex-13awgt0 > div > div:nth-child(5) > div > div > img').click();
+        
         cy.get('.r-transitionProperty-1i6wzkk > .css-text-1rynq56').click();
         cy.title().should('not.equal', 'Home');
 
@@ -72,7 +73,7 @@ describe('Test 1', () => {
         // //Nouveau User
         cy.logout('');
         cy.register('ro', 'bin');
-        cy.get('.r-alignItems-1ybcz0z > .r-touchAction-1otgn73').click(); //Rejoindre la partie
-        cy.get('.r-alignItems-1ybcz0z > .r-touchAction-1otgn73').contains('Quitter'); //Verification du changement
+        cy.get('.r-alignItems-obd0qt > .r-touchAction-1otgn73 > .r-alignItems-1awozwy > .css-view-175oi2r > .css-text-1rynq56').click(); //Rejoindre la partie
+        cy.get('.r-alignItems-obd0qt > .r-touchAction-1otgn73').contains('Quitter'); //Verification du changement
     });
 });
