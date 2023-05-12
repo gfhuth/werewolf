@@ -37,19 +37,18 @@ cypress:
     - cd client/
     - npm install cypress  
     - ./node_modules/.bin/cypress run  
-    - if [ $(yarn test | grep "Total :" |  cut -c 14-100") != $(yarn test | grep "Succeed :" |  cut -c 16-100)  ]; then
-    - exit 1
-    - else echo "ALL OK"
-    - fi;
 
 
 test_unit_backend:
   stage: test
   image: node:latest
   script:
-    - cd server/
+    - cd serveur/
     - yarn start &
-    - yarn test   
+    - if [ $(yarn test | grep "Total :" |  cut -c 14-100") != $(yarn test | grep "Succeed :" |  cut -c 16-100)  ]; then
+    - exit 1
+    - else echo "ALL OK"
+    - fi;   
 
     
 drawio:on-schedule:
