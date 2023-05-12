@@ -43,7 +43,7 @@ test_unit_backend:
   stage: test
   image: node:latest
   script:
-    - yarn add ts-node
+    - yarn gloabal add ts-node
     - cd server/
     - yarn install 
     - yarn start &
