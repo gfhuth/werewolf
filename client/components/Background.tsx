@@ -50,15 +50,13 @@ export default function Background(props: { children: React.ReactNode; page?: st
     });
 
     return (
-        <>
-            <Container minHeight={"100%"} minWidth={"100%"} position={"relative"} display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"} overflow={"hidden"}>
-                {last2Frame !== last1Frame && <Image key={last2Frame} source={frames[last2Frame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />}
-                {last1Frame !== currentFrame && <Image key={last1Frame} source={frames[last1Frame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />}
-                <Image key={currentFrame} source={frames[currentFrame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />
+        <Container minHeight={"100%"} minWidth={"100%"} position={"relative"} display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"} overflow={"hidden"}>
+            {last2Frame !== last1Frame && <Image key={last2Frame} source={frames[last2Frame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />}
+            {last1Frame !== currentFrame && <Image key={last1Frame} source={frames[last1Frame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />}
+            <Image key={currentFrame} source={frames[currentFrame]} alt="Background image" position={"absolute"} width={"100%"} height={"100%"} resizeMode="cover" />
 
-                <Container pt={50} />
-                {props.children}
-            </Container>
-        </>
+            <Container pt={50} />
+            {props.children}
+        </Container>
     );
 }
