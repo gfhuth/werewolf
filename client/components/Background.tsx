@@ -14,9 +14,9 @@ enum PHASE_ANCHOR {
 export default function Background(props: { children: React.ReactNode; page?: string }): React.ReactElement {
     const gameContext = useContext(GameContext);
 
-    const [last2Frame, setLast2Frame] = useState(0);
-    const [last1Frame, setLast1Frame] = useState(1);
-    const [currentFrame, setCurrentFrame] = useState(2);
+    const [last2Frame, setLast2Frame] = useState(PHASE_ANCHOR.NIGHT_START - 2);
+    const [last1Frame, setLast1Frame] = useState(PHASE_ANCHOR.NIGHT_START - 1);
+    const [currentFrame, setCurrentFrame] = useState(PHASE_ANCHOR.NIGHT_START);
 
     const updateFrame = (): void => {
         const diffSeconds = (new Date().getTime() - gameContext.phaseAnchorDate.getTime()) / 1000;
