@@ -3,6 +3,10 @@ import database from "../util/database";
 import { SQLBoolean } from "../util/sql/schema";
 import { Game, GameStatus, Role } from "./gameModel";
 import Power from "./powerModelBetter";
+import ClairvoyancePower from "./powers/ClairvoyancePower";
+import ContaminationPower from "./powers/ContaminationPower";
+import InsomniaPower from "./powers/InsomniaPower";
+import SpiritismPower from "./powers/SpiritismPower";
 import { User } from "./userModel";
 
 export class Player {
@@ -127,6 +131,10 @@ export class Player {
         const player = new Player(user, game);
         player.setWerewolf(data.werewolf);
         player.setAlive(data.alive);
+        if (data.power === InsomniaPower.POWERNAME) player.setPower(new InsomniaPower());
+        else if (data.power === ContaminationPower.POWERNAME) player.setPower(new ContaminationPower());
+        else if (data.power === ClairvoyancePower.POWERNAME) player.setPower(new ClairvoyancePower());
+        else if (data.power === SpiritismPower.POWERNAME) player.setPower(new SpiritismPower());
 
         // TODO load power
 
