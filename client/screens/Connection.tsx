@@ -6,6 +6,7 @@ import { Box, Button, Divider, Heading, Input, Text, useToast } from "native-bas
 import { UserContext } from "../context/UserContext";
 import request from "../utils/request";
 import Background from "../components/Background";
+import InputText from "../components/inputs/InputText";
 
 export default function Login(): React.ReactElement {
     const navigation = useNavigation<StackNavigation>();
@@ -80,8 +81,10 @@ export default function Login(): React.ReactElement {
                     <>
                         <Heading>Connexion</Heading>
                         <Divider my={5} />
-                        <Input mt={2} placeholder="Pseudo" onChangeText={setUsername} />
-                        <Input mt={2} placeholder="Mot de passe" type="password" onChangeText={setPassword} />
+                        <InputText onChange={setUsername} value={username} placeholder="Pseudo" />
+                        {/* <Input mt={2} placeholder="Pseudo" onChangeText={setUsername} /> */}
+                        <InputText onChange={setPassword} value={password} placeholder="Mot de passe" type="password" />
+                        {/* <Input mt={2} placeholder="Mot de passe" type="password" onChangeText={setPassword} /> */}
                         <Button mt={2} onPress={verifyUserAndPass}>
                             Connexion
                         </Button>
@@ -94,8 +97,10 @@ export default function Login(): React.ReactElement {
                     <>
                         <Heading>Inscription</Heading>
                         <Divider my={5} />
-                        <Input mt={2} placeholder="Pseudo" onChangeText={setUsername} />
-                        <Input mt={2} placeholder="Mot de passe" type="password" onChangeText={setPassword} />
+                        <InputText onChange={setUsername} value={username} placeholder="Pseudo" />
+                        {/* <Input mt={2} placeholder="Pseudo" onChangeText={setUsername} /> */}
+                        <InputText onChange={setPassword} value={password} placeholder="Mot de passe" type="password" />
+                        {/* <Input mt={2} placeholder="Mot de passe" type="password" onChangeText={setPassword} /> */}
                         <Button mt={2} onPress={registerUser}>
                             S'inscrire
                         </Button>
