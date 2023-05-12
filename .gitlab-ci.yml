@@ -65,13 +65,19 @@ drawio:on-schedule:
     - git pull
     - git config user.name "CI Runner DrawIO"
     - git config user.email "ci_runner@nothing.org"
+    # création des dossiers de sortie
     - mkdir -p documentation/client/out
+    - mkdir -p documentation/server/out
+    - mkdir -p documentation/global/out
     #Génération des images avec drawio
     - drawio --export -f svg --crop --output documentation/client/out documentation/client/
     - drawio --export -f svg --crop --output documentation/server/out documentation/server/
-    #on ajoute les images et commit/push
+    - drawio --export -f svg --crop --output documentation/global/out documentation/global/
+    # On ajoute les images et commit/push
     - git add documentation/client/out/*
     - git add documentation/server/out/*
+    - git add documentation/global/out/*
+    # Push si nécessaire
     - if [ $(git status | grep "nothing to commit" | wc -l) == "0" ]; then
     - git commit -m "[skip ci] DrawIO rendering"
     - git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git 
