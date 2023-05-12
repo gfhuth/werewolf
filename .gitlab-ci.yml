@@ -52,13 +52,13 @@ cypress:
 
 test_unit_backend:
   stage: test
-  image: cypress/browsers:latest
+  image: node:latest
   script:
     - cd server/
     - yarn install 
     - npm install -g ts-node
     - yarn start &
-    - sleep 10
+    - sleep 20
     - yarn test
     # - if [ $(yarn test | grep "Total :" |  cut -c 14-100") != $(yarn test | grep "Succeed :" |  cut -c 16-100)  ]; then
     # - exit 1
