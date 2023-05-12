@@ -45,10 +45,11 @@ test_unit_backend:
   script:
     - cd server/
     - yarn start &
-    - if [ $(yarn test | grep "Total :" |  cut -c 14-100") != $(yarn test | grep "Succeed :" |  cut -c 16-100)  ]; then
-    - exit 1
-    - else echo "ALL OK"
-    - fi;   
+    - yarn test
+    # - if [ $(yarn test | grep "Total :" |  cut -c 14-100") != $(yarn test | grep "Succeed :" |  cut -c 16-100)  ]; then
+    # - exit 1
+    # - else echo "ALL OK"
+    # - fi;   
 
     
 drawio:on-schedule:
