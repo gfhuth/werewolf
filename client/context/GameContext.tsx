@@ -61,7 +61,7 @@ export type GameContextType = {
 export const GameContext = React.createContext<GameContextType>({
     phase: GamePhase.NIGHT,
     phaseDuration: 60 * 5,
-    phaseProgression: 10,
+    phaseProgression: 0,
     phaseAnchorDate: new Date(),
     eventHandlers: {},
     registerEventHandler: () => null,
@@ -84,7 +84,7 @@ export function GameProvider(props: { children: React.ReactNode; gameId: number 
 
     const [eventHandlers, setEventHandlers] = useState<{ [key: string]: EventHandlerCallback }>({});
     const [phase, setPhase] = useState<GamePhase>(GamePhase.NIGHT);
-    const [phaseDuration, setPhaseDuration] = useState<number>(60);
+    const [phaseDuration, setPhaseDuration] = useState<number>(60 * 5);
     const [phaseProgression, setPhaseProgression] = useState<number>(0);
     const [phaseAnchorDate, setPhaseAnchorDate] = useState<Date>(new Date());
     const [myInfos, setMyInfos] = useState<SelfInfos>({ alive: true, role: Role.HUMAN, power: Power.NONE });
