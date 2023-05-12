@@ -33,7 +33,7 @@ eslint:
 #modification du gitlab ci -> cypress
 cypress:
   stage: test
-  image: cypress/browsers:node12.14.1-chrome85-ff81
+  image: cypress/browsers:latest
   script:
     - cd server/
     - yarn install --frozen-lockfile
