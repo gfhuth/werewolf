@@ -30,13 +30,11 @@ export const usePower = async (game: Game, player: Player, data: Record<string, 
 
     power.usePower(game, player, data);
     power.setAlreadyUsed(true);
-    player.sendMessage("POWER_END", {});
+    player.sendPowerState();
 };
 
 function getInfoPower(game: Game, player: Player): void {
-    if (!player.getPower()) return;
-    if (game.getStatus() === GameStatus.DAY || player.getPower().getAlreadyUsed()) player.sendMessage("POWER_END", {});
-    else player.sendMessage("POWER_START", {});
+    player.sendPowerState();
 }
 
 Event.registerHandlers("GET_ALL_INFO", getInfoPower);

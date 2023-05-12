@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Game, GameParam, GameStatus, Role } from "../models/gameModel";
+import { Game, GameParam, GameStatus } from "../models/gameModel";
 import { Event } from "../controllers/eventController";
 import database from "../util/database";
 
@@ -237,7 +237,7 @@ export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promi
 
         // Supression du joueur dans la liste des joueurs de la partie
         const player: Player = game.getPlayer(user.getUsername());
-        game.removePlayer(player.getUser().getUsername());
+        game.removePlayer(player.getName());
 
         // Insert a new record in the user_games table
         await database.deleteFrom("players").where("players.game", "=", gameId).where("players.user", "=", user.getUsername()).executeTakeFirst();
@@ -249,27 +249,17 @@ export const leaveGame = async (req: AuthenticatedRequest, res: Response): Promi
     }
 };
 
-// function getInfoGame(game: Game, player: Player): void {
-//     player.sendMessage("GET_ALL_INFO_GAME", { status: game.getStatus() });
-// }
-
 function getInfoPlayersList(game: Game, player: Player): void {
     player.sendInfoAllPlayers();
 }
 
 function endGame(game: Game, player: Player): void {
-    const winningRole: Role = game.getWinningRole();
-    if (winningRole) player.sendMessage("END_GAME", { winningRole: winningRole });
+    game.eventEndGame(player);
 }
 
 function gameStatus(game: Game, player: Player): void {
-    player.sendMessage(game.getStatus() === GameStatus.DAY ? "DAY_START" : "NIGHT_START", {
-        phaseLength: game.getStatus() === GameStatus.DAY ? game.getGameParam().dayLength : game.getGameParam().nightLength,
-        elapsedTime:
-            game.getStatus() === GameStatus.DAY ?
-                ((Date.now() - game.getGameParam().startDate) % (game.getGameParam().dayLength + game.getGameParam().nightLength)) - game.getGameParam().nightLength :
-                (Date.now() - game.getGameParam().startDate) % (game.getGameParam().dayLength + game.getGameParam().nightLength)
-    });
+    if (game.getStatus() === GameStatus.DAY) game.eventDayStart(player);
+    else if (game.getStatus() === GameStatus.NIGHT) game.eventNightStart(player);
 }
 
 // Event.registerHandlers("GET_ALL_INFO", getInfoGame);

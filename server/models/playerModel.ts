@@ -1,6 +1,6 @@
 import { ServerToClientEvents } from "../controllers/event/eventTypes";
 import database from "../util/database";
-import { Game, Role } from "./gameModel";
+import { Game, GameStatus, Role } from "./gameModel";
 import Power from "./powerModelBetter";
 import { User } from "./userModel";
 
@@ -35,6 +35,10 @@ export class Player {
 
     public getUser(): User {
         return this.user;
+    }
+
+    public getName(): string {
+        return this.getUser().getUsername();
     }
 
     public getRole(): Role {
@@ -82,7 +86,7 @@ export class Player {
             const role: Role = (this.isWerewolf() && player.isWerewolf()) || player === this || player.isDead() ? player.getRole() : null;
             const power: string = player === this || player.isDead() ? this.getPowerName() : null;
             return {
-                user: player.getUser().getUsername(),
+                user: player.getName(),
                 alive: !player.isDead(),
                 role: role,
                 power: power
@@ -91,11 +95,11 @@ export class Player {
         this.sendMessage("LIST_PLAYERS", { players: infoPlayers });
     }
 
-    // public sendInfoPlayer(): void {
-    //     const role: Role = this.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
-    //     const power: string = this.getPower() ? this.getPower().getName() : "NO_POWER";
-    //     this.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: power, nbWerewolves: this.game.getWerewolves().length });
-    // }
+    public sendPowerState(): void {
+        if (!this.power) return;
+        if (this.game.getStatus() === GameStatus.DAY || this.getPower().getAlreadyUsed()) this.sendMessage("POWER_END", {});
+        if (this.game.getStatus() === GameStatus.NIGHT) this.sendMessage("POWER_START", {});
+    }
 
     public static schema = async (): Promise<void> => {
         await database.schema
@@ -110,6 +114,12 @@ export class Player {
             .execute();
     };
 
+    /**
+     * Sett player data
+     * @param {Game} game player's game
+     * @param {Record<string, any>} data player data
+     * @returns {Player}
+     */
     public static async load(game: Game, data: { user: string; power: string; werewolf: boolean; alive: boolean }): Promise<Player> {
         const user = await User.load(data.user);
         const player = new Player(user, game);
