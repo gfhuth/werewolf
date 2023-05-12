@@ -35,7 +35,7 @@ export default class SpiritismPower extends Power {
 
     public applyPower(game: Game, player: Player): void {
         game.setChatSpiritism(player, this.getTargets()[0]);
-        LOGGER.log(`Spiritism power applied (${player.getUser().getUsername()} and ${this.getTargets()[0].getUser().getUsername()} can now discuss in the spiritism chat`);
+        LOGGER.log(`Spiritism power applied (${player.getName()} and ${this.getTargets()[0].getName()} can now discuss in the spiritism chat`);
     }
 
 }

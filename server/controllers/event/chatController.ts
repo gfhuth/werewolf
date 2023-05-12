@@ -19,7 +19,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
     const message: Message = {
         game: game.getGameId(),
         type: data.chat_type,
-        user: player.getUser().getUsername(),
+        user: player.getName(),
         content: data.content,
         date: data.date
     };
@@ -70,7 +70,7 @@ const newMessage = async (game: Game, player: Player, data: { date: number; chat
             return;
         }
         await database.insertInto("messages").values(message).execute();
-        LOGGER.log(`New message from ${player.getUser().getUsername()}`);
+        LOGGER.log(`New message from ${player.getName()}`);
         chat.addMessage(message);
     } else {
         player.sendError("CHAT_ERROR", 500, "Chat null");
@@ -92,9 +92,6 @@ const getAllChats = async (game: Game, player: Player): Promise<void> => {
             content: message.content
         }));
     }
-    // res[ChatType.CHAT_VILLAGE] = game.getChat(ChatType.CHAT_VILLAGE).getMessages();
-    // res[ChatType.CHAT_WEREWOLF] = game.getChat(ChatType.CHAT_WEREWOLF).getMessages();
-    // res[ChatType.CHAT_SPIRITISM] = game.getChat(ChatType.CHAT_SPIRITISM).getMessages();
     LOGGER.log(`CHAT ALL CHAT END`);
 
     player.sendMessage("GET_ALL_INFO_CHAT", res);
