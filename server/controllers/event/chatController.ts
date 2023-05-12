@@ -85,12 +85,21 @@ const getAllChats = async (game: Game, player: Player): Promise<void> => {
     for (const chatType of chatTypes) {
         const chat = game.getChat(chatType);
         if (!chat || !chat.hasMember(player)) continue;
-        res[chatType] = chat.getMessages().map((message) => ({
-            author: message.user,
-            date: message.date,
-            chat_type: chatType,
-            content: message.content
-        }));
+        if (player.isDead()) {
+            res[chatType] = (await database.selectFrom("messages").select(["user", "date", "type", "content"]).where("type", "=", chat.getType()).execute()).map((msg) => ({
+                author: msg.user,
+                date: msg.date,
+                chat_type: chatType,
+                content: msg.content
+            }));
+        } else {
+            res[chatType] = chat.getMessages().map((message) => ({
+                author: message.user,
+                date: message.date,
+                chat_type: chatType,
+                content: message.content
+            }));
+        }
     }
     LOGGER.log(`CHAT ALL CHAT END`);
 
