@@ -33,6 +33,7 @@ cypress:
   stage: lint
   image: node:latest
   script:
+    - npm init
     - npm ci
     - npm run start:ci &
     - npm run e2e
