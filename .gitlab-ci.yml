@@ -43,9 +43,11 @@ test_unit_backend:
   stage: test
   image: node:latest
   script:
+    - yarn global add ts-node --prefix /usr/local
     - cd server/
     - yarn install 
     - yarn start &
+    - sleep 10
     - yarn test
     # - if [ $(yarn test | grep "Total :" |  cut -c 14-100") != $(yarn test | grep "Succeed :" |  cut -c 16-100)  ]; then
     # - exit 1
