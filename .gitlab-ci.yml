@@ -38,7 +38,6 @@ cypress:
     - yarn start &
     - cd ..
     - cd client/
-    - npm ci
     - ./node_modules/.bin/cypress run --browser chrome
 
 
