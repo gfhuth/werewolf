@@ -46,6 +46,7 @@ cypress:
     - npm install -g ts-node
     - yarn add cypress
     - yarn start &
+    - sleep 30
     - ./node_modules/.bin/cypress run --browser chrome
 
 
