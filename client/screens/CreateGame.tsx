@@ -97,17 +97,21 @@ export default function CreateGame(): React.ReactElement {
                     <Divider my={5} />
                     <FormControl>
                         <FormControl.Label>Durée du jour (minutes)</FormControl.Label>
-                        <InputNumber value={fieldsValue.dayLength} onChange={(value): void => {
-                            setFieldsValue((oldValue) => ({ ...oldValue, dayLength: value })); 
-                            gameContext.setDayDuration(value);
-                        }} />
+                        <InputNumber
+                            value={fieldsValue.dayLength}
+                            onChange={(value): void => {
+                                setFieldsValue((oldValue) => ({ ...oldValue, dayLength: value }));
+                            }}
+                        />
                     </FormControl>
                     <FormControl>
                         <FormControl.Label>Durée de la nuit (minutes)</FormControl.Label>
-                        <InputNumber value={fieldsValue.nightLength} onChange={(value): void => {
-                            setFieldsValue((oldValue) => ({ ...oldValue, nightLength: value })); 
-                            gameContext.setNightDuration(value);
-                        }} />
+                        <InputNumber
+                            value={fieldsValue.nightLength}
+                            onChange={(value): void => {
+                                setFieldsValue((oldValue) => ({ ...oldValue, nightLength: value }));
+                            }}
+                        />
                     </FormControl>
                     <Divider my={5} />
                     <FormControl>

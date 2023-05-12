@@ -101,7 +101,7 @@ export default function ChatComponent(): React.ReactElement {
                         <Text>Aucun message</Text>
                     )}
                 </ScrollView>
-                <InputText value={message} onChange={setMessage} InputRightElement={<IconButton icon={<Ionicons name="send" />} onPress={sendMessage} />} />
+                <InputText value={message} onChange={setMessage} InputRightElement={<IconButton icon={<Ionicons name="send" />} onPress={sendMessage} color={"primary.600"} />} />
             </View>
         </Collapsible>
     );

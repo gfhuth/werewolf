@@ -31,11 +31,11 @@ export default function Jeux(): React.ReactElement {
             <Overlay />
             <View>
                 {gameContext.phase == GamePhase.DAY ? (
-                    <Text color={"white"} fontWeight={"900"} fontSize={"150%"}>
+                    <Text color={"white"} fontWeight={"900"} fontSize={"23"}>
                         TMP : Jour
                     </Text>
                 ) : (
-                    <Text color={"white"} fontWeight={"900"} fontSize={"150%"}>
+                    <Text color={"white"} fontWeight={"900"} fontSize={"23"}>
                         TMP : Nuit
                     </Text>
                 )}

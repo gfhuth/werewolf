@@ -31,7 +31,7 @@ export default function InputDate(props: { value: Date, onChange: (value: Date) 
 
     return (
         <>
-            <Pressable mt={2} onPress={(): void => setDateOpen(true)}>
+            <Pressable mt={2} onPress={(): void => setDateOpen(true)} onFocus={(): void => setDateOpen(true)}>
                 <Input value={moment(props.value).format("DD/MM/YYYY HH:mm")} />
             </Pressable>
             <DatePickerModal visible={dateOpen} date={date} mode="single" onConfirm={onConfirmDate} onDismiss={onDismiss} locale="en" />

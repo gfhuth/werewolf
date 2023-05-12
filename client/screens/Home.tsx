@@ -24,7 +24,7 @@ function capitalize(text: string): string {
     return text.charAt(0).toUpperCase() + text.toLocaleLowerCase().substring(1);
 }
 
-function GameCard(props: { game: Partie; buttons?: Array<React.ReactNode> }): React.ReactElement {
+function GameCard(props: { game: Partie; buttons?: React.ReactNode }): React.ReactElement {
     const game = props.game;
     return (
         <View key={game.id}>
@@ -40,12 +40,12 @@ function GameCard(props: { game: Partie; buttons?: Array<React.ReactNode> }): Re
                         </Text>
                     </HStack>
                 </HStack>
-                <Text fontSize={"105%"}>
+                <Text fontSize={"16"}>
                     Créateur : <Text fontWeight={"500"}>{game.host}</Text>
                 </Text>
-                <HStack justifyContent={"space-between"} alignItems={"end"}>
-                    <Text fontSize={"105%"}>{capitalize(game.date < new Date() ? moment(game.date).from(moment()) : moment().to(moment(game.date)))}</Text>
-                    <View display={"flex"} alignItems={"end"}>
+                <HStack justifyContent={"space-between"} alignItems={"flex-end"}>
+                    <Text fontSize={"16"}>{capitalize(game.date < new Date() ? moment(game.date).from(moment()) : moment().to(moment(game.date)))}</Text>
+                    <View display={"flex"} alignItems={"flex-end"}>
                         {props.buttons}
                     </View>
                 </HStack>
@@ -80,7 +80,6 @@ export default function Home(): React.ReactElement {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res.games);
                 res.games.map((info: Partie) => {
                     info.date = new Date(info.startDate);
                 });
@@ -100,7 +99,6 @@ export default function Home(): React.ReactElement {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res.games);
                 res.games.map((info: Partie) => {
                     info.date = new Date(info.startDate);
                 });
@@ -172,7 +170,7 @@ export default function Home(): React.ReactElement {
                                 <GameCard
                                     key={informationPartie.id}
                                     game={informationPartie}
-                                    buttons={[
+                                    buttons={
                                         informationPartie.date > new Date() ? (
                                             <Button key={1} size="md" fontSize="lg" width={"130"} onPress={(): void => joinGame(informationPartie.id)}>
                                                 Rejoindre la partie
@@ -182,7 +180,7 @@ export default function Home(): React.ReactElement {
                                                 La partie a déjà commencée
                                             </Text>
                                         )
-                                    ]}
+                                    }
                                 />
                             ))}
                 </View>
@@ -195,20 +193,20 @@ export default function Home(): React.ReactElement {
                                 key={informationPartie.id}
                                 game={informationPartie}
                                 buttons={
-                                    informationPartie.date < new Date() ?
-                                        [
-                                            <Button key={1} size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
-                                                  Go to game
-                                            </Button>
-                                        ] :
-                                        [
+                                    informationPartie.date < new Date() ? (
+                                        <Button key={1} size="md" fontSize="lg" width={"20"} onPress={(): void => goToGame(informationPartie.id)}>
+                                            Go to game
+                                        </Button>
+                                    ) : (
+                                        <>
                                             <Text key={1} fontSize={"sm"} color={"muted.600"} width={150} textAlign={"right"}>
-                                                  La partie n'a pas encore commencée
-                                            </Text>,
+                                                La partie n'a pas encore commencée
+                                            </Text>
                                             <Button key={2} size="md" fontSize="lg" width={"20"} colorScheme={"red"} onPress={(): void => leaveGame(informationPartie.id)}>
-                                                  Quitter
+                                                Quitter
                                             </Button>
-                                        ]
+                                        </>
+                                    )
                                 }
                             />
                         ))}
