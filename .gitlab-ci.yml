@@ -34,7 +34,10 @@ cypress:
   image: node:latest
   script:
     - npm install cypress
-    - npm run e2e
+    - cd client/
+    - ./node_modules/.bin/cypress run  
+
+    
 drawio:on-schedule:
   stage: drawio
   image: "docker-registry.univ-nantes.fr/bousse-e/docker-drawio"
