@@ -52,7 +52,7 @@ cypress:
 
 test_unit_backend:
   stage: test
-  image: node:latest
+  image: cypress/browsers:latest
   script:
     - cd server/
     - yarn install 
