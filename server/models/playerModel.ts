@@ -1,7 +1,12 @@
 import { ServerToClientEvents } from "../controllers/event/eventTypes";
 import database from "../util/database";
-import { Game, Role } from "./gameModel";
+import { SQLBoolean } from "../util/sql/schema";
+import { Game, GameStatus, Role } from "./gameModel";
 import Power from "./powerModelBetter";
+import ClairvoyancePower from "./powers/ClairvoyancePower";
+import ContaminationPower from "./powers/ContaminationPower";
+import InsomniaPower from "./powers/InsomniaPower";
+import SpiritismPower from "./powers/SpiritismPower";
 import { User } from "./userModel";
 
 export class Player {
@@ -25,16 +30,22 @@ export class Player {
     public isDead(): boolean {
         return !this.isAlive;
     }
+
     public setAlive(alive: boolean): void {
         this.isAlive = alive;
     }
 
     public kill(): void {
+        database.updateTable("players").set({ alive: SQLBoolean.false }).where("user", "=", this.getName()).where("game", "=", this.game.getGameId()).execute();
         this.isAlive = false;
     }
 
     public getUser(): User {
         return this.user;
+    }
+
+    public getName(): string {
+        return this.getUser().getUsername();
     }
 
     public getRole(): Role {
@@ -50,6 +61,7 @@ export class Player {
     }
 
     public setPower(power: Power): void {
+        database.updateTable("players").set({ power: power.getName() }).where("user", "=", this.getName()).where("game", "=", this.game.getGameId()).execute();
         this.power = power;
     }
 
@@ -58,15 +70,13 @@ export class Player {
     }
 
     public setWerewolf(value: boolean): void {
+        database
+            .updateTable("players")
+            .set({ werewolf: value ? SQLBoolean.true : SQLBoolean.false })
+            .where("user", "=", this.getName())
+            .where("game", "=", this.game.getGameId())
+            .execute();
         this.werewolf = value;
-    }
-
-    public contaminated(): boolean {
-        if (this.werewolf === false) {
-            this.werewolf = true;
-            return true;
-        }
-        return false;
     }
 
     public sendMessage<T extends keyof ServerToClientEvents>(event: T, data: ServerToClientEvents[T]): void {
@@ -82,7 +92,7 @@ export class Player {
             const role: Role = (this.isWerewolf() && player.isWerewolf()) || player === this || player.isDead() ? player.getRole() : null;
             const power: string = player === this || player.isDead() ? this.getPowerName() : null;
             return {
-                user: player.getUser().getUsername(),
+                user: player.getName(),
                 alive: !player.isDead(),
                 role: role,
                 power: power
@@ -91,11 +101,11 @@ export class Player {
         this.sendMessage("LIST_PLAYERS", { players: infoPlayers });
     }
 
-    // public sendInfoPlayer(): void {
-    //     const role: Role = this.isWerewolf() ? Role.WEREWOLF : Role.HUMAN;
-    //     const power: string = this.getPower() ? this.getPower().getName() : "NO_POWER";
-    //     this.sendMessage("GET_ALL_INFO_PLAYER", { role: role, power: power, nbWerewolves: this.game.getWerewolves().length });
-    // }
+    public sendPowerState(): void {
+        if (!this.power) return;
+        if (this.game.getStatus() === GameStatus.DAY || this.getPower().getAlreadyUsed()) this.sendMessage("POWER_END", {});
+        if (this.game.getStatus() === GameStatus.NIGHT) this.sendMessage("POWER_START", {});
+    }
 
     public static schema = async (): Promise<void> => {
         await database.schema
@@ -110,13 +120,21 @@ export class Player {
             .execute();
     };
 
+    /**
+     * Sett player data
+     * @param {Game} game player's game
+     * @param {Record<string, any>} data player data
+     * @returns {Player}
+     */
     public static async load(game: Game, data: { user: string; power: string; werewolf: boolean; alive: boolean }): Promise<Player> {
         const user = await User.load(data.user);
         const player = new Player(user, game);
         player.setWerewolf(data.werewolf);
         player.setAlive(data.alive);
-
-        // TODO load power
+        if (data.power === InsomniaPower.POWERNAME) player.setPower(new InsomniaPower());
+        else if (data.power === ContaminationPower.POWERNAME) player.setPower(new ContaminationPower());
+        else if (data.power === ClairvoyancePower.POWERNAME) player.setPower(new ClairvoyancePower());
+        else if (data.power === SpiritismPower.POWERNAME) player.setPower(new SpiritismPower());
 
         return player;
     }

@@ -53,7 +53,7 @@ export class Game {
         this.gameId = gameId;
         this.host = host;
         this.gameParam = gameParam;
-        this.chats = [];
+        this.chats = [new Chat(ChatType.CHAT_VILLAGE, []), new Chat(ChatType.CHAT_WEREWOLF, []), new Chat(ChatType.CHAT_SPIRITISM, [])];
         this.currentVote = null;
 
         Game.addGameInList(this);
@@ -66,25 +66,6 @@ export class Game {
     /* ------------------ fonction logique de la partie ------------------ */
 
     /**
-     * Initialisation des chats lors de la création d'une partie
-     */
-    public initChats(): void {
-        this.chats.push(new Chat(ChatType.CHAT_VILLAGE, this.getAllPlayers()));
-        // Ajout de l'insomnie dans le chat des loup-garous
-        this.chats.push(
-            new Chat(
-                ChatType.CHAT_WEREWOLF,
-                this.getWerewolves().concat(
-                    this.getAllPlayers().filter((player) => {
-                        if (!player.getPower()) return false;
-                        else return player.getPower().getName() === ClairvoyancePower.POWERNAME;
-                    })
-                )
-            )
-        );
-        this.chats.push(new Chat(ChatType.CHAT_SPIRITISM, []));
-    }
-    /**
      * Mise à jour du chat du chaman
      * @param {Player} chaman Joueur ayant le pouvoir de spiritisme
      * @param {Player} deadPlayer Joueur mort qui échange avec lui la nuit
@@ -95,7 +76,7 @@ export class Game {
     }
 
     public addPlayer(player: Player): void {
-        this.players.set(player.getUser().getUsername(), player);
+        this.players.set(player.getName(), player);
     }
 
     public removePlayer(username: string): void {
@@ -106,16 +87,27 @@ export class Game {
         return this.players.has(user.getUsername());
     }
 
-    public getHost(): User {
-        return this.host;
-    }
-
     public delete(): void {
         Game.games.delete(this.gameId);
     }
 
     public isStarted(): boolean {
         return this.getGameParam().startDate < Date.now();
+    }
+
+    public eventDayStart(player: Player): void {
+        const elapsedTime: number = ((Date.now() - this.getGameParam().startDate) % (this.getGameParam().dayLength + this.getGameParam().nightLength)) - this.getGameParam().nightLength;
+        player.sendMessage("DAY_START", { phaseLength: this.getGameParam().dayLength, elapsedTime: elapsedTime });
+    }
+
+    public eventNightStart(player: Player): void {
+        const elapsedTime: number = (Date.now() - this.getGameParam().startDate) % (this.getGameParam().dayLength + this.getGameParam().nightLength);
+        player.sendMessage("NIGHT_START", { phaseLength: this.getGameParam().nightLength, elapsedTime: elapsedTime });
+    }
+
+    public eventEndGame(player: Player): void {
+        const winningRole: Role = this.getWinningRole();
+        if (winningRole) player.sendMessage("END_GAME", { winningRole: winningRole });
     }
 
     private setupRoles(): void {
@@ -129,28 +121,32 @@ export class Game {
             players.splice(players.indexOf(werewolf), 1);
         }
         LOGGER.log(`${nbWerewolves} werewolf(s) in this game`);
-        werewolves.forEach((player) => LOGGER.log(`${player.getUser().getUsername()} is a werewolf in this game`));
+        werewolves.forEach((player) => LOGGER.log(`${player.getName()} is a werewolf in this game`));
     }
 
     private setupPower(): void {
         const werewolves: Array<Player> = this.getWerewolves();
         const humans: Array<Player> = this.getAllPlayers().filter((player) => !player.isWerewolf());
 
+        // Set contamination (werewolf power)
         if (Math.random() <= this.gameParam.probaContamination) {
             const contamination: Player = werewolves[Math.floor(Math.random() * werewolves.length)];
             contamination.setPower(new ContaminationPower());
         }
+        // Set insomnia (human power)
         if (humans.length > 0 && Math.random() <= this.gameParam.probaInsomnie) {
             const insomnie: Player = humans[Math.floor(Math.random() * humans.length)];
             insomnie.setPower(new InsomniaPower());
         }
 
+        // Set spiritsm
         let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getPower());
         if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaSpiritisme) {
             const spiritisme: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
             spiritisme.setPower(new SpiritismPower());
         }
 
+        // Set clairvoyance
         playersWithoutPower = playersWithoutPower.filter((player) => !player.getPower());
         if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaVoyance) {
             const voyance: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
@@ -158,17 +154,10 @@ export class Game {
         }
     }
 
-    public getWinningRole(): Role | null {
-        if (!this.isStarted()) return null;
-        if (this.getWerewolves().filter((player) => !player.isDead()).length === 0) return Role.HUMAN;
-        else if (this.getAllPlayers().filter((player) => !player.isWerewolf() && !player.isDead()).length === 0) return Role.WEREWOLF;
-        return null;
-    }
-
     private verifyEndGame(): boolean {
         const winningRole: Role = this.getWinningRole();
         if (winningRole) {
-            this.getAllPlayers().forEach((player) => player.sendMessage("END_GAME", { winningRole: winningRole }));
+            this.getAllPlayers().forEach((player) => this.eventEndGame(player));
             LOGGER.log("End game");
             return true;
         }
@@ -186,7 +175,7 @@ export class Game {
         const resultVote: Player = this.currentVote.getResult();
         if (resultVote) {
             resultVote.kill();
-            LOGGER.log(`Player ${resultVote.getUser().getUsername()} is dead`);
+            LOGGER.log(`Player ${resultVote.getName()} is dead`);
         }
     }
 
@@ -195,12 +184,8 @@ export class Game {
             .filter((player) => player.getPower())
             .forEach((player) => {
                 player.getPower().setAlreadyUsed(false);
-                player.sendMessage("POWER_START", {});
+                player.sendPowerState();
             });
-    }
-
-    private getPlayerWithPower(power: string): Player | undefined {
-        return this.getAllPlayers().find((p) => p.getPower() && p.getPower().getName() === power);
     }
 
     startDay(): void {
@@ -215,10 +200,9 @@ export class Game {
         LOGGER.log(`Alive humans number: ${this.getAllPlayers().filter((p) => !p.isWerewolf() && !p.isDead()).length}`);
         LOGGER.log(`Alive werewolves number: ${this.getWerewolves().filter((p) => !p.isDead()).length}`);
 
-        // Envoie à chaque joueur un recap de la nuit
+        // Envoie à chaque joueur le début du jour et un recap de la nuit
         this.getAllPlayers().forEach((player) => {
-            const elapsedTime: number = ((Date.now() - this.getGameParam().startDate) % (this.getGameParam().dayLength + this.getGameParam().nightLength)) - this.getGameParam().nightLength;
-            player.sendMessage("DAY_START", { phaseLength: this.getGameParam().dayLength, elapsedTime: elapsedTime });
+            this.eventDayStart(player);
             player.sendInfoAllPlayers();
         });
 
@@ -226,13 +210,15 @@ export class Game {
         const isEndGame: boolean = this.verifyEndGame();
 
         if (!isEndGame) {
-            // Réinitialisation du chat
-            this.getChat(ChatType.CHAT_VILLAGE).resetMessages();
+            // Fermeture des chats de la nuit et réinitilisation des chats du jour
+            this.getChat(ChatType.CHAT_WEREWOLF).close();
+            this.getChat(ChatType.CHAT_SPIRITISM).close();
+            this.getChat(ChatType.CHAT_VILLAGE).resetChatMembers(this.getAllPlayers());
 
-            // Initialisation du vote
-            this.currentVote.endVote();
+            // Fermeture du vote précédent et initialisation du vote
+            this.currentVote.close();
             this.setVote(new Vote(VoteType.VOTE_VILLAGE, Player.alivePlayers(this.getAllPlayers())));
-            this.currentVote.startVote();
+            this.currentVote.open();
 
             setTimeout(this.startNight.bind(this), this.gameParam.dayLength);
         }
@@ -247,10 +233,9 @@ export class Game {
         LOGGER.log(`Alive humans number: ${this.getAllPlayers().filter((p) => !p.isWerewolf() && !p.isDead()).length}`);
         LOGGER.log(`Alive werewolves number: ${this.getWerewolves().filter((p) => !p.isDead()).length}`);
 
-        // Envoie à chaque joueur un recap du jour
+        // Envoie à chaque joueur le début de la nuit et un recap du jour
         this.getAllPlayers().forEach((player) => {
-            const elapsedTime: number = (Date.now() - this.getGameParam().startDate) % (this.getGameParam().dayLength + this.getGameParam().nightLength);
-            player.sendMessage("NIGHT_START", { phaseLength: this.getGameParam().nightLength, elapsedTime: elapsedTime });
+            this.eventNightStart(player);
             player.sendInfoAllPlayers();
         });
 
@@ -261,18 +246,15 @@ export class Game {
             // Réinitialisation des pouvoirs
             this.resetPowers();
 
-            // Réinitialisation des chats
-            this.getChat(ChatType.CHAT_WEREWOLF).resetMessages();
-            // this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(this.getWerewolves().concat(this.getAllPlayers().filter((player) => !player.isWerewolf() && player.isDead())));
+            // Fermeture des chats du jour et réinitilisation des chats de la nuit
+            this.getChat(ChatType.CHAT_VILLAGE).close();
             this.getChat(ChatType.CHAT_WEREWOLF).resetChatMembers(unique(...this.getWerewolves(), ...this.getAllPlayers().filter((p) => p.isDead()), this.getPlayerWithPower(InsomniaPower.POWERNAME)));
-
-            this.getChat(ChatType.CHAT_SPIRITISM).resetMessages();
             this.getChat(ChatType.CHAT_SPIRITISM).resetChatMembers([]);
 
-            // Initialisation du vote
-            if (this.currentVote) this.currentVote.endVote();
+            // Fermeture du vote précédent et initialisation du vote
+            if (this.currentVote) this.currentVote.close();
             this.setVote(new Vote(VoteType.VOTE_WEREWOLF, Player.alivePlayers(this.getWerewolves())));
-            this.currentVote.startVote();
+            this.currentVote.open();
 
             setTimeout(this.startDay.bind(this), this.gameParam.nightLength);
         }
@@ -294,10 +276,6 @@ export class Game {
         LOGGER.log(`Initialisation des pouvoirs : ${this.gameId}`);
         this.setupPower();
 
-        // Initialisation des chats
-        LOGGER.log(`Initialisation des chats : ${this.gameId}`);
-        this.initChats();
-
         // Lancement du jeu avec la première nuit
         LOGGER.log(`game ${this.gameId} successfuly initialized`);
         this.startNight();
@@ -310,6 +288,10 @@ export class Game {
      */
     public getGameId(): number {
         return this.gameId;
+    }
+
+    public getHost(): User {
+        return this.host;
     }
 
     public getGameParam(): GameParam {
@@ -339,19 +321,15 @@ export class Game {
         return this.getAllPlayers().filter((player: Player) => player.isWerewolf());
     }
 
-    public getGameRecap(): Record<string, any> {
-        const usernameList: Array<string> = [];
-        const usernameDeathList: Array<string> = [];
-        const iterator = this.players.values();
-        for (let player = iterator.next(); !player.done; player = iterator.next()) {
-            usernameList.push(player.value.getUser().getUsername());
-            if (player.value.isDeath()) usernameDeathList.push(player.value.getUser().getUsername());
-        }
-        return {
-            status: this.getStatus(),
-            playerInGame: usernameList,
-            deathPlayer: usernameDeathList
-        };
+    private getPlayerWithPower(power: string): Player | undefined {
+        return this.getAllPlayers().find((p) => p.getPower() && p.getPower().getName() === power);
+    }
+
+    public getWinningRole(): Role | null {
+        if (!this.isStarted()) return null;
+        if (this.getWerewolves().filter((player) => !player.isDead()).length === 0) return Role.HUMAN;
+        else if (this.getAllPlayers().filter((player) => !player.isWerewolf() && !player.isDead()).length === 0) return Role.WEREWOLF;
+        return null;
     }
 
     public getStatus(): GameStatus {
@@ -364,8 +342,8 @@ export class Game {
 
     /* ------------------ Static Function ------------------ */
     /**
-     * Charge une partie depuis la base de données
-     * @param {number} gameId Id de la partie
+     * Get game from the database
+     * @param {number} gameId game id
      * @returns {Game}
      */
     static async load(gameId: number): Promise<Game> {
@@ -474,14 +452,6 @@ export class Game {
             const game: Game = new Game(elem.id, await User.load(elem.host), gameParams);
             game.load();
         }
-
-        // Initialisation des joueurs de chaque partie
-        // const players: Array<{ name: string; role: number; power: number; game: number }> = await database.selectFrom("players").select(["name", "role", "power", "game"]).execute();
-        // for (const elem of players) {
-        //     const game: Game = Game.getGame(elem.game);
-        //     const player: Player = new Player(User.getUser(elem.name), Villager.load(elem.role), elem.power, game);
-        //     game.addPlayer(player);
-        // }
         LOGGER.log("Chargement des parties déjà créées terminé");
     }
 

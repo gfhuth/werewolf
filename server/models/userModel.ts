@@ -15,6 +15,11 @@ export class User {
         this.waitingMessages = [];
     }
 
+    /**
+     * Get user data
+     * @param {string} username name of the user
+     * @returns {User}
+     */
     static async load(username: string): Promise<User> {
         if (User.usersSet[username]) return User.usersSet[username];
 
@@ -42,6 +47,9 @@ export class User {
         return this.ws != null;
     }
 
+    /**
+     * Send waiting message to a user because of deconnexion
+     */
     public sendWaitingMessages(): void {
         for (const message of this.waitingMessages) this.ws.send(message);
         this.waitingMessages.length = 0;

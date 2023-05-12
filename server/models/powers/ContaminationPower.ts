@@ -33,7 +33,7 @@ export default class ContaminationPower extends Power {
 
     public applyPower(game: Game, player: Player): void {
         this.getTargets()[0].setWerewolf(true);
-        LOGGER.log(`Contamination power applied (${this.getTargets()[0].getUser().getUsername()} is now a werewolf)`);
+        LOGGER.log(`Contamination power applied (${this.getTargets()[0].getName()} is now a werewolf)`);
     }
 
 }

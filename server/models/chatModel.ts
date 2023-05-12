@@ -31,21 +31,32 @@ export class Chat {
     }
 
     public hasMember(player: Player): boolean {
-        return !!this.getMembers().find((p) => p.getUser().getUsername() === player.getUser().getUsername());
+        return !!this.getMembers().find((p) => p.getName() === player.getName());
     }
 
     public getMessages(): Array<Message> {
         return this.messages;
     }
 
-    public resetMessages(): void {
+    public close(): void {
+        this.members.forEach((member) => {
+            this.sendQuitChat(member);
+        });
         this.messages.length = 0;
+        this.members.length = 0;
     }
 
     public resetChatMembers(newMembers: Array<Player>): void {
-        this.members.filter((p) => !newMembers.includes(p)).forEach((p) => p.sendMessage("QUIT_CHAT", { chat_type: this.type }));
         this.members = newMembers;
-        this.members.forEach((p) => p.sendMessage("JOIN_CHAT", { chat_type: this.type }));
+        this.members.forEach((p) => this.sendJoinChat(p));
+    }
+
+    public sendJoinChat(player: Player): void {
+        player.sendMessage("JOIN_CHAT", { chat_type: this.type });
+    }
+
+    public sendQuitChat(player: Player): void {
+        player.sendMessage("QUIT_CHAT", { chat_type: this.type });
     }
 
     /**
