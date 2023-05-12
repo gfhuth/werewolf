@@ -45,6 +45,7 @@ cypress:
     - yarn install --frozen-lockfile
     - npm install -g ts-node
     - yarn add cypress
+    - yarn start &
     - ./node_modules/.bin/cypress run --browser chrome
 
 
@@ -52,9 +53,9 @@ test_unit_backend:
   stage: test
   image: node:latest
   script:
-    - yarn global add ts-node --prefix /usr/local
     - cd server/
     - yarn install 
+    - npm install -g ts-node
     - yarn start &
     - sleep 10
     - yarn test
