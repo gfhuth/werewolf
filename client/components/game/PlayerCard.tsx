@@ -41,13 +41,15 @@ export default function PlayerCard(props: { player: Player }): React.ReactElemen
     const getVoteElement = (): React.ReactNode => {
         if (playerRatification) {
             return (
-                <Actionsheet.Item display={"flex"} flexDirection={"row"}>
-                    <Button bg="green.400" onPress={(): void => ratify(false)} flexGrow={1}>
-                        Voter pour la vie
-                    </Button>
-                    <Button bg="red.400" onPress={(): void => ratify(true)} flexGrow={1}>
-                        Voter pour la mort
-                    </Button>
+                <Actionsheet.Item>
+                    <View width={"100%"} display={"flex"} flexDirection={"row"}>
+                        <Button colorScheme={"green"} onPress={(): void => ratify(false)} flexGrow={1}>
+                            Voter pour la vie
+                        </Button>
+                        <Button colorScheme={"red"} onPress={(): void => ratify(true)} flexGrow={1}>
+                            Voter pour la mort
+                        </Button>
+                    </View>
                 </Actionsheet.Item>
             );
         } else {
