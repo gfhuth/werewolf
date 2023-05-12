@@ -146,6 +146,14 @@ export default function Home(): React.ReactElement {
         }
     }, [isFocused]);
 
+
+    useEffect(() => {
+        setInterval(() => {
+            requestListeDesParties();
+            requestListeDesPartiesUser();
+        }, 30000);
+    }, []);
+
     return (
         <Background>
             <NavigationUI allowBack={false} />
