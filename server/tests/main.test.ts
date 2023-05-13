@@ -199,6 +199,8 @@ const main = async (): Promise<void> => {
     console.log(colors.yellow(`Total : ${nbSuccess + nbFailed}`));
     console.log(colors.green(`Succeed : ${nbSuccess}`));
     console.log(colors.red(`Failed : ${nbFailed}`));
+
+    if (nbFailed > 0) process.exit(1);
 };
 
 main();
