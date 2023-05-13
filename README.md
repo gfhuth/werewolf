@@ -1,17 +1,17 @@
 ## Installation pour développement
 
-### Dépendances
+### Dépendances: 
 
 - Installer en global `npm i -g yarn ts-node expo`
 - Installer sur vscode [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [Prettier ESLint](https://marketplace.visualstudio.com/items?itemName=rvest.vs-code-prettier-eslint), [TODO Tree](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree)
 
 
-## (a) Analyse 
+## (a) Analyse:
 
-### Description des acteurs
+### Description des acteurs:
     
 <center>
-    <img src="documentation/acteurs.png">
+    <img src="documentation/global/out/acteurs.svg">
 </center>
 
     - User: Ce sont les utilisateur qui veut créer un compte ou se authentifier dans une compte déjà crée.
@@ -20,26 +20,52 @@
 
     - Server: c'est une monolithe que a les attribution de gérer la logique du jeu et coordonne l'interaction entre les joueurs. Il reçoit et traite les actions du client, met à jour l'état du jeu et envoie des mises à jour d'état à tous les joueurs. Le serveur de jeu gère l'authentification et l'autorisation des joueurs. L’implémentation des protocole HTTP ou WebSocket permettre la communication avec le client. Aussi c'est une role du server implémenter la base de donné pour les donné pérenne stockant les données du jeu, telles que les informations des joueurs, l'état du jeu e messages.
 
-### Diagramme de cas d’utilisations
+### Diagramme de cas d’utilisations:
 
 <center>
-    <img src="documentation/client/out/use_case_client.png">
+    <img src="documentation/client/out/use_case.svg">
 </center>
 
-### Description de ces cas d’utilisations au travers de diagrammes de séquences système pertinents
+### Description de ces cas d’utilisations au travers de diagrammes de séquences système pertinents:
 
-### Diagramme de classes d’analyse
+#### Creation de la partie:
 
-### Diagramme d’états/transitions si nécessaire
+<center>
+    <img src="documentation/global/sequence_analyse_creation_partie.drawio">
+</center>
 
-## Document de conception
+#### Deroulement de la partie:
 
-### L’architecture
+<center>
+    <img src="documentation/global/out/sequence_analyse_deroulement_partie.svg">
+</center>
 
-### Conception détaillée
+#### Messages du chat:
 
-- #### Diagramme de classes logicielles
+<center>
+    <img src="documentation/global/out/sequence_analyse_message_chat.svg">
+</center>
 
-- #### Diagrammes de séquence
+### Diagramme de classes d’analyse:
 
-- #### Diagrammes d’états-transitions
+<center>
+    <img src="documentation/server/out/diagramme_de_classes_analyse.svg">
+</center>
+
+### Diagramme d’états/transitions si nécessaire:
+
+## Document de conception:
+
+### L’architecture:
+
+### Conception détaillée:
+
+- #### Diagramme de classes logicielles:
+
+<center>
+    <img src="documentation/server/out/classe_models.svg">
+</center>
+
+- #### Diagrammes de séquence:
+
+- #### Diagrammes d’états-transitions:
