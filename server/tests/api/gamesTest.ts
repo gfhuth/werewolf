@@ -2,7 +2,7 @@ import request from "supertest";
 import { Client, url } from "../main.test";
 import { test } from "../test-api/testAPI";
 
-const testTiming = 2;
+const testTiming = 5;
 const date: Date = new Date();
 date.setSeconds(date.getSeconds() + testTiming);
 
