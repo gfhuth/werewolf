@@ -2,7 +2,7 @@ import { ServerToClientEvents } from "../controllers/event/eventTypes";
 import database from "../util/database";
 import { SQLBoolean } from "../util/sql/schema";
 import { Game, GameStatus, Role } from "./gameModel";
-import Power from "./powerModelBetter";
+import Power from "./powerModel";
 import ClairvoyancePower from "./powers/ClairvoyancePower";
 import ContaminationPower from "./powers/ContaminationPower";
 import InsomniaPower from "./powers/InsomniaPower";

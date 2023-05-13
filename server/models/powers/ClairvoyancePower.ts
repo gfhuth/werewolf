@@ -4,7 +4,7 @@ import { Event } from "../../controllers/eventController";
 import Logger from "../../util/Logger";
 import { Game } from "../gameModel";
 import { Player } from "../playerModel";
-import Power from "../powerModelBetter";
+import Power from "../powerModel";
 
 const LOGGER = new Logger("CLAIRVOYANCE");
 
@@ -15,6 +15,15 @@ export default class ClairvoyancePower extends Power {
 
     public constructor() {
         super(ClairvoyancePower.POWERNAME, false);
+    }
+
+    public tryAssign(game: Game, players: Player[]): Player|null {
+        const proba = game.getGameParam().probaVoyance as number;
+        if (proba && Math.random() > proba) return;
+
+        const player = players[Math.floor(Math.random() * players.length)];
+        player.setPower(this);
+        return player;
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_CLAIRVOYANCE"]): void {
@@ -35,4 +44,5 @@ export default class ClairvoyancePower extends Power {
 
 }
 
+Power.registerPower(ClairvoyancePower);
 Event.registerHandlers("USE_POWER_CLAIRVOYANCE", usePower);

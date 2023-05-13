@@ -1,6 +1,6 @@
 import { Game, GameStatus } from "../../models/gameModel";
 import { Player } from "../../models/playerModel";
-import Power from "../../models/powerModelBetter";
+import Power from "../../models/powerModel";
 import { Event } from "../eventController";
 
 export const usePower = async (game: Game, player: Player, data: Record<string, any>): Promise<void> => {

@@ -128,6 +128,7 @@ export const newGame = async (req: AuthenticatedRequest, res: Response): Promise
     for (const cond of conditions) {
         if (cond.value < cond.minRange || cond.value > cond.maxRange) {
             res.status(406).json({ message: cond.errorMessage });
+            LOGGER.log(`Failed to create new game: setting ${cond.value} not between ${cond.minRange} and ${cond.maxRange}`);
             return;
         }
     }

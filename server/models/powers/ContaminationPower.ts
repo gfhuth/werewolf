@@ -4,7 +4,7 @@ import { Event } from "../../controllers/eventController";
 import Logger from "../../util/Logger";
 import { Game } from "../gameModel";
 import { Player } from "../playerModel";
-import Power from "../powerModelBetter";
+import Power from "../powerModel";
 
 const LOGGER = new Logger("CONTAMINATION");
 
@@ -15,6 +15,18 @@ export default class ContaminationPower extends Power {
 
     public constructor() {
         super(ContaminationPower.POWERNAME, true);
+    }
+
+    public tryAssign(game: Game, players: Player[]): Player|null {
+        const werewolves = players.filter((player) => player.isWerewolf());
+        if (werewolves.length === 0) return;
+
+        const proba = game.getGameParam().probaContamination as number;
+        if (proba && Math.random() > proba) return;
+
+        const player = werewolves[Math.floor(Math.random() * werewolves.length)];
+        player.setPower(this);
+        return player;
     }
 
     public usePower(game: Game, player: Player, data: ClientToServerEvents["USE_POWER_CONTAMINATION"]): void {
@@ -38,4 +50,5 @@ export default class ContaminationPower extends Power {
 
 }
 
+Power.registerPower(ContaminationPower);
 Event.registerHandlers("USE_POWER_CONTAMINATION", usePower);

@@ -11,6 +11,7 @@ import ClairvoyancePower from "./powers/ClairvoyancePower";
 import { toBoolean } from "../util/sql/schema";
 import { User } from "./userModel";
 import { unique } from "../util/Utils";
+import Power from "./powerModel";
 
 const LOGGER = new Logger("GAME");
 
@@ -36,6 +37,7 @@ export type GameParam = {
     probaInsomnie: number;
     probaVoyance: number;
     probaSpiritisme: number;
+    [key: string]: number | string;
 };
 
 export class Game {
@@ -125,33 +127,42 @@ export class Game {
     }
 
     private setupPower(): void {
-        const werewolves: Array<Player> = this.getWerewolves();
-        const humans: Array<Player> = this.getAllPlayers().filter((player) => !player.isWerewolf());
+        // const werewolves: Array<Player> = this.getWerewolves();
+        // const humans: Array<Player> = this.getAllPlayers().filter((player) => !player.isWerewolf());
 
-        // Set contamination (werewolf power)
-        if (Math.random() <= this.gameParam.probaContamination) {
-            const contamination: Player = werewolves[Math.floor(Math.random() * werewolves.length)];
-            contamination.setPower(new ContaminationPower());
-        }
-        // Set insomnia (human power)
-        if (humans.length > 0 && Math.random() <= this.gameParam.probaInsomnie) {
-            const insomnie: Player = humans[Math.floor(Math.random() * humans.length)];
-            insomnie.setPower(new InsomniaPower());
+        const powers = Power.getPowers();
+        let players = this.getAllPlayers();
+        for (const power of powers) {
+            const powerInstance = new power();
+            const assignedPlayer = powerInstance.tryAssign(this, players);
+            if (assignedPlayer) 
+                players = players.filter((player) => player !== assignedPlayer);
         }
 
-        // Set spiritsm
-        let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getPower());
-        if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaSpiritisme) {
-            const spiritisme: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
-            spiritisme.setPower(new SpiritismPower());
-        }
+        // // Set contamination (werewolf power)
+        // if (Math.random() <= this.gameParam.probaContamination) {
+        //     const contamination: Player = werewolves[Math.floor(Math.random() * werewolves.length)];
+        //     contamination.setPower(new ContaminationPower());
+        // }
+        // // Set insomnia (human power)
+        // if (humans.length > 0 && Math.random() <= this.gameParam.probaInsomnie) {
+        //     const insomnie: Player = humans[Math.floor(Math.random() * humans.length)];
+        //     insomnie.setPower(new InsomniaPower());
+        // }
 
-        // Set clairvoyance
-        playersWithoutPower = playersWithoutPower.filter((player) => !player.getPower());
-        if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaVoyance) {
-            const voyance: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
-            voyance.setPower(new ClairvoyancePower());
-        }
+        // // Set spiritsm
+        // let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getPower());
+        // if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaSpiritisme) {
+        //     const spiritisme: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
+        //     spiritisme.setPower(new SpiritismPower());
+        // }
+
+        // // Set clairvoyance
+        // playersWithoutPower = playersWithoutPower.filter((player) => !player.getPower());
+        // if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaVoyance) {
+        //     const voyance: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
+        //     voyance.setPower(new ClairvoyancePower());
+        // }
     }
 
     private verifyEndGame(): boolean {

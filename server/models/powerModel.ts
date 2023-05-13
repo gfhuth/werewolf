@@ -1,7 +1,20 @@
 import { Game } from "./gameModel";
 import { Player } from "./playerModel";
 
+type SubPower = {
+    new(): Power
+}
+
 export default abstract class Power {
+
+    private static powers: Array<SubPower> = [];
+
+    public static registerPower(power: SubPower): void {
+        Power.powers.push(power);
+    }
+    public static getPowers(): Array<SubPower> {
+        return Power.powers;
+    }
 
     private name: string;
     private alreadyUsed: boolean;
@@ -42,5 +55,7 @@ export default abstract class Power {
     public abstract usePower(game: Game, player: Player, data: Record<string, any>): void;
 
     public abstract applyPower(game: Game, player: Player): void;
+
+    public abstract tryAssign(game: Game, players: Array<Player>): Player|null;
 
 }
