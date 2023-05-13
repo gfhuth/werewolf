@@ -80,10 +80,14 @@ drawio:on-schedule:
     - mkdir -p documentation/client/out
     - mkdir -p documentation/server/out
     - mkdir -p documentation/global/out
-    #Génération des images avec drawio
+    # Génération des images (SVG) avec drawio
     - drawio --export -f svg --crop --output documentation/client/out documentation/client/
     - drawio --export -f svg --crop --output documentation/server/out documentation/server/
     - drawio --export -f svg --crop --output documentation/global/out documentation/global/
+    # Génération des images (PNG) avec drawio
+    - drawio --export -f png --crop --output documentation/client/out documentation/client/
+    - drawio --export -f png --crop --output documentation/server/out documentation/server/
+    - drawio --export -f png --crop --output documentation/global/out documentation/global/
     # On ajoute les images et commit/push
     - git add documentation/client/out/*
     - git add documentation/server/out/*
