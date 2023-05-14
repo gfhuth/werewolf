@@ -1,6 +1,6 @@
-## Installation pour développement
+# Installation pour développement
 
-### Dépendances: 
+## Dépendances: 
 
 - Installer en global `npm i -g yarn ts-node expo`
 - Installer sur vscode [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [Prettier ESLint](https://marketplace.visualstudio.com/items?itemName=rvest.vs-code-prettier-eslint), [TODO Tree](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree)
@@ -29,6 +29,28 @@
 <center>
     <img src="documentation/server/out/use_case.png">
 </center>
+
+# Développement du backend
+
+Il est possible d'étendre le jeu du loup-garou et de rajouter des pouvoirs. On peut imaginer des pouvoirs tel que le *\color{black}{Voleur}* qui échange son pouvoir avec quelqu'un d'autres, ou la mise en place de *\color{black}{Cupidon}* qui rend deux personnes amoureuses.  
+  
+Afin de faciliter le mise en place de ces extensions, le développement du jeu a fait en sorte qu'il suffit de rajouter un fichier dans le répertoire `models/powers/` qui implémente le pouvoir.  
+  
+Un pouvoir est représenté par une classe qui étends la classe `Power` en donnant les deux informations suivantes :
+
+- le nom du pouvoir
+- un booléen qui indique si le pouvoir s'applique immédiatement dans la nuit ou uniquement au début du jour
+
+La classe du pouvoir implément uniquement deux méthodes :
+
+- `applyPower`: permet d'appliquer le pouvoir
+- `usePower`: effectuer des vérifications des conditions d'application du pouvoir et appelle `applyPower` uniquement si le pouvoir s'applique immédiatement la nuit.
+
+Enfin, afin qu'un joueur puisse utiliser le pouvoir, il est nécessaire de créer un événement `USE_POWER_POWERNAME` associé à ce pouvoir dans la liste des événements et d'y associer la méthode usePower. Cette tâche se fait facilement avec la ligne de code suivante que l'on place à la fin du fichier, en dehors de la classe :
+
+```ts
+Event.registerHandlers("USE_POWER_POWERNAME", usePower);
+```
 
 
 ### Description de ces cas d’utilisations au travers de diagrammes de séquences système pertinents:
