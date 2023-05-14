@@ -1,3 +1,30 @@
+# Présentation du projet
+
+
+<center>
+    <img src="asset/imageReadme.png">
+</center>
+
+<br><br>
+Le projet consiste a créer le jeux Loup-Garou sur mobile et web. Pour ce faire nous avons crée toute une application avec l'architecture MVC que vous pouvez voir ci-desous.
+
+
+<center>
+    <img src="documentation/global/out/mvc.png">
+</center>
+
+
+Pour ce projet nous avons utilisé plusieurs technologies:
+
+* React Native
+* Yarn
+* Expo
+
+* Plusieurs librairies (voir le fichier package.json)
+
+# Documentation pour l’installation et les tests
+
+
 ## Installation pour développement
 
 ### Dépendances: 
