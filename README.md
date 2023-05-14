@@ -34,7 +34,6 @@ Une fois cette commande faite, il faut installer certaines librairies globalemen
 
 ### Frontend
 $\textcolor{red}{\text{Attention, la partie frontend doit être lancée après partie backend.}}$ 
-
 <br>
 
 Pour lancer l’application web il vous suffit d’aller dans le dossier *client/* et de faire la commande suivante dans un terminal :
@@ -114,9 +113,7 @@ Event.registerHandlers("USE_POWER_POWERNAME", usePower);
 
 
 ---
-<span style="color:red">
-ANCIEN README A SURPPRIMER
-</span>
+$\textcolor{red}{\text{ANCIEN README A SURPPRIMER}}$ 
 
 
 ## Dépendances: 
