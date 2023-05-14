@@ -11,7 +11,7 @@
 ### Description des acteurs:
     
 <center>
-    <img src="documentation/global/out/acteurs.svg">
+    <img src="documentation/global/out/acteurs.png">
 </center>
 
     - User: Ce sont les utilisateur qui veut créer un compte ou se authentifier dans une compte déjà crée.
@@ -23,33 +23,38 @@
 ### Diagramme de cas d’utilisations:
 
 <center>
-    <img src="documentation/client/out/use_case.svg">
+    <img src="documentation/client/out/use_case.png">
 </center>
+
+<center>
+    <img src="documentation/server/out/use_case.png">
+</center>
+
 
 ### Description de ces cas d’utilisations au travers de diagrammes de séquences système pertinents:
 
 #### Creation de la partie:
 
 <center>
-    <img src="documentation/global/sequence_analyse_creation_partie.drawio">
+    <img src="documentation/global/out/sequence_analyse_creation_partie.png">
 </center>
 
 #### Deroulement de la partie:
 
 <center>
-    <img src="documentation/global/out/sequence_analyse_deroulement_partie.svg">
+    <img src="documentation/global/out/sequence_analyse_deroulement_partie.png">
 </center>
 
 #### Messages du chat:
 
 <center>
-    <img src="documentation/global/out/sequence_analyse_message_chat.svg">
+    <img src="documentation/global/out/sequence_analyse_message_chat.png">
 </center>
 
 ### Diagramme de classes d’analyse:
 
 <center>
-    <img src="documentation/server/out/diagramme_de_classes_analyse.svg">
+    <img src="documentation/server/out/diagramme_de_classes_analyse.png">
 </center>
 
 ### Diagramme d’états/transitions si nécessaire:
@@ -58,12 +63,18 @@
 
 ### L’architecture:
 
+<center>
+    <img src="documentation/global/out/mvc.png">
+</center>
+
+
+
 ### Conception détaillée:
 
 - #### Diagramme de classes logicielles:
 
 <center>
-    <img src="documentation/server/out/classe_models.svg">
+    <img src="documentation/server/out/classe_models.png">
 </center>
 
 - #### Diagrammes de séquence:
