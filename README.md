@@ -1,15 +1,16 @@
 # Présentation du projet
-<center>
+<p align="center">
     <img src="asset/imageReadme.png">
-</center>
+</p>
+
 
 <br><br>
 Le projet consiste à créer le jeu Loup-Garou sur mobile et web. Pour ce faire, nous avons créé toute une application avec l'architecture MVC que vous pouvez voir ci-dessous.
 
 
-<center>
+<p align="center">
     <img src="documentation/global/out/mvc.png">
-</center>
+</p>
 
 <br><br>
 Pour ce projet, nous avons utilisé plusieurs technologies :
