@@ -7,7 +7,7 @@
     "start": "ts-node server.ts",
     "build-test": "rm db.sqlite && ts-node server.ts",
     "test": "ts-node tests/main.test.ts",
-    "fix": "yarn install && rm db.sqlite"
+    "fix": "yarn install && rm -f db.sqlite"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
