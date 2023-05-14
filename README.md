@@ -33,10 +33,8 @@ Une fois cette commande faite, il faut installer certaines librairies globalemen
 
 
 ### Frontend
+$\textcolor{red}{\text{Attention, la partie frontend doit être lancée après partie backend.}}$ 
 
-<span style="color:red">
-Attention, la partie frontend doit être lancée après partie backend.
-</span>
 <br>
 
 Pour lancer l’application web il vous suffit d’aller dans le dossier *client/* et de faire la commande suivante dans un terminal :
