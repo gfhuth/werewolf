@@ -1,8 +1,14 @@
-# Rendu pour la partie ACOL
+---
+title: Projet CAWEB - Partie ACOL
+author: CARRÈRE Bruno, GIEULES Damien, THIKEN Samuel, FACCIN HUTH Guilherme, VOLAND Dorian
+---
+Projet CAWEB - Partie ACOL
 
-## (a) Analyse
+CARRÈRE Bruno, GIEULES Damien, THIKEN Samuel, HUTH Guilherme, VOLAND Dorian
 
-### Description des acteurs
+# (a) Analyse
+
+## Description des acteurs
 
 Dans le de notre projet, nous avons défini plusieurs acteurs grâce à la documentation que nous a été fourni.
 
@@ -16,7 +22,7 @@ Dans le de notre projet, nous avons défini plusieurs acteurs grâce à la docum
 - Player représente les personnes physiques qui joue au jeu.
 - Server quant à lui un acteur secondaire, il représente notre serveur et les actions qu'il effectue.
 
-### Diagramme de cas d'utilisations
+## Diagramme de cas d'utilisations
 
 Chaque acteur peut faire différentes actions comme vous pouvez le voir ci-dessous.
 
@@ -30,11 +36,11 @@ Chaque acteur peut faire différentes actions comme vous pouvez le voir ci-desso
 
 <br>
 
-#### Diagrammes de séquences système
+### Diagrammes de séquences système
 
 Nous avons choisi d'expliciter plusieurs cas d'utilisation à travers des diagrammes de séquence système
 
-##### Chat
+#### Chat
 
 Pré-conditions:
 
@@ -50,7 +56,7 @@ Post-conditions:
     <img src="documentation/global/client/../../global/out/sequence_analyse_message_chat.png">
 </p>
 
-##### Création d'une partie
+#### Création d'une partie
 
 Pré-conditions:
 
@@ -65,7 +71,7 @@ Post-conditions:
     <img src="documentation/global/client/../../global/out/sequence_analyse_creation_partie.png">
 </p>
 
-##### Déroulement d'une partie
+#### Déroulement d'une partie
 
 Pré-conditions:
 
@@ -83,7 +89,7 @@ Post-conditions:
 
 <br>
 
-### Diagramme de classes d’analyse
+## Diagramme de classes d’analyse
 
 Vous pouvez voir ci-dessous un diagramme de classe d'analyse pour la globalité de notre application.
 Ce diagramme ne contient que les informations liées au serveur, et no contient pas d'élément lié de près ou de loin à l'affichage sur l'application. Ce diagramme ne contient pas non plus les éléments permettant l'interaction entre le client et le serveur
@@ -92,7 +98,7 @@ Ce diagramme ne contient que les informations liées au serveur, et no contient 
     <img src="documentation/server/out/classe_analyse_global.png">
 </p>
 
-### Diagramme d'état transition
+## Diagramme d'état transition
 
 Nous avons jugé utile d'ajouter un diagramme d'état transition pour la partie client pour expliciter le déroulement d'une utilisation classique de l'application
 
@@ -100,9 +106,9 @@ Nous avons jugé utile d'ajouter un diagramme d'état transition pour la partie 
     <img src="documentation/client/out/etats_transitions.png">
 </p>
 
-## (b) Conception
+# (b) Conception
 
-### Architecture MVC
+## Architecture MVC
 
 Pour ce projet, l'architecture choisie a été le modèle MVC, dont voici le détail
 
@@ -116,9 +122,9 @@ Ce modèle a été appliqué selon les responsabilités de chaque partie (backen
     <img src="documentation/global/out/responsabilite.png">
 </p>
 
-### Conception détaillée
+## Conception détaillée
 
-#### Architecture du client
+### Architecture du client
 
 L'application est séparée en "activité" (pages). Voilà un diagramme expliquant la navigation entre les pages. La page "jeu" est quant à elle la plus complexe des pages, puisqu'elle doit afficher tous les éléments liés à la partie 
 
@@ -126,7 +132,7 @@ L'application est séparée en "activité" (pages). Voilà un diagramme expliqua
     <img src="documentation/client/out/navigation.png">
 </p>
 
-#### Diagramme de classes logicielles
+### Diagramme de classes logicielles
 
 Le diagramme de classe logicielles correspondant au serveur est le suivant. De la même manière que le diagramme de classe d'analyse, ce diagramme ne contient pas l'affichage et la communication, qui sont expliqués plus loin dans ce document
 
@@ -134,7 +140,7 @@ Le diagramme de classe logicielles correspondant au serveur est le suivant. De l
     <img src="documentation/server/out/classe_models.png">
 </p>
 
-#### Communication client-serveur
+### Communication client-serveur
 
 Pour communiquer entre le client et le serveur, nous avons utilisé 2 technologies : HTTP et Websocket. Voilà comment ces technologies sont réparties dans l'application :
 
@@ -146,7 +152,7 @@ Utiliser ces deux technologies nous permet de cumuler les avantages des deux :
 - en HTTP, nous pouvons faire des requêtes simples se basant sur le principe de question/réponse, ce qui est indispensable pour lister les parties, se connecter, etc
 - en websocket, la communication est à double sens : le serveur peut envoyer des informations sans que le client ne demande quoi que ce soit. Cela nous permet de changer un état sur l'affichage du client sans demander explicitement si un changement est a effectuer. En utilisant cette technologie, on évite le "polling", qui consiste a demander régulièrement les modifications récentes, et qui, à grande échelle, apporte un stress conséquent sur le serveur
 
-#### Fonctionnement détaillés de fonctionnalités
+### Fonctionnement détaillés de fonctionnalités
 
 Nous avons utilisé une implémentation basée sur des évènements (une variante du patron de conception observer) pour gérer les actions utilisateurs ainsi que les informations du serveur. Voici des diagrammes expliquant le fonctionnement :
 
@@ -172,7 +178,7 @@ Le fonctionnement est relativement simple :
 
 Ce système nous permet de mieux organiser le code en séparant les responsabilités des éléments, et nous permet de plus facilement étendre l'application
 
-#### Extensions
+### Extensions
 
 Nous avons conçu cette application en essayant d'appliquer au maximum les enseignements vus en cours et ailleurs, comme par exemple les patrons de conceptions, mais aussi des principes comme le principe SOLID
 
