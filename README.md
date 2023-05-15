@@ -97,6 +97,12 @@ Même si cette lacune dans les tests unitaires ne permet pas de tester certains 
 
 <br>
 
+# Déploiement
+
+Pour déployer le serveur (backend), nous avons choisi d'utiliser Microsoft Azure, notamment parce qu'il s'agit d'un outil reconnu et utilisé par de nombreux professionnels.
+Le lien de notre application déployée est le suivant : ICI_LIEN_AZURE
+Toutefois, la configuration du projet dans le dépôt reste en locale, pour simplifier les tests.
+
 # Documentation utilisateur
 
 ## Développement du backend
