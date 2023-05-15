@@ -43,7 +43,48 @@ Pré-conditions:
 Post-conditions:
 - Les messages sont recus par tout les players
 
-
+<br>
 <p align="center">
     <img src="documentation/global/client/../../global/out/sequence_analyse_message_chat.png">
+</p>
+
+
+
+- Création d'une partie
+
+Pré-conditions:
+- Le serveur doit etre lancé.
+- Les Users doivent etre connectés
+
+Post-conditions:
+- La partie est bien créé
+
+<p align="center">
+    <img src="documentation/global/client/../../global/out/sequence_analyse_creation_partie.png">
+</p>
+
+
+
+- Déroulement d'une partie
+
+Pré-conditions:
+- Le serveur doit etre lancé.
+- Les Players doivent etre connectés
+- La partie doit deja etre créé 
+
+Post-conditions:
+- La partie est terminé
+
+<p align="center">
+    <img src="documentation/global/client/../../global/out/sequence_analyse_deroulement_partie.png">
+</p>
+
+<br>
+
+### Diagramme de classes d’analyse
+
+Vous pouvez voir ci-dessous un diagramme de classe d'analyse pour la globalité de notre application.
+
+<p align="center">
+    <img src="documentation/global/client/../../server/out/classe_analyse_global.png">
 </p>
