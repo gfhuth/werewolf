@@ -86,5 +86,5 @@ Post-conditions:
 Vous pouvez voir ci-dessous un diagramme de classe d'analyse pour la globalité de notre application.
 
 <p align="center">
-    <img src="documentation/global/client/../../server/out/classe_analyse_global.png">
+    <img src="documentation/server/out/classe_analyse_global.png">
 </p>
