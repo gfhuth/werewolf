@@ -32,7 +32,7 @@ export default function CreateGame(): React.ReactElement {
     const toast = useToast();
 
     const [fieldsValue, setFieldsValue] = useState<FormFieldsValue>({
-        nbPlayerMin: 2,
+        nbPlayerMin: 5,
         nbPlayerMax: 20,
         dayLength: 60,
         nightLength: 60,
