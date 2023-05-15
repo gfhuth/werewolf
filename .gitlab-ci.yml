@@ -105,6 +105,7 @@ drawio:on-schedule:
     - git push https://cirunner:${HTTP_GIT_TOKEN}@gitlab.com/grenoble-inp-ensimag/4MMCAW6/G2/ProjetACOLWEB/ProjetACOLWEB_bruno_carrere_damien_gieules_dorian_voland_guilherme_faccin_huth_samuel_thiken.git 
     - else echo "No changes, ignoring commit"
     - fi;
+  when: always
 
 
 deploy-job:      # This job runs in the deploy stage.
