@@ -101,7 +101,7 @@ Même si cette lacune dans les tests unitaires ne permet pas de tester certains 
 
 ## Développement du backend
 
-Il est possible d'étendre le jeu du loup-garou et de rajouter des pouvoirs. On peut imaginer des pouvoirs tel que le *\color{black}{Voleur}* qui échange son pouvoir avec quelqu'un d'autres, ou la mise en place de *\color{black}{Cupidon}* qui rend deux personnes amoureuses.
+Il est possible d'étendre le jeu du loup-garou et de rajouter des pouvoirs. On peut imaginer des pouvoirs tel que le *<span style="color:black">Voleur</span>* qui échange son pouvoir avec quelqu'un d'autres, ou la mise en place de *<span style="color:black">Cupidon</span>* qui rend deux personnes amoureuses.
 
 Afin de faciliter le mise en place de ces extensions, le développement du jeu a fait en sorte qu'il suffit de rajouter un fichier dans le répertoire `models/powers/` qui implémente le pouvoir.
 
