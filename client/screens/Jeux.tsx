@@ -43,17 +43,6 @@ export default function Jeux(): React.ReactElement {
         <Background page="Game">
             <NavigationUI allowBack onBack={onBack} />
             <Overlay />
-            <View>
-                {gameContext.phase == GamePhase.DAY ? (
-                    <Text color={"white"} fontWeight={"900"} fontSize={"23"}>
-                        TMP : Jour
-                    </Text>
-                ) : (
-                    <Text color={"white"} fontWeight={"900"} fontSize={"23"}>
-                        TMP : Nuit
-                    </Text>
-                )}
-            </View>
 
             <PlayersList />
 
