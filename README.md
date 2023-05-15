@@ -111,6 +111,13 @@ Enfin, afin qu'un joueur puisse utiliser le pouvoir, il est nécessaire de crée
 Event.registerHandlers("USE_POWER_POWERNAME", usePower);
 ```
 
+Un dernier point pour ajouter un pouvoir est son initialisation au début de la partie. Pour cela, il suffit d'ajouter dans la classe de votre nouveau pouvoir la méthode `tryAssign` qui prend en paramètre une partie avec la liste des joueurs de cette partie et assigne le nouveau pouvoir en prenant en compte la probabilité d'apparition du pouvoir définit dans les paramètres de la partie et d'autres critères que vous pouvez définir dans cette méthode.  
+Enfin, il est nécessaire d'enregistrer le pouvoir dans la liste de tous les pouvoirs avec la ligne de commande suivante que l'on ajoute à la fin du fichier avec l'enregistrement de l'événement associé au pouvoir :
+
+```ts
+Power.registerPower(YourNewPower);
+```
+
 
 ---
 $\textcolor{red}{\text{ANCIEN README A SURPPRIMER}}$ 
