@@ -133,3 +133,7 @@ Enfin, il est nécessaire d'enregistrer le pouvoir dans la liste de tous les pou
 ```ts
 Power.registerPower(YourNewPower);
 ```
+
+## Développement du frontend
+
+De la même manière que pour le backend, le frontend permet un ajout de pouvoir simplifié. Le système n'est pas complètement modulaire, mais quelques légères modifications le permettrait. Pour ajouter un pouvoir, il faut ajouter un fichier dans client/components/game/powers, en implémentant 2 fonctions : Overlay() et PlayerActions(). Ces deux fonctions permettent respectivement d'ajouter un overlay dédié au pouvoir ainsi que d'ajouter dynamiquement des actions pour chaque joueur. Afin de rendre ces composants accessible, il est aujourd'hui nécessaire de les ajouter dans le fichier client/context/PowerContext, dans les fonctions getOverlay et getPlayerActions
