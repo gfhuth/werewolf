@@ -80,6 +80,13 @@ drawio:on-schedule:
     - mkdir -p documentation/client/out
     - mkdir -p documentation/server/out
     - mkdir -p documentation/global/out
+    # Suppression des rendus existants
+    - rm documentation/client/out/*.png
+    - rm documentation/client/out/*.svg
+    - rm documentation/server/out/*.png
+    - rm documentation/server/out/*.svg
+    - rm documentation/global/out/*.png
+    - rm documentation/global/out/*.svg
     # Génération des images (SVG) avec drawio
     - drawio --export -f svg --crop --output documentation/client/out documentation/client/
     - drawio --export -f svg --crop --output documentation/server/out documentation/server/
