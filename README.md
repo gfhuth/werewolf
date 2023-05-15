@@ -83,7 +83,13 @@ Puis, lancer les tests dans un nouveau terminal dans le dossier *server/* avec l
 ```
 yarn fix && yarn test
 ```
-La commande `yarn test` lance les tests unitaires du serveur
+  
+La commande `yarn test` lance les tests unitaires du serveur.  
+Les tests unitaires permettent de tester l'API de création d'un utilisateur avec toute la gestion de l'authentification et leur cas d'erreurs. Ils permettent également de tester la création d'une partie, le fait qu'un utilisateur puisse rejoindre une partie et vérifient bien les messages d'erreur en cas d'échec.  
+Ensuite, les tests unitaires permettent aussi de tester l'interaction de l'utilisateur avec le serveur à travers les websockets en prenant en compte l'authentification sur les websockets (et leur cas d'erreur) et la logique du jeu.  
+Pour tester la logique du jeu, les tests unitaires permettent de faire dérouler une partie complète sur une nuit et un jour avec les rôles et pouvoirs distribués de manières aléatoires afin de tester le maximum de cas possibles en terme de configuration du jeu.  
+Néanmoins, tous les événements passant dans les websockets n'ont pas pu être vérifiés par les tests unitaires car les tests partent du principe qu'ils connaissent l'ordre d'arrivée des événements. Ainsi, lors de l'attente d'un événement, certains peuvent être oubliés et donc pas vérifiés.  
+Même si cette lacune dans les tests unitaires ne permet pas de tester certains événements, sans l'assurance de l'existence de ces événements, le frontend ne peut pas fonctionner. C'est pourquoi le fonctionnement du frontend permet aussi d'assurer une certaine couverture de test du backend.
 
 
 <br>
