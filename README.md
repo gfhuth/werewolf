@@ -25,7 +25,7 @@ Pour ce projet, nous avons utilisé plusieurs technologies :
 
 # Documentation pour l'installation et les tests
 
-**Cette documentation tient compte que vous avez déjà téléchargé le projet.**
+**Cette documentation tient compte que vous avez déjà téléchargé le projet et installé nodejs et npm**
 
 ## Installation
 
