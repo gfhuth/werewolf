@@ -4,10 +4,7 @@ import { Player } from "./playerModel";
 import { Chat, ChatType } from "./chatModel";
 import { Vote, VoteType } from "./voteModel";
 import Logger from "../util/Logger";
-import ContaminationPower from "./powers/ContaminationPower";
 import InsomniaPower from "./powers/InsomniaPower";
-import SpiritismPower from "./powers/SpiritismPower";
-import ClairvoyancePower from "./powers/ClairvoyancePower";
 import { toBoolean } from "../util/sql/schema";
 import { User } from "./userModel";
 import { unique } from "../util/Utils";
@@ -127,9 +124,6 @@ export class Game {
     }
 
     private setupPower(): void {
-        // const werewolves: Array<Player> = this.getWerewolves();
-        // const humans: Array<Player> = this.getAllPlayers().filter((player) => !player.isWerewolf());
-
         const powers = Power.getPowers();
         let players = this.getAllPlayers();
         for (const power of powers) {
@@ -138,31 +132,6 @@ export class Game {
             if (assignedPlayer) 
                 players = players.filter((player) => player !== assignedPlayer);
         }
-
-        // // Set contamination (werewolf power)
-        // if (Math.random() <= this.gameParam.probaContamination) {
-        //     const contamination: Player = werewolves[Math.floor(Math.random() * werewolves.length)];
-        //     contamination.setPower(new ContaminationPower());
-        // }
-        // // Set insomnia (human power)
-        // if (humans.length > 0 && Math.random() <= this.gameParam.probaInsomnie) {
-        //     const insomnie: Player = humans[Math.floor(Math.random() * humans.length)];
-        //     insomnie.setPower(new InsomniaPower());
-        // }
-
-        // // Set spiritsm
-        // let playersWithoutPower: Array<Player> = this.getAllPlayers().filter((player) => !player.getPower());
-        // if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaSpiritisme) {
-        //     const spiritisme: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
-        //     spiritisme.setPower(new SpiritismPower());
-        // }
-
-        // // Set clairvoyance
-        // playersWithoutPower = playersWithoutPower.filter((player) => !player.getPower());
-        // if (playersWithoutPower.length > 0 && Math.random() <= this.gameParam.probaVoyance) {
-        //     const voyance: Player = playersWithoutPower[Math.floor(Math.random() * playersWithoutPower.length)];
-        //     voyance.setPower(new ClairvoyancePower());
-        // }
     }
 
     private verifyEndGame(): boolean {

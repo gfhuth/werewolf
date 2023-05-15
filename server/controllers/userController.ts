@@ -72,7 +72,7 @@ export const whoAmI = async (req: AuthenticatedRequest, res: Response): Promise<
 
 export const register = async (req: Request<any, any, { username: string; password: string }>, res: Response): Promise<void> => {
     const { username, password } = req.body;
-    // TODO: il y a peut-être des conditions à vérifier sur username et password
+
     if (!username) {
         res.status(400).send("Missing username");
         return;
